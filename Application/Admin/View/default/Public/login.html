@@ -1,0 +1,60 @@
+<extend name="Base/common" />
+<block name="body">
+  <form class="form-signin" action="__SELF__" method="post" role="form">
+      <h2 class="form-signin-heading">Please sign in</h2>
+      <input type="text" name="username" class="form-control first-text" placeholder="Email address" ajaxurl="/member/checkUserNameUnique.html" errormsg="Username are 1-16 characters." nullmsg="Username is required." datatype="*1-16" value="" required autofocus>
+      <input type="password" name="password" class="form-control middle-text" placeholder="Password" errormsg="Password are 6-20 characters." nullmsg="Password is required." datatype="*6-20" required>
+      <input type="text" class="form-control last-text" placeholder="Verification code" errormsg="please input verification code." nullmsg="please input verification code." datatype="*5-5" name="verify">
+      <img class="verifyimg reloadverify" alt="Click to switch" title="Click to switch" src="{:U('verify')}" style="cursor:pointer;">
+      <div class="Validform_checktip text-warning"></div>
+      <div class="checkbox">
+          <label>
+            <input type="checkbox"  value="remember-me"> Remember me
+          </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  </form>
+</block>
+
+<block name="side"> </block>
+<block name="script">
+	<script type="text/javascript">
+
+    	$(document)
+	    	.ajaxStart(function(){
+	    		$("button:submit").addClass("log-in").attr("disabled", true);
+	    	})
+	    	.ajaxStop(function(){
+	    		$("button:submit").removeClass("log-in").attr("disabled", false);
+	    	});
+
+
+    	$("form").submit(function(){
+    		var self = $(this);
+    		$.post(self.attr("action"), self.serialize(), success, "json");
+    		return false;
+
+    		function success(data){
+    			if(data.status){
+    				window.location.href = data.url;
+    			} else {
+    				self.find(".Validform_checktip").text(data.info);
+    				//刷新验证码
+    				$(".reloadverify").click();
+    			}
+    		}
+    	});
+
+		$(function(){
+			  var verifyimg = $(".verifyimg").attr("src");
+        $(".reloadverify").click(function(){
+            if( verifyimg.indexOf('?')>0){
+                $(".verifyimg").attr("src", verifyimg+'&random='+Math.random());
+            }else{
+                $(".verifyimg").attr("src", verifyimg.replace(/\?.*$/,'')+'?'+Math.random());
+            }
+        });
+        $(".common-footer").addClass("static-footer");
+		});
+	</script>
+</block>

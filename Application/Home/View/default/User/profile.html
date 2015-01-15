@@ -1,0 +1,42 @@
+<extend name="Base/common" />
+<block name="body">
+<form class="form-signin" action="__SELF__" method="post" role="form">
+    <h2 class="form-signin-heading">Change password</h2>
+    <input type="password" name="oldpassword" class="form-control first-text" placeholder="Old password" errormsg="Password are 6-20 characters." nullmsg="Old Password is required." datatype="*6-20" required autofocus>
+    <input type="password" name="password" class="form-control middle-text" placeholder="New password" errormsg="Password are 6-20 characters." nullmsg="Password is required." datatype="*6-20" required>
+    <input type="password" name="repassword" class="form-control last-text" placeholder="Conifrm new password" recheck="password" errormsg="Password is mismatch." nullmsg="Password is required." datatype="*" required>
+    <div class="Validform_checktip text-warning"></div>
+    <button class="btn btn-lg btn-primary btn-block" style="margin-top:10px" type="submit">Submit</button>
+</form>
+</block>
+
+<block name="side"></block>
+<block name="script">
+	<script type="text/javascript">
+
+    	$(document)
+	    	.ajaxStart(function(){
+	    		$("button:submit").addClass("log-in").attr("disabled", true);
+	    	})
+	    	.ajaxStop(function(){
+	    		$("button:submit").removeClass("log-in").attr("disabled", false);
+	    	});
+
+    	$("form").submit(function(){
+    		var self = $(this);
+    		$.post(self.attr("action"), self.serialize(), success, "json");
+    		return false;
+
+    		function success(data){
+    			if(data.status){
+                    window.location.href = data.url;
+                } else {
+                    self.find(".Validform_checktip").text(data.info);
+    			}
+    		}
+    	});
+      $(function(){
+        $(".common-footer").addClass("static-footer");
+      });
+	</script>
+</block>
