@@ -29,11 +29,11 @@ class PublicController extends Controller {
             }
             /* 调用登录接口登录 */
             $User = new UserApi;
-            $uid = $User->login($username, $password);
-            if(0 < $uid){ //UC登录成功
+            $uid = $User->login($username, $password); //检验用户名和密码是否一致，返回用户的UID
+            if(0 < $uid){ //登录成功
                 /* 登录用户 */
                 $Member = D('Member');
-                if($Member->login($uid)){ //登录用户
+                if($Member->login($uid)){ //登录用户，将auth加入session
                     //跳转到登录前页面
                     $this->success('Success to login!', U('Index/index'));
                 } else {

@@ -28,14 +28,19 @@ class AdminController extends Controller {
 
         // 是否是超级管理员
         define('IS_ROOT',   is_administrator());
+        if(!IS_ROOT){
+            $this->error('403:禁止访问', U('Public/logout'));
+        }
+
         if(!IS_ROOT && C('ADMIN_ALLOW_IP')){
             // 检查IP地址访问
             if(!in_array(get_client_ip(),explode(',',C('ADMIN_ALLOW_IP')))){
-                $this->error('403:禁止访问');
+                $this->error('403:禁止访问', U('Public/logout'));
             }
         }
+
         // 检测访问权限
-        $access =   $this->accessControl();
+        /*$access =   $this->accessControl();
         if ( $access === false ) {
             $this->error('403:禁止访问');
         }elseif( $access === null ){
@@ -49,7 +54,7 @@ class AdminController extends Controller {
             }elseif( $dynamic === false ){
                 $this->error('未授权访问!');
             }
-        }
+        }*/
     }
 
     /* 空操作，用于输出404页面 */

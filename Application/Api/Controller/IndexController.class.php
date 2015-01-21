@@ -16,10 +16,6 @@ class IndexController extends ApiController {
      * @author zhangqiqian <43874051@qq.com>
      */
     public function index(){
-        if(UID){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Welcome to index.'));
-        } else {
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Please sign in.'));
-        }
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Welcome to Api'));
     }
 }
