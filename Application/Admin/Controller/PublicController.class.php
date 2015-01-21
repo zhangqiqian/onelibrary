@@ -23,7 +23,7 @@ class PublicController extends Controller {
      */
     public function login($username = null, $password = null, $verify = null){
         if(IS_POST){
-            /* 检测验证码 TODO: */
+            /* 检测验证码 */
             if(!check_verify($verify)){
                 $this->error('验证码输入错误！');
             }
@@ -34,12 +34,11 @@ class PublicController extends Controller {
                 /* 登录用户 */
                 $Member = D('Member');
                 if($Member->login($uid)){ //登录用户
-                    //TODO:跳转到登录前页面
+                    //跳转到登录前页面
                     $this->success('Success to login!', U('Index/index'));
                 } else {
                     $this->error($Member->getError());
                 }
-
             } else { //登录失败
                 switch($uid) {
                     case -1: $error = '用户不存在或被禁用！'; break; //系统级别禁用
@@ -49,11 +48,7 @@ class PublicController extends Controller {
                 $this->error($error);
             }
         } else {
-            if(is_login()){
-                $this->redirect('Index/index');
-            }else{
-                $this->display();
-            }
+            $this->display();
         }
     }
 

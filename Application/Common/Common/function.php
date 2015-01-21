@@ -66,10 +66,10 @@ function arr2str($arr, $glue = ','){
  * @static
  * @access public
  * @param string $str 需要转换的字符串
- * @param string $start 开始位置
+ * @param int $start 开始位置
  * @param string $length 截取长度
  * @param string $charset 编码格式
- * @param string $suffix 截断显示字符
+ * @param boolean $suffix 截断显示字符
  * @return string
  */
 function msubstr($str, $start=0, $length, $charset="utf-8", $suffix=true) {
@@ -185,7 +185,7 @@ function data_auth_sign($data) {
 * @access public
 * @param array $list 查询结果
 * @param string $field 排序的字段名
-* @param array $sortby 排序类型
+* @param string $sortby 排序类型
 * asc正向排序 desc逆向排序 nat自然排序
 * @return array
 */
@@ -210,64 +210,6 @@ function list_sort_by($list, $field, $sortby='asc') {
        return $resultSet;
    }
    return false;
-}
-
-/**
- * 把返回的数据集转换成Tree
- * @param array $list 要转换的数据集
- * @param string $pid parent标记字段
- * @param string $level level标记字段
- * @return array
- * @author zhangqiqian <43874051@qq.com>
- */
-function list_to_tree($list, $pk='id', $pid = 'pid', $child = '_child', $root = 0) {
-    // 创建Tree
-    $tree = array();
-    if(is_array($list)) {
-        // 创建基于主键的数组引用
-        $refer = array();
-        foreach ($list as $key => $data) {
-            $refer[$data[$pk]] =& $list[$key];
-        }
-        foreach ($list as $key => $data) {
-            // 判断是否存在parent
-            $parentId =  $data[$pid];
-            if ($root == $parentId) {
-                $tree[] =& $list[$key];
-            }else{
-                if (isset($refer[$parentId])) {
-                    $parent =& $refer[$parentId];
-                    $parent[$child][] =& $list[$key];
-                }
-            }
-        }
-    }
-    return $tree;
-}
-
-/**
- * 将list_to_tree的树还原成列表
- * @param  array $tree  原来的树
- * @param  string $child 孩子节点的键
- * @param  string $order 排序显示的键，一般是主键 升序排列
- * @param  array  $list  过渡用的中间数组，
- * @return array        返回排过序的列表数组
- * @author zhangqiqian <43874051@qq.com>
- */
-function tree_to_list($tree, $child = '_child', $order='id', &$list = array()){
-    if(is_array($tree)) {
-        $refer = array();
-        foreach ($tree as $key => $value) {
-            $reffer = $value;
-            if(isset($reffer[$child])){
-                unset($reffer[$child]);
-                tree_to_list($value[$child], $child, $order, $list);
-            }
-            $list[] = $reffer;
-        }
-        $list = list_sort_by($list, $order, $sortby='asc');
-    }
-    return $list;
 }
 
 /**
@@ -305,10 +247,11 @@ function get_redirect_url(){
 /**
  * 时间戳格式化
  * @param int $time
+ * @param string $format
  * @return string 完整的时间显示
  * @author zhangqiqian <43874051@qq.com>
  */
-function time_format($time = NULL,$format='Y-m-d H:i'){
+function time_format($time = NULL, $format = 'Y-m-d H:i:s'){
     $time = $time === NULL ? NOW_TIME : intval($time);
     return date($format, $time);
 }
@@ -408,8 +351,9 @@ function create_dir_or_files($files){
  * api('Admin/User/getName','id=5');  调用Admin模块的User接口
  * @param  string  $name 格式 [模块名]/接口名/方法名
  * @param  array|string  $vars 参数
+ * @return function
  */
-function api($name,$vars=array()){
+function api($name, $vars = array()){
     $array     = explode('/',$name);
     $method    = array_pop($array);
     $classname = array_pop($array);
@@ -420,74 +364,3 @@ function api($name,$vars=array()){
     }
     return call_user_func_array($callback,$vars);
 }
-
-/**
- * 记录行为日志，并执行该行为的规则
- * @param string $action 行为标识
- * @param string $model 触发行为的模型名
- * @param int $record_id 触发行为的记录id
- * @param int $user_id 执行行为的用户id
- * @return boolean
- * @author huajie <banhuajie@163.com>
- */
-function action_log($action = null, $model = null, $record_id = null, $user_id = null){
-
-    //参数检查
-    if(empty($action) || empty($model) || empty($record_id)){
-        return '参数不能为空';
-    }
-    if(empty($user_id)){
-        $user_id = is_login();
-    }
-
-    //查询行为,判断是否执行
-    $action_info = M('Action')->getByName($action);
-    if($action_info['status'] != 1){
-        return '该行为被禁用或删除';
-    }
-
-    //插入行为日志
-    $data['action_id']      =   $action_info['id'];
-    $data['user_id']        =   $user_id;
-    $data['action_ip']      =   ip2long(get_client_ip());
-    $data['model']          =   $model;
-    $data['record_id']      =   $record_id;
-    $data['create_time']    =   NOW_TIME;
-
-    //解析日志规则,生成日志备注
-    if(!empty($action_info['log'])){
-        if(preg_match_all('/\[(\S+?)\]/', $action_info['log'], $match)){
-            $log['user']    =   $user_id;
-            $log['record']  =   $record_id;
-            $log['model']   =   $model;
-            $log['time']    =   NOW_TIME;
-            $log['data']    =   array('user'=>$user_id,'model'=>$model,'record'=>$record_id,'time'=>NOW_TIME);
-            foreach ($match[1] as $value){
-                $param = explode('|', $value);
-                if(isset($param[1])){
-                    $replace[] = call_user_func($param[1],$log[$param[0]]);
-                }else{
-                    $replace[] = $log[$param[0]];
-                }
-            }
-            $data['remark'] =   str_replace($match[0], $replace, $action_info['log']);
-        }else{
-            $data['remark'] =   $action_info['log'];
-        }
-    }else{
-        //未定义日志规则，记录操作url
-        $data['remark']     =   '操作url：'.$_SERVER['REQUEST_URI'];
-    }
-
-    M('ActionLog')->add($data);
-
-    if(!empty($action_info['rule'])){
-        //解析行为
-        $rules = parse_action($action, $user_id);
-
-        //执行行为
-        $res = execute_action($rules, $action_info['id'], $user_id);
-    }
-}
-
-

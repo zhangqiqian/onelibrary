@@ -59,10 +59,6 @@ class MemberModel extends MongoModel{
 
         /* 登录用户 */
         $this->autoLogin($user);
-
-        //记录行为
-        //action_log('user_login', 'member', $uid, $uid);
-
         return true;
     }
 
@@ -98,7 +94,6 @@ class MemberModel extends MongoModel{
 
         session('user_auth', $auth);
         session('user_auth_sign', data_auth_sign($auth));
-
     }
 
 }
