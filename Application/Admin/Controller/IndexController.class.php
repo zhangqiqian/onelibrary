@@ -16,10 +16,6 @@ class IndexController extends AdminController {
      * @author zhangqiqian <43874051@qq.com>
      */
     public function index(){
-        if(UID){
-            $this->display();
-        } else {
-            $this->redirect('Public/login');
-        }
+        $this->display();
     }
 }

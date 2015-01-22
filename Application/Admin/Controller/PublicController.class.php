@@ -35,7 +35,7 @@ class PublicController extends Controller {
                 $Member = D('Member');
                 if($Member->login($uid)){ //登录用户，将auth加入session
                     //跳转到登录前页面
-                    $this->success('Success to login!', U('Index/index'));
+                    $this->success('Success to login!', U('Dashboard/index'));
                 } else {
                     $this->error($Member->getError());
                 }

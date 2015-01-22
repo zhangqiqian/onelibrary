@@ -115,7 +115,7 @@ class UserController extends AdminController {
             $Api = new UserApi();
             $res = $Api->updateInfo($uid, $oldpassword, $data);
             if($res['status']){
-                $this->success('修改密码成功！', U('Index/index'));
+                $this->success('修改密码成功！', U('Dashboard/index'));
             }else{
                 $this->error($res['info']);
             }

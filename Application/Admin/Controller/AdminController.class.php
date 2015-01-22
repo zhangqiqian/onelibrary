@@ -59,7 +59,7 @@ class AdminController extends Controller {
 
     /* 空操作，用于输出404页面 */
     public function _empty(){
-        $this->redirect('Index/index');
+        $this->redirect('Dashboard/index');
     }
 
     /* 用户登录检测 */
