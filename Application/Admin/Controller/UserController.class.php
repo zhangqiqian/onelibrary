@@ -95,11 +95,11 @@ class UserController extends AdminController {
      * 修改密码提交
      * @author zhangqiqian <43874051@qq.com>
      */
-    public function submitPassword($oldpassword, $password, $repassword){
-        if ( !is_login() ) {
+    public function submitPassword($oldpassword = '', $password = '', $repassword = ''){
+        if(!is_login()) {
             $this->error( '您还没有登陆',U('User/login') );
         }
-        if ( IS_POST ) {
+        if(IS_POST) {
             //获取参数
             $uid = is_login();
             $data['password'] = $password;
@@ -119,8 +119,6 @@ class UserController extends AdminController {
             }else{
                 $this->error($res['info']);
             }
-        }else{
-            $this->display();
         }
     }
 

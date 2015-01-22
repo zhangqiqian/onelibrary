@@ -11,40 +11,43 @@ namespace Api\Controller;
 use User\Api\UserApi;
 
 /**
- * 后台用户控制器
+ * API用户控制器
  * @author zhangqiqian <43874051@qq.com>
  */
 class UserController extends ApiController {
 
     /**
-     * 用户管理首页
-     * @author zhangqiqian <43874051@qq.com>
+     * @param string $username
+     * @param string $password
+     * @param string $repassword
+     * @param string $email
+     * @param string $verify
      */
-    public function index(){
-        $nickname       =   I('nickname');
-        $map['status']  =   array('egt',0);
-        if(is_numeric($nickname)){
-            $map['uid|nickname']=   array(intval($nickname),array('like','%'.$nickname.'%'),'_multi'=>true);
-        }else{
-            $map['nickname']    =   array('like', '%'.(string)$nickname.'%');
+    public function register($username = '', $password = '', $repassword = '', $email = '', $verify = ''){
+        if(!C('USER_ALLOW_REGISTER')){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => '注册已关闭'));
         }
+        if(IS_POST){ //注册用户
+            /* 检测验证码 */
+            /*if(!check_verify($verify)){
+                $this->ajaxReturn(array('errno' => 1, 'errmsg' => '验证码输入错误'));
+            }*/
 
-        $list   = $this->lists('Member', $map);
-        int_to_string($list);
-        $this->assign('_list', $list);
-        $this->meta_title = '用户信息';
-        $this->display();
-    }
+            /* 检测密码 */
+            if($password != $repassword){
+                $this->ajaxReturn(array('errno' => 1, 'errmsg' => '密码和重复密码不一致'));
+            }
 
-    /**
-     * 修改昵称初始化
-     * @author zhangqiqian <43874051@qq.com>
-     */
-    public function updateNickname(){
-        $nickname = M('Member')->getFieldByUid(UID, 'nickname');
-        $this->assign('nickname', $nickname);
-        $this->meta_title = '修改昵称';
-        $this->display();
+            /* 调用注册接口注册用户 */
+            $User = new UserApi;
+            $uid = $User->register($username, $password, $email);
+            if(0 < $uid){ //注册成功
+                //TODO: 发送验证邮件
+                $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Success to sign up'));
+            } else { //注册失败，显示错误信息
+                $this->ajaxReturn(array('errno' => 1, 'errmsg' => $this->showRegError($uid)));
+            }
+        }
     }
 
     /**
@@ -55,18 +58,18 @@ class UserController extends ApiController {
         //获取参数
         $nickname = I('post.nickname');
         $password = I('post.password');
-        empty($nickname) && $this->error('请输入昵称');
-        empty($password) && $this->error('请输入密码');
+        empty($nickname) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请输入昵称'));
+        empty($password) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请输入密码'));
 
         //密码验证
         $User   =   new UserApi();
         $uid    =   $User->login(UID, $password, 4);
-        ($uid == -2) && $this->error('密码不正确');
+        ($uid == -2) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '密码不正确'));
 
         $Member =   D('Member');
         $data   =   $Member->create(array('nickname'=>$nickname));
         if(!$data){
-            $this->error($Member->getError());
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => $Member->getError()));
         }
 
         $res = $Member->where(array('uid'=>$uid))->save($data);
@@ -76,44 +79,40 @@ class UserController extends ApiController {
             $user['username']   =   $data['nickname'];
             session('user_auth', $user);
             session('user_auth_sign', data_auth_sign($user));
-            $this->success('修改昵称成功！');
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => '修改昵称成功！'));
         }else{
-            $this->error('修改昵称失败！');
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => '修改昵称失败！'));
         }
-    }
-
-    /**
-     * 修改密码初始化
-     * @author zhangqiqian <43874051@qq.com>
-     */
-    public function updatePassword(){
-        $this->meta_title = '修改密码';
-        $this->display();
     }
 
     /**
      * 修改密码提交
      * @author zhangqiqian <43874051@qq.com>
      */
-    public function submitPassword(){
-        //获取参数
-        $password   =   I('post.old');
-        empty($password) && $this->error('请输入原密码');
-        $data['password'] = I('post.password');
-        empty($data['password']) && $this->error('请输入新密码');
-        $repassword = I('post.repassword');
-        empty($repassword) && $this->error('请输入确认密码');
-
-        if($data['password'] !== $repassword){
-            $this->error('您输入的新密码与确认密码不一致');
+    public function submitPassword($oldpassword = '', $password = '', $repassword = ''){
+        if(!is_login()){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => '您还没有登录'));
         }
+        if(IS_POST){
+            //获取参数
+            $uid = is_login();
+            $data['password'] = $password;
 
-        $Api    =   new UserApi();
-        $res    =   $Api->updateInfo(UID, $password, $data);
-        if($res['status']){
-            $this->success('修改密码成功！');
-        }else{
-            $this->error($res['info']);
+            empty($oldpassword) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请输入原密码'));
+            empty($data['password']) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请输入新密码'));
+            empty($repassword) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请输入确认密码'));
+
+            if($data['password'] !== $repassword){
+                $this->ajaxReturn(array('errno' => 1, 'errmsg' => '您输入的新密码与确认密码不一致'));
+            }
+
+            $Api = new UserApi();
+            $res = $Api->updateInfo($uid, $oldpassword, $data);
+            if($res['status']){
+                $this->ajaxReturn(array('errno' => 0, 'errmsg' => '修改密码成功'));
+            }else{
+                $this->ajaxReturn(array('errno' => 1, 'errmsg' => $res['info']));
+            }
         }
     }
 
