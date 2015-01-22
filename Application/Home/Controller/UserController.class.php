@@ -67,7 +67,7 @@ class UserController extends HomeController {
 				$Member = D('Member');
 				if($Member->login($uid)){ //登录用户
 					//TODO:跳转到登录前页面
-					$this->success('Success to login!',U('Home/Index/index'));
+					$this->success('Success to login!',U('Index/index'));
 				} else {
 					$this->error($Member->getError());
 				}
@@ -136,8 +136,8 @@ class UserController extends HomeController {
 		}
         if ( IS_POST ) {
             //获取参数
-            $uid        =   is_login();
-            $password   =   I('post.oldpassword');
+            $uid        = is_login();
+            $password   = I('post.oldpassword');
             $repassword = I('post.repassword');
             $data['password'] = I('post.password');
             empty($password) && $this->error('请输入原密码');
@@ -151,9 +151,9 @@ class UserController extends HomeController {
             $Api = new UserApi();
             $res = $Api->updateInfo($uid, $password, $data);
             if($res['status']){
-                $this->success('修改密码成功！');
+                $this->success('修改密码成功！', U('Index/index'));
             }else{
-                $this->error($this->showRegError($res['info']));
+                $this->error($res['info']);
             }
         }else{
             $this->display();
