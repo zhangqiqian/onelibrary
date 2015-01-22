@@ -83,7 +83,7 @@ class UserController extends AdminController {
     }
 
     /**
-     * 修改密码初始化
+     * 修改密码
      * @author zhangqiqian <43874051@qq.com>
      */
     public function updatePassword(){
@@ -95,25 +95,32 @@ class UserController extends AdminController {
      * 修改密码提交
      * @author zhangqiqian <43874051@qq.com>
      */
-    public function submitPassword(){
-        //获取参数
-        $password   =   I('post.old');
-        empty($password) && $this->error('请输入原密码');
-        $data['password'] = I('post.password');
-        empty($data['password']) && $this->error('请输入新密码');
-        $repassword = I('post.repassword');
-        empty($repassword) && $this->error('请输入确认密码');
-
-        if($data['password'] !== $repassword){
-            $this->error('您输入的新密码与确认密码不一致');
+    public function submitPassword($oldpassword, $password, $repassword){
+        if ( !is_login() ) {
+            $this->error( '您还没有登陆',U('User/login') );
         }
+        if ( IS_POST ) {
+            //获取参数
+            $uid = is_login();
+            $data['password'] = $password;
 
-        $Api    =   new UserApi();
-        $res    =   $Api->updateInfo(UID, $password, $data);
-        if($res['status']){
-            $this->success('修改密码成功！');
+            empty($oldpassword) && $this->error('请输入原密码');
+            empty($data['password']) && $this->error('请输入新密码');
+            empty($repassword) && $this->error('请输入确认密码');
+
+            if($data['password'] !== $repassword){
+                $this->error('您输入的新密码与确认密码不一致');
+            }
+
+            $Api = new UserApi();
+            $res = $Api->updateInfo($uid, $oldpassword, $data);
+            if($res['status']){
+                $this->success('修改密码成功！', U('Index/index'));
+            }else{
+                $this->error($res['info']);
+            }
         }else{
-            $this->error($res['info']);
+            $this->display();
         }
     }
 
@@ -165,5 +172,4 @@ class UserController extends AdminController {
         }
         return $error;
     }
-
 }
