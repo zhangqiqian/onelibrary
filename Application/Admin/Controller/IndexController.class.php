@@ -16,6 +16,6 @@ class IndexController extends AdminController {
      * @author zhangqiqian <43874051@qq.com>
      */
     public function index(){
-        $this->display();
+        $this->redirect(U('Dashboard/index'));
     }
 }

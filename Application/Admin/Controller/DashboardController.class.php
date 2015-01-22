@@ -12,10 +12,20 @@ use Think\Controller;
 
 class DashboardController extends AdminController {
     /**
-     * 后台首页-Dashboard
+     * 后台-Dashboard
      * @author zhangqiqian <43874051@qq.com>
      */
     public function index(){
         $this->display();
     }
+
+    public function message(){
+        $this->display();
+    }
+
+    public function location(){
+        $this->display();
+    }
+
+
 }
