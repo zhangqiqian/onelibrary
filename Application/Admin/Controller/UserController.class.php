@@ -122,6 +122,11 @@ class UserController extends AdminController {
         }
     }
 
+    public function userlist(){
+
+        $this->display();
+    }
+
     public function add($username = '', $password = '', $repassword = '', $email = ''){
         if(IS_POST){
             /* 检测密码 */
