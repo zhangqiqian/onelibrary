@@ -13,7 +13,7 @@ use Think\Controller;
 /**
  * 前台首页控制器
  */
-class IndexController extends Controller {
+class IndexController extends HomeController {
     public function index(){
         $this->display();
     }

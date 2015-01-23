@@ -130,7 +130,7 @@ class UserController extends HomeController {
      * 修改密码提交
      * @author zhangqiqian <43874051@qq.com>
      */
-    public function profile(){
+    public function changePassword(){
 		if ( !is_login() ) {
 			$this->error( '您还没有登陆',U('User/login') );
 		}
