@@ -32,10 +32,10 @@
                             </ul>
                         </li>
                 <else/>
-                        <li>
+                        <li <eq name="Think.ACTION_NAME" value="login" >class="active"</eq>>
                             <a href="{:U('User/login')}">Sign in</a>
                         </li>
-                        <li>
+                        <li <eq name="Think.ACTION_NAME" value="register" >class="active"</eq>>
                             <a href="{:U('User/register')}">Sign up</a>
                         </li>
                 </if>
