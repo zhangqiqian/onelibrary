@@ -23,6 +23,9 @@ define('APP_PATH','../Application/');
 // 定义Runtime目录
 define('RUNTIME_PATH', '../Runtime/');
 
+// 定义下载目录
+define('DOWNLOAD_PATH', '../Download/');
+
 // 引入ThinkPHP入口文件
 require '../ThinkPHP/ThinkPHP.php';
 
