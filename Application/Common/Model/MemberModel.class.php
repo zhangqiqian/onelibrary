@@ -96,4 +96,39 @@ class MemberModel extends MongoModel{
         session('user_auth_sign', data_auth_sign($auth));
     }
 
+    /**
+     * 获取所有用户
+     * @return array
+     */
+    public function get_member_list(){
+        $members = $this->select();
+        if(!$members){
+            $members = array();
+        }
+        return $members;
+    }
+
+    /**
+     * 获取用户信息
+     * @param $uid
+     * @return array
+     */
+    public function get_member($uid){
+        $member = $this->where(array('uid' => $uid))->find();
+        if(empty($member)){
+            $member = array();
+        }
+        return $member;
+    }
+
+    /**
+     * 更新用户
+     * @param $uid
+     * @param $userinfo
+     * @return array
+     */
+    public function update_member($uid, $userinfo){
+        $ret = $this->where(array('uid' => $uid))->save($userinfo);
+        return $ret;
+    }
 }
