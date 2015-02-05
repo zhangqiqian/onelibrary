@@ -23,7 +23,15 @@ class SettingsController extends AdminController {
         $this->display();
     }
 
-    public function update_user(){
+    public function user_add(){
+        $this->display();
+    }
+
+    public function user_add_submit(){
+        $this->success('Success.', U('Settings/user'));
+    }
+
+    public function user_edit(){
         $uid = I('uid', 0, 'intval');
         if(empty($uid)){
             $this->ajaxReturn(array('errno' => 400401, 'errmsg' => 'Uid is required.'));
@@ -41,14 +49,18 @@ class SettingsController extends AdminController {
             unset($member['status']);
             unset($member['login_count']);
         }
-        $this->ajaxReturn($member);
+        $this->assign('member', $member);
+        $this->display();
     }
 
-    public function update_user_do(){
-        $member = new MemberModel;
-        $members = $member->get_member_list();
-        $this->assign('members', $members);
-        $this->display();
+    public function user_edit_submit(){
+        $uid = I('uid', 0, 'intval');
+        if(empty($uid)){
+            $this->error('Uid is required.');
+        }
+        $mMember = new MemberModel;
+        $member = $mMember;
+        $this->success('Success.', U('Settings/user'));
     }
 
     public function message(){

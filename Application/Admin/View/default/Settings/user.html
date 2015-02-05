@@ -20,7 +20,10 @@
             <li><a href="#">Settings</a></li>
             <li class="active">User</li>
           </ol>
-          <h1 class="page-header">User List</h1>
+          <div>
+            <a href="{:U('Settings/user_add')}" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myModal">Add User</a>
+            <h1 class="page-header">User List</h1>
+          </div>
           <div id="main" class="table-responsive">
             <table class="table table-striped table-hover">
               <thead>
@@ -51,7 +54,7 @@
                   <td>{$member.last_login_time|date="Y-m-d H:i:s",###}</td>
                   <td>{$member.login_count}</td>
                   <td><eq name="member.status" value="1">Active<else/>Disable</eq></td>
-                  <td><a href="" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
+                  <td><a href="{:U('Settings/user_edit')}" title="Edit" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
                 </tr>
               </foreach>
               </tbody>
@@ -59,4 +62,12 @@
           </div>
       </div>
     </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      </div>
+    </div>
+  </div>
 </block>
