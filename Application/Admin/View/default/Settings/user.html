@@ -47,8 +47,8 @@
                   <td>{$member.uid}</td>
                   <td>{$member.nickname}</td>
                   <td><eq name="member.sex" value="1">Male<else/>Female</eq></td>
-                  <td>{$member.major|ucwords}</td>
-                  <td>{$member.class|ucwords}</td>
+                  <td>{$member.major|default='Unknown'}</td>
+                  <td>{$member.grade|ucwords}</td>
                   <td>{$member.desc|ucfirst}</td>
                   <td>{$member.last_login_ip|long2ip}</td>
                   <td>{$member.last_login_time|date="Y-m-d H:i:s",###}</td>

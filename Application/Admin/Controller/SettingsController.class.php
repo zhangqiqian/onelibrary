@@ -28,14 +28,12 @@ class SettingsController extends AdminController {
     }
 
     public function user_add_submit(){
-        $this->success('Success.', U('Settings/user'));
+        //TODO
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'This feature is not implemented.', 'url' => U('Settings/user'), 'location' => ''));
     }
 
     public function user_edit(){
         $uid = I('uid', 0, 'intval');
-        if(empty($uid)){
-            $this->ajaxReturn(array('errno' => 400401, 'errmsg' => 'Uid is required.'));
-        }
         $mMember = new MemberModel;
         $member = $mMember->get_member($uid);
         if($member){
@@ -56,11 +54,11 @@ class SettingsController extends AdminController {
     public function user_edit_submit(){
         $uid = I('uid', 0, 'intval');
         if(empty($uid)){
-            $this->error('Uid is required.');
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
         }
         $mMember = new MemberModel;
         $member = $mMember;
-        $this->success('Success.', U('Settings/user'));
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/user'), 'location' => ''));
     }
 
     public function message(){

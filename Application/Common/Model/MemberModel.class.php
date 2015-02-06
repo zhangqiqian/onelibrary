@@ -30,7 +30,7 @@ class MemberModel extends MongoModel{
         array('sex', 1, self::MODEL_INSERT),
         array('birthday', NOW_TIME),
         array('major', ""),
-        array('class', ""),
+        array('grade', ""),
         array('desc', ""),
     );
 

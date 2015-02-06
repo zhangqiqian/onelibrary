@@ -1,9 +1,9 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    <h4 class="modal-title" id="myModalLabel">Add User</h4>
+    <h4 class="modal-title" id="myModalLabel">Edit User</h4>
 </div>
 <div class="modal-body">
-    <form class="form-horizontal">
+    <form id="addUserForm" class="form-horizontal" action="{:U('Settings/user_edit_submit')}">
         <div class="form-group">
             <label for="nickname" class="col-sm-3 control-label">Nickname</label>
             <div class="col-sm-5">
@@ -11,16 +11,14 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="sex" class="col-sm-3 control-label">Sex</label>
+            <label class="col-sm-3 control-label">Sex</label>
             <div class="col-sm-5">
-                <div id="sex" class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-primary">
-                        <input type="radio" name="sex" autocomplete="off"> Male
-                    </label>
-                    <label class="btn btn-primary">
-                        <input type="radio" name="sex" autocomplete="off"> Female
-                    </label>
-                </div>
+                <label class="radio-inline">
+                    <input type="radio" name="sex" value="1" checked> Male
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="sex" value="0"> Female
+                </label>
             </div>
         </div>
         <div class="form-group">
@@ -30,9 +28,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="class" class="col-sm-3 control-label">Class</label>
+            <label for="grade" class="col-sm-3 control-label">Grade</label>
             <div class="col-sm-5">
-                <select id="class" name="class" placeholder="Class" class="form-control">
+                <select id="grade" name="grade" placeholder="Grade" class="form-control">
                     <option value="1">Freshman</option>
                     <option value="2">Sophomore</option>
                     <option value="3">Junior</option>
@@ -49,6 +47,29 @@
     </form>
 </div>
 <div class="modal-footer">
+    <div class="Validform_checktip text-danger"></div>
     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-    <button type="button" class="btn btn-primary btn-sm">Save</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="add_user();">Save</button>
 </div>
+
+<script>
+    $(document).ajaxStart(function(){
+        $("button:submit").addClass("log-in").attr("disabled", true);
+    }).ajaxStop(function(){
+        $("button:submit").removeClass("log-in").attr("disabled", false);
+    });
+
+    function add_user(){
+        var self = $("#addUserForm");
+        $.post(self.attr("action"), self.serialize(), function(data){
+            if(data.status){
+                self.find(".Validform_checktip").addClass('text-success');
+                self.find(".Validform_checktip").removeClass('text-danger');
+                self.find(".Validform_checktip").text(data.info);
+                window.location.href = data.url;
+            } else {
+                self.find(".Validform_checktip").text(data.info);
+            }
+        }, "json");
+    }
+</script>

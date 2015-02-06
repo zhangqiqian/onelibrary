@@ -28,9 +28,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="class" class="col-sm-3 control-label">Class</label>
+            <label for="grade" class="col-sm-3 control-label">Grade</label>
             <div class="col-sm-5">
-                <select id="class" name="class" placeholder="Class" class="form-control">
+                <select id="grade" name="grade" placeholder="Grade" class="form-control">
                     <option value="1">Freshman</option>
                     <option value="2">Sophomore</option>
                     <option value="3">Junior</option>
@@ -47,28 +47,38 @@
     </form>
 </div>
 <div class="modal-footer">
-    <div class="Validform_checktip text-danger"></div>
+    <div id="tips" class="Validform_checktip text-danger pull-left"></div>
     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-    <button type="button" class="btn btn-primary btn-sm" onclick="add_user();">Save</button>
+    <button type="submit" class="btn btn-primary btn-sm" onclick="add_user();">Save</button>
 </div>
 
 <script>
     $(document).ajaxStart(function(){
-                    $("button:submit").addClass("log-in").attr("disabled", true);
+                    $("button:submit").attr("disabled", true);
                 }).ajaxStop(function(){
-                    $("button:submit").removeClass("log-in").attr("disabled", false);
+                    $("button:submit").attr("disabled", false);
                 });
 
     function add_user(){
         var self = $("#addUserForm");
         $.post(self.attr("action"), self.serialize(), function(data){
-            if(data.status){
-                self.find(".Validform_checktip").addClass('text-success');
-                self.find(".Validform_checktip").removeClass('text-danger');
-                self.find(".Validform_checktip").text(data.info);
-                window.location.href = data.url;
+            if(data.errno == 0){
+                $("#tips").addClass('text-success');
+                $("#tips").removeClass('text-danger');
+                $("#tips").text(data.errmsg);
+                //window.location.href = data.url;
             } else {
-                self.find(".Validform_checktip").text(data.info);
+                var location = data.location;
+                if($('#msg'))
+                {
+                    $('#msg').empty();
+                    $('#msg').remove();
+                }
+                if(location){
+                    $('#' + location).after("<span class='text-error' id='msg'>&nbsp;"+ data.errmsg +" </span>");
+                }else{
+                    $('#tips').text(data.errmsg);
+                }
             }
         }, "json");
     }
