@@ -45,7 +45,7 @@ return array(
     'APP_USE_NAMESPACE' => true,
     //扩展函数库
     "LOAD_EXT_FILE"     => '',
-    'LOAD_EXT_CONFIG'   => '',
+    'LOAD_EXT_CONFIG'   => 'onelibrary',
 
     'LOG_RECORD'            =>  false,   // 默认不记录日志
     'LOG_TYPE'              =>  'File', // 日志记录类型 默认为文件方式
