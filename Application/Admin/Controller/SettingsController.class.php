@@ -36,28 +36,36 @@ class SettingsController extends AdminController {
         $uid = I('uid', 0, 'intval');
         $mMember = new MemberModel;
         $member = $mMember->get_member($uid);
-        if($member){
-            unset($member['_id']);
-            unset($member['birthday']);
-            unset($member['ctime']);
-            unset($member['last_login_ip']);
-            unset($member['last_login_time']);
-            unset($member['login_count']);
-            unset($member['mtime']);
-            unset($member['status']);
-            unset($member['login_count']);
-        }
         $this->assign('member', $member);
         $this->display();
     }
 
     public function user_edit_submit(){
         $uid = I('uid', 0, 'intval');
+        $sex = I('sex', 1, 'intval');
+        $major = I('major', '');
+        $grade = I('grade', 1, 'intval');
+        $desc = I('desc', '');
+
         if(empty($uid)){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
         }
+        if(!in_array($sex, array(0,1))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Sex value is invalid.', 'location' => 'sex'));
+        }
+        $grades = C('USER_GRADES');
+        if(!in_array($grade, array_keys($grades))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'sex'));
+        }
+
+        $userinfo = array(
+            'sex' => $sex,
+            'major' => $major,
+            'grade' => $grade,
+            'desc' => $desc,
+        );
         $mMember = new MemberModel;
-        $member = $mMember;
+        $member = $mMember->update_member($uid, $userinfo);
         $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/user'), 'location' => ''));
     }
 

@@ -101,11 +101,21 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function get_member_list(){
-        $members = $this->select();
+        $members = $this->order('uid')->select();
         if(!$members){
             $members = array();
         }
-        return $members;
+        $grades = C('USER_GRADES');
+        $ret = array();
+        foreach ($members as $member) {
+            unset($member['_id']);
+            unset($member['birthday']);
+            unset($member['ctime']);
+            unset($member['mtime']);
+            $member['grade'] = $grades[$member['grade']];
+            $ret[] = $member;
+        }
+        return $ret;
     }
 
     /**
@@ -118,6 +128,13 @@ class MemberModel extends MongoModel{
         if(empty($member)){
             $member = array();
         }
+        unset($member['_id']);
+        unset($member['birthday']);
+        unset($member['ctime']);
+        unset($member['last_login_ip']);
+        unset($member['last_login_time']);
+        unset($member['login_count']);
+        unset($member['mtime']);
         return $member;
     }
 
