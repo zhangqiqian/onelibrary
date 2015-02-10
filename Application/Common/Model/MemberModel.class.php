@@ -12,7 +12,7 @@ use Think\Model\MongoModel;
 use User\Api\UserApi;
 
 /**
- * 文档基础模型
+ * Member模型
  */
 class MemberModel extends MongoModel{
 
@@ -30,7 +30,7 @@ class MemberModel extends MongoModel{
         array('sex', 1, self::MODEL_INSERT),
         array('birthday', NOW_TIME),
         array('major', ""),
-        array('grade', ""),
+        array('grade', 1),
         array('desc', ""),
     );
 
@@ -145,6 +145,7 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function update_member($uid, $userinfo){
+        $userinfo['mtime'] = time();
         $ret = $this->where(array('uid' => $uid))->save($userinfo);
         return $ret;
     }
