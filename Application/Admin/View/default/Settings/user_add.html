@@ -26,10 +26,9 @@
         <label for="grade" class="col-sm-3 control-label">Grade</label>
         <div class="col-sm-5">
             <select id="grade" name="grade" placeholder="Grade" class="form-control">
-                <option value="1">Freshman</option>
-                <option value="2">Sophomore</option>
-                <option value="3">Junior</option>
-                <option value="4">Senior</option>
+                <foreach name="grades" item="grade" >
+                    <option data="1" value="{$key}">{$grade}</option>
+                </foreach>
             </select>
         </div>
     </div>

@@ -1,43 +1,36 @@
 <form id="editMessageForm" class="form-horizontal" action="{:U('Settings/message_edit_submit')}">
     <div class="form-group">
-        <label for="nickname" class="col-sm-3 control-label">Nickname</label>
+        <label for="title" class="col-sm-3 control-label">Title</label>
         <div class="col-sm-5">
-            <input type="hidden" id="uid" name="uid" value="{$member.uid}">
-            <input type="text" class="form-control" id="nickname" name="nickname" value="{$member.nickname}" placeholder="Nick name" disabled>
+            <input type="text" class="form-control" id="title" name="title" value="{$message.title}" placeholder="Title">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">Sex</label>
-        <div class="col-sm-5">
-            <label class="radio-inline">
-                <input type="radio" name="sex" value="1" <eq name="member.sex" value="1">checked</eq>> Male
-            </label>
-            <label class="radio-inline">
-                <input type="radio" name="sex" value="0" <eq name="member.sex" value="0">checked</eq>> Female
-            </label>
+        <label for="author" class="col-sm-3 control-label">Author</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="author" name="author" value="{$message.author}" placeholder="Author">
         </div>
     </div>
     <div class="form-group">
-        <label for="major" class="col-sm-3 control-label">Major</label>
-        <div class="col-sm-5">
-            <input type="text" class="form-control" id="major" name="major" value="{$member.major}" placeholder="Major">
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="grade" class="col-sm-3 control-label">Grade</label>
-        <div class="col-sm-5">
-            <select id="grade" name="grade" placeholder="Grade" class="form-control">
-                <option value="1" <eq name="member.grade" value="1">checked</eq> >Freshman</option>
-                <option value="2" <eq name="member.grade" value="2">checked</eq> >Sophomore</option>
-                <option value="3" <eq name="member.grade" value="3">checked</eq> >Junior</option>
-                <option value="4" <eq name="member.grade" value="4">checked</eq> >Senior</option>
+        <label for="category" class="col-sm-3 control-label">Category</label>
+        <div class="col-sm-3">
+            <select id="category" name="category" placeholder="category" class="form-control">
+                <foreach name="categories" item="category" >
+                    <option value="{$key}" <eq name="message.category" value="key">checked</eq> >{$category}</option>
+                </foreach>
             </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="content" class="col-sm-3 control-label">Content</label>
+        <div class="col-sm-9">
+            <textarea id="content" name="content" placeholder="Content" class="form-control" rows="4">{$message.content}</textarea>
         </div>
     </div>
     <div class="form-group">
         <label for="desc" class="col-sm-3 control-label">Description</label>
         <div class="col-sm-9">
-            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="4">{$member.desc}</textarea>
+            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="2">value="{$message.desc}"</textarea>
         </div>
     </div>
 </form>

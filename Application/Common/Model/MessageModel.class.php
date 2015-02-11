@@ -25,12 +25,13 @@ class MessageModel extends MongoModel{
         array('title', '', self::MODEL_INSERT),
         array('content', '', self::MODEL_INSERT),
         array('author', '', self::MODEL_INSERT),
-        array('category', '', self::MODEL_INSERT),
+        array('category', 0, self::MODEL_INSERT),
         array('link', '', self::MODEL_INSERT),
         array('pubdate', NOW_TIME, self::MODEL_INSERT),
-        array('status', 0),
-        array('level', 0),
-        array('desc', ""),
+        array('status', 0, self::MODEL_INSERT),
+        array('level', 0, self::MODEL_INSERT),
+        array('tags', array(), self::MODEL_INSERT),
+        array('desc', '', self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
     );
@@ -49,6 +50,7 @@ class MessageModel extends MongoModel{
             unset($message['_id']);
             unset($message['ctime']);
             unset($message['mtime']);
+            $message['tags'] = implode(',', $message['tag']);
             $ret[] = $message;
         }
         return $ret;
@@ -76,8 +78,8 @@ class MessageModel extends MongoModel{
      * @return array
      */
     public function insert_message($message){
-        //$message['mtime'] = time();
-        //$message['ctime'] = time();
+        $message['mtime'] = time();
+        $message['ctime'] = time();
         $ret = $this->add($message);
         return $ret;
     }
@@ -89,7 +91,7 @@ class MessageModel extends MongoModel{
      * @return array
      */
     public function update_message($message_id, $message){
-        //$message['mtime'] = time();
+        $message['mtime'] = time();
         $ret = $this->where(array('message_id' => $message_id))->save($message);
         return $ret;
     }

@@ -26,6 +26,8 @@ class SettingsController extends AdminController {
     }
 
     public function user_add(){
+        $grades = C('USER_GRADES');
+        $this->assign('grades', $grades);
         $this->display();
     }
 
@@ -79,12 +81,39 @@ class SettingsController extends AdminController {
     }
 
     public function message_add(){
+        $categories = C('MESSAGE_CATEGORIES');
+        $this->assign('categories', $categories);
         $this->display();
     }
 
     public function message_add_submit(){
-        //TODO
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'This feature is not implemented.', 'url' => U('Settings/message'), 'location' => ''));
+        $title = I('title', '');
+        $author = I('author', '');
+        $category = I('category', 0, 'intval');
+        $content = I('content', '');
+        $link = I('link', '');
+        $desc = I('desc', '');
+
+        $categories = C('MESSAGE_CATEGORIES');
+        if(!in_array($category, array_keys($categories))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Category value is invalid.', 'location' => 'category'));
+        }
+
+        $message = array(
+            'title' => $title,
+            'author' => $author,
+            'category' => $category,
+            'content' => $content,
+            'link' => $link,
+            'desc' => $desc,
+            'pubdate' => time(),
+            'status' => 0,
+            'level' => 0,
+            'tags' => array()
+        );
+        $mMessage = new MessageModel();
+        $ret = $mMessage->insert_message($message);
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
     }
 
     public function message_edit(){
@@ -92,35 +121,44 @@ class SettingsController extends AdminController {
         $mMessage = new MessageModel();
         $message = $mMessage->get_message($message_id);
         $this->assign('message', $message);
+
+        $categories = C('MESSAGE_CATEGORIES');
+        $this->assign('categories', $categories);
+
         $this->display();
     }
 
     public function message_edit_submit(){
-        $uid = I('uid', 0, 'intval');
-        $sex = I('sex', 1, 'intval');
-        $major = I('major', '');
-        $grade = I('grade', 1, 'intval');
+        $message_id = I('message_id', 0, 'intval');
+        $title = I('title', '');
+        $author = I('author', '');
+        $category = I('category', 0, 'intval');
+        $content = I('content', '');
+        $link = I('link', '');
         $desc = I('desc', '');
 
-        if(empty($uid)){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
+        if(empty($message_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Message ID is invalid.', 'location' => ''));
         }
-        if(!in_array($sex, array(0,1))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Sex value is invalid.', 'location' => 'sex'));
-        }
-        $grades = C('USER_GRADES');
-        if(!in_array($grade, array_keys($grades))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'sex'));
+
+        $categories = C('MESSAGE_CATEGORIES');
+        if(!in_array($category, array_keys($categories))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Category value is invalid.', 'location' => 'category'));
         }
 
         $message = array(
-            'sex' => $sex,
-            'major' => $major,
-            'grade' => $grade,
+            'title' => $title,
+            'author' => $author,
+            'category' => $category,
+            'content' => $content,
+            'link' => $link,
             'desc' => $desc,
         );
         $mMessage = new MessageModel();
-        $ret = $mMessage->update_message($uid, $message);
+        $ret = $mMessage->insert_message($message);
+
+        $mMessage = new MessageModel();
+        $ret = $mMessage->update_message($message_id, $message);
         $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
     }
 

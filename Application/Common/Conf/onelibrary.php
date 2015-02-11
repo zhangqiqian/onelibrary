@@ -8,4 +8,16 @@ return array(
         4 => 'Senior',
     ),
 
+    /* Message Category Mapping */
+    'MESSAGE_CATEGORIES' => array(
+        1 => 'Scholarship',
+        2 => 'Science',
+        3 => 'Education',
+        4 => 'Skill',
+        5 => 'Knowledge',
+        6 => 'Life',
+        7 => 'News',
+        8 => 'Training',
+        0 => 'Unknown',
+    ),
 );
