@@ -45,12 +45,14 @@ class MessageModel extends MongoModel{
         if(!$messages){
             $messages = array();
         }
+        $categories = C('MESSAGE_CATEGORIES');
         $ret = array();
         foreach ($messages as $message) {
             unset($message['_id']);
             unset($message['ctime']);
             unset($message['mtime']);
-            $message['tags'] = implode(',', $message['tag']);
+            $message['tags'] = implode(', ', $message['tags']);
+            $message['category'] = $categories[$message['category']];
             $ret[] = $message;
         }
         return $ret;
@@ -69,6 +71,7 @@ class MessageModel extends MongoModel{
         unset($message['_id']);
         unset($message['ctime']);
         unset($message['mtime']);
+        $message['tags'] = implode(', ', $message['tags']);
         return $message;
     }
 
