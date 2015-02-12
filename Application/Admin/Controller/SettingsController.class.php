@@ -87,18 +87,26 @@ class SettingsController extends AdminController {
     }
 
     public function message_add_submit(){
-        $title = I('title', '');
-        $author = I('author', '');
+        $title = I('title', '', 'trim');
+        $author = I('author', '', 'trim');
         $category = I('category', 0, 'intval');
-        $content = I('content', '');
-        $link = I('link', '');
-        $desc = I('desc', '');
+        $content = I('content', '', 'trim');
+        $link = I('link', '', 'trim');
+        $tag_str = I('tags', '', 'trim');
+        $desc = I('desc', '', 'trim');
 
         $categories = C('MESSAGE_CATEGORIES');
         if(!in_array($category, array_keys($categories))){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Category value is invalid.', 'location' => 'category'));
         }
 
+        $tags = array();
+        if($tag_str){
+            $tags_arr = explode(',', $tag_str);
+            foreach ($tags_arr as $tag) {
+                $tags[] = $tag;
+            }
+        }
         $message = array(
             'title' => $title,
             'author' => $author,
@@ -109,7 +117,7 @@ class SettingsController extends AdminController {
             'pubdate' => time(),
             'status' => 0,
             'level' => 0,
-            'tags' => array()
+            'tags' => $tags
         );
         $mMessage = new MessageModel();
         $ret = $mMessage->insert_message($message);
@@ -130,12 +138,13 @@ class SettingsController extends AdminController {
 
     public function message_edit_submit(){
         $message_id = I('message_id', 0, 'intval');
-        $title = I('title', '');
-        $author = I('author', '');
+        $title = I('title', '', 'trim');
+        $author = I('author', '', 'trim');
         $category = I('category', 0, 'intval');
-        $content = I('content', '');
-        $link = I('link', '');
-        $desc = I('desc', '');
+        $content = I('content', '', 'trim');
+        $link = I('link', '', 'trim');
+        $tag_str = I('tags', '', 'trim');
+        $desc = I('desc', '', 'trim');
 
         if(empty($message_id)){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Message ID is invalid.', 'location' => ''));
@@ -146,19 +155,46 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Category value is invalid.', 'location' => 'category'));
         }
 
+        $tags = array();
+        if($tag_str){
+            $tags_arr = explode(',', $tag_str);
+            foreach ($tags_arr as $tag) {
+                $tags[] = trim($tag);
+            }
+        }
+
         $message = array(
             'title' => $title,
             'author' => $author,
             'category' => $category,
             'content' => $content,
+            'pubdate' => time(),
             'link' => $link,
+            'tags' => $tags,
             'desc' => $desc,
         );
         $mMessage = new MessageModel();
-        $ret = $mMessage->insert_message($message);
+        $ret = $mMessage->update_message($message_id, $message);
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+    }
+
+    public function message_del(){
+        $message_id = I('message_id', 0, 'intval');
+        $mMessage = new MessageModel();
+        $message = $mMessage->get_message($message_id);
+        $this->assign('message', $message);
+        $this->display();
+    }
+
+    public function message_del_submit(){
+        $message_id = I('message_id', 0, 'intval');
+
+        if(empty($message_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Message ID is invalid.', 'location' => ''));
+        }
 
         $mMessage = new MessageModel();
-        $ret = $mMessage->update_message($message_id, $message);
+        $ret = $mMessage->remove_message($message_id);
         $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
     }
 

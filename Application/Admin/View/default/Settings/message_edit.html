@@ -2,6 +2,7 @@
     <div class="form-group">
         <label for="title" class="col-sm-3 control-label">Title</label>
         <div class="col-sm-5">
+            <input type="hidden" id="message_id" name="message_id" value="{$message.message_id}">
             <input type="text" class="form-control" id="title" name="title" value="{$message.title}" placeholder="Title">
         </div>
     </div>
@@ -16,7 +17,7 @@
         <div class="col-sm-3">
             <select id="category" name="category" placeholder="category" class="form-control">
                 <foreach name="categories" item="category" >
-                    <option value="{$key}" <eq name="message.category" value="key">checked</eq> >{$category}</option>
+                    <option value="{$key}">{$category}</option>
                 </foreach>
             </select>
         </div>
@@ -28,9 +29,26 @@
         </div>
     </div>
     <div class="form-group">
+        <label for="link" class="col-sm-3 control-label">Link</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="link" name="link" value="{$message.link}" placeholder="http://">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="tags" class="col-sm-3 control-label">Tag</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="tags" name="tags" value="{$message.tags}" placeholder="More tags separated by commas.">
+        </div>
+    </div>
+    <div class="form-group">
         <label for="desc" class="col-sm-3 control-label">Description</label>
         <div class="col-sm-9">
-            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="2">value="{$message.desc}"</textarea>
+            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="2">{$message.desc}</textarea>
         </div>
     </div>
 </form>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#category").val("{$message.category}");
+    });
+</script>
