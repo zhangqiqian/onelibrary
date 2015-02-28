@@ -217,12 +217,44 @@ class SettingsController extends AdminController {
     }
 
     public function location_add(){
+        $countries = C('COUNTRY_CODE_MAP');
+        $this->assign('countries', $countries);
         $this->display();
     }
 
     public function location_add_submit(){
-        //TODO
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'This feature is not implemented.', 'url' => U('Settings/location'), 'location' => ''));
+        $name = I('name', '', 'trim');
+        $longitude = I('longitude', 0.0, 'floatval');
+        $latitude = I('latitude', 0.0, 'floatval');
+        $status = I('status', 0, 'intval');
+        $country_code = I('country_code', '', 'trim');
+        $region = I('region', '', 'trim');
+        $city = I('city', '', 'trim');
+        $desc = I('desc', '', 'trim');
+
+        $country_codes = C('COUNTRY_CODE_MAP');
+        if(!in_array($country_code, array_keys($country_codes))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Country code is invalid.', 'location' => 'country'));
+        }
+
+        $location = array(
+            'name' => $name,
+            'longitude' => $longitude,
+            'latitude' => $latitude,
+            'status' => $status,
+            'country_code' => $country_code,
+            'region' => $region,
+            'city' => $city,
+            'desc' => $desc
+        );
+        $mLocation = new LocationModel();
+        $ret = $mLocation->insert_location($location);
+        if($ret){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/location'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/location'), 'location' => ''));
+        }
+
     }
 
     public function location_edit(){
@@ -230,36 +262,72 @@ class SettingsController extends AdminController {
         $mLocation = new LocationModel();
         $location = $mLocation->get_location($location_id);
         $this->assign('location', $location);
+
+        $countries = C('COUNTRY_CODE_MAP');
+        $this->assign('countries', $countries);
+
         $this->display();
     }
 
     public function location_edit_submit(){
         $location_id = I('location_id', 0, 'intval');
-        $sex = I('sex', 1, 'intval');
-        $major = I('major', '');
-        $grade = I('grade', 1, 'intval');
-        $desc = I('desc', '');
+        $name = I('name', '', 'trim');
+        $longitude = I('longitude', 0.0, 'floatval');
+        $latitude = I('latitude', 0.0, 'floatval');
+        $status = I('status', 0, 'intval');
+        $country_code = I('country_code', '', 'trim');
+        $region = I('region', '', 'trim');
+        $city = I('city', '', 'trim');
+        $desc = I('desc', '', 'trim');
 
-        if(empty($uid)){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
+        if(empty($location_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Location id is invalid.', 'location' => ''));
         }
-        if(!in_array($sex, array(0,1))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Sex value is invalid.', 'location' => 'sex'));
-        }
-        $grades = C('USER_GRADES');
-        if(!in_array($grade, array_keys($grades))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'sex'));
+        if(!in_array($status, array(0,1))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Status is invalid.', 'location' => 'sex'));
         }
 
         $location_info = array(
-            'sex' => $sex,
-            'major' => $major,
-            'grade' => $grade,
-            'desc' => $desc,
+            'name' => $name,
+            'longitude' => $longitude,
+            'latitude' => $latitude,
+            'status' => $status,
+            'country_code' => $country_code,
+            'region' => $region,
+            'city' => $city,
+            'desc' => $desc
         );
+
         $mLocation = new LocationModel();
         $ret = $mLocation->update_location($location_id, $location_info);
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/location'), 'location' => ''));
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/location'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/location'), 'location' => ''));
+        }
+    }
+
+    public function location_del(){
+        $location_id = I('location_id', 0, 'intval');
+        $mLocation = new LocationModel();
+        $location = $mLocation->get_location($location_id);
+        $this->assign('location', $location);
+        $this->display();
+    }
+
+    public function location_del_submit(){
+        $location_id = I('location_id', 0, 'intval');
+        if(empty($location_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Location ID is invalid.', 'location' => ''));
+        }
+
+        $mLocation = new LocationModel();
+        $ret = $mLocation->remove_location($location_id);
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/location'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/location'), 'location' => ''));
+        }
     }
 
 }
