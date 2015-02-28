@@ -1,42 +1,59 @@
 <form id="addLocationForm" class="form-horizontal" action="{:U('Settings/location_add_submit')}">
     <div class="form-group">
-        <label for="nickname" class="col-sm-3 control-label">Nickname</label>
+        <label for="name" class="col-sm-3 control-label">Name</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="nickname" name="nickname" placeholder="Nick name">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Location name">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">Sex</label>
+        <label class="col-sm-3 control-label">Status</label>
         <div class="col-sm-5">
             <label class="radio-inline">
-                <input type="radio" name="sex" value="1" checked> Male
+                <input type="radio" name="status" value="1" checked> Enabled
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" value="0"> Female
+                <input type="radio" name="status" value="0"> Disabled
             </label>
         </div>
     </div>
     <div class="form-group">
-        <label for="major" class="col-sm-3 control-label">Major</label>
+        <label for="longitude" class="col-sm-3 control-label">Longitude</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="major" name="major" placeholder="Major">
+            <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude">
         </div>
     </div>
     <div class="form-group">
-        <label for="grade" class="col-sm-3 control-label">Grade</label>
+        <label for="latitude" class="col-sm-3 control-label">Latitude</label>
         <div class="col-sm-5">
-            <select id="grade" name="grade" placeholder="Grade" class="form-control">
-                <option value="1">Freshman</option>
-                <option value="2">Sophomore</option>
-                <option value="3">Junior</option>
-                <option value="4">Senior</option>
+            <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="country_code" class="col-sm-3 control-label">Country</label>
+        <div class="col-sm-5">
+            <select id="country_code" name="country_code" placeholder="Country" class="form-control">
+                <foreach name="countries" item="country" >
+                    <option value="{$key}">{$country}</option>
+                </foreach>
             </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="region" class="col-sm-3 control-label">Region</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="region" name="region" placeholder="Region">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="city" class="col-sm-3 control-label">City</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="city" name="city" placeholder="City">
         </div>
     </div>
     <div class="form-group">
         <label for="desc" class="col-sm-3 control-label">Description</label>
         <div class="col-sm-9">
-            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="4"></textarea>
+            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="2"></textarea>
         </div>
     </div>
 </form>

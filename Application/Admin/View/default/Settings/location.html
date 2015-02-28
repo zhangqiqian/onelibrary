@@ -30,32 +30,33 @@
               <thead>
               <tr>
                 <th width="50">ID</th>
-                <th>Nick Name</th>
-                <th>Sex</th>
-                <th>Major</th>
-                <th>Grade</th>
+                <th>Name</th>
+                <th>Longitude</th>
+                <th>Latitude</th>
+                <th>Country</th>
+                <th>Region</th>
+                <th>City</th>
                 <th>Description</th>
-                <th>Last Login IP</th>
-                <th>Last Login Time</th>
-                <th>Login Count</th>
                 <th width="150">Status</th>
                 <th width="150">Operation</th>
               </tr>
               </thead>
               <tbody>
-              <foreach name="members" item="member" >
+              <foreach name="locations" item="location" >
                 <tr>
-                  <td>{$member.uid}</td>
-                  <td>{$member.nickname}</td>
-                  <td><eq name="member.sex" value="1">Male<else/>Female</eq></td>
-                  <td>{$member.major|default='Unknown'}</td>
-                  <td>{$member.grade|ucwords}</td>
-                  <td>{$member.desc|ucfirst}</td>
-                  <td>{$member.last_login_ip|long2ip}</td>
-                  <td>{$member.last_login_time|date="Y-m-d H:i:s",###}</td>
-                  <td>{$member.login_count}</td>
-                  <td><eq name="member.status" value="1">Active<else/>Disabled</eq></td>
-                  <td><a href="javascript:open_dialog('edit', '{:U('Settings/location_edit')}/uid/{$member.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
+                  <td>{$location.location_id}</td>
+                  <td>{$location.name}</td>
+                  <td>{$location.longitude|default='0'}</td>
+                  <td>{$location.latitude|default='0'}</td>
+                  <td>{$location.country|ucfirst}</td>
+                  <td>{$location.region|ucfirst}</td>
+                  <td>{$location.city|ucfirst}</td>
+                  <td>{$location.desc|ucfirst}</td>
+                  <td><eq name="location.status" value="1">Enabled<else/>Disabled</eq></td>
+                  <td>
+                      <a href="javascript:open_dialog('edit', '{:U('Settings/location_edit')}/location_id/{$location.location_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+                      <a href="javascript:open_dialog('del', '{:U('Settings/location_del')}/location_id/{$location.location_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                  </td>
                 </tr>
               </foreach>
               </tbody>
@@ -64,7 +65,7 @@
         </div>
       </div>
 
-  <!-- Modal -->
+  <!-- Add Modal -->
   <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -83,7 +84,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Edit Modal -->
   <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -102,6 +103,24 @@
     </div>
   </div>
 
+  <!-- Del Modal -->
+  <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="delModalLabel">Edit Location</h4>
+        </div>
+        <div id="delFormPage" class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <div id="del-tips" class="Validform_checktip text-danger pull-left"></div>
+          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="del_location();">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     $(document).ajaxStart(function(){
       $("button:submit").attr("disabled", true);
@@ -112,8 +131,13 @@
     function open_dialog(tag, url){
       if(tag == 'add'){
         $("#editFormPage").empty();
-      }else{
+        $("#delFormPage").empty();
+      }else if(tag == 'edit'){
         $("#addFormPage").empty();
+        $("#delFormPage").empty();
+      }else if(tag == 'del'){
+        $("#addFormPage").empty();
+        $("#editFormPage").empty();
       }
       $("#"+tag+"-tips").empty();
       $("#"+tag+"FormPage").load(url);
@@ -127,7 +151,7 @@
           $("#add-tips").addClass('text-success');
           $("#add-tips").removeClass('text-danger');
           $("#add-tips").text(data.errmsg);
-          //window.location.href = data.url;
+          window.location.href = data.url;
         } else {
           var location = data.location;
           if($('#msg'))
@@ -163,6 +187,30 @@
             $('#' + location).after("<span class='text-danger' id='msg'>&nbsp;"+ data.errmsg +" </span>");
           }else{
             $('#edit-tips').text(data.errmsg);
+          }
+        }
+      }, "json");
+    }
+
+    function del_location(){
+      var self = $("#delLocationForm");
+      $.post(self.attr("action"), self.serialize(), function(data){
+        if(data.errno == 0){
+          $("#del-tips").addClass('text-success');
+          $("#del-tips").removeClass('text-danger');
+          $("#del-tips").text(data.errmsg);
+          window.location.href = data.url;
+        } else {
+          var location = data.location;
+          if($('#msg'))
+          {
+            $('#msg').empty();
+            $('#msg').remove();
+          }
+          if(location){
+            $('#' + location).after("<span class='text-danger' id='msg'>&nbsp;"+ data.errmsg +" </span>");
+          }else{
+            $('#del-tips').text(data.errmsg);
           }
         }
       }, "json");

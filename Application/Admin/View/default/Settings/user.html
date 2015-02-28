@@ -53,7 +53,7 @@
               <td>{$member.last_login_ip|long2ip}</td>
               <td>{$member.last_login_time|date="Y-m-d H:i:s",###}</td>
               <td>{$member.login_count}</td>
-              <td><eq name="member.status" value="1">Active<else/>Disabled</eq></td>
+              <td><eq name="member.status" value="1">Enabled<else/>Disabled</eq></td>
               <td><a href="javascript:open_dialog('edit', '{:U('Settings/user_edit')}/uid/{$member.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
             </tr>
           </foreach>

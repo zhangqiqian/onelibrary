@@ -1,0 +1,8 @@
+<form id="delLocationForm" class="form-horizontal" action="{:U('Settings/location_del_submit')}">
+    <input type="hidden" id="location_id" name="location_id" value="{$location.location_id}">
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        Are you sure to delete the location <strong><em>{$location.name}</em></strong> ?
+    </div>
+</form>
