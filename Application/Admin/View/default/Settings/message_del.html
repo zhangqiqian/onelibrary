@@ -1,0 +1,8 @@
+<form id="delMessageForm" class="form-horizontal" action="{:U('Settings/message_del_submit')}">
+    <input type="hidden" id="message_id" name="message_id" value="{$message.message_id}">
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        Are you sure to delete the message <strong><em>{$message.title}</em></strong> ?
+    </div>
+</form>
