@@ -24,12 +24,11 @@ class LocationModel extends MongoModel{
         array('location_id', 0, self::MODEL_INSERT),
         array('name', '', self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT),
-        array('longitude', 0, self::MODEL_INSERT),
-        array('latitude', 0, self::MODEL_INSERT),
-        array('city', "", self::MODEL_INSERT),
-        array('country', "", self::MODEL_INSERT),
+        array('longitude', 0.0, self::MODEL_INSERT),
+        array('latitude', 0.0, self::MODEL_INSERT),
         array('country_code', "", self::MODEL_INSERT),
         array('region', "", self::MODEL_INSERT),
+        array('city', "", self::MODEL_INSERT),
         array('desc', "", self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
@@ -44,13 +43,13 @@ class LocationModel extends MongoModel{
         if(!$locations){
             $locations = array();
         }
-        $grades = C('USER_GRADES');
+        $countries = C('COUNTRY_CODE_MAP');
         $ret = array();
         foreach ($locations as $location) {
             unset($location['_id']);
             unset($location['ctime']);
             unset($location['mtime']);
-            $location['grade'] = $grades[$location['grade']];
+            $location['country'] = $countries[$location['country_code']];
             $ret[] = $location;
         }
         return $ret;
@@ -78,7 +77,9 @@ class LocationModel extends MongoModel{
      * @return array
      */
     public function insert_location($location){
-        $ret = $this->save($location);
+        $location['ctime'] = time();
+        $location['mtime'] = time();
+        $ret = $this->add($location);
         return $ret;
     }
 
@@ -89,6 +90,7 @@ class LocationModel extends MongoModel{
      * @return array
      */
     public function update_location($location_id, $location){
+        $location['mtime'] = time();
         $ret = $this->where(array('location_id' => $location_id))->save($location);
         return $ret;
     }
@@ -99,7 +101,6 @@ class LocationModel extends MongoModel{
      * @return array
      */
     public function remove_location($location_id){
-        //$location['mtime'] = time();
         $ret = $this->where(array('location_id' => $location_id))->delete();
         return $ret;
     }
