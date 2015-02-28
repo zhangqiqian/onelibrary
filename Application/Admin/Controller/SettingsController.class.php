@@ -121,7 +121,11 @@ class SettingsController extends AdminController {
         );
         $mMessage = new MessageModel();
         $ret = $mMessage->insert_message($message);
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+        if($ret){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/message'), 'location' => ''));
+        }
     }
 
     public function message_edit(){
@@ -175,7 +179,11 @@ class SettingsController extends AdminController {
         );
         $mMessage = new MessageModel();
         $ret = $mMessage->update_message($message_id, $message);
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/message'), 'location' => ''));
+        }
     }
 
     public function message_del(){
@@ -188,14 +196,17 @@ class SettingsController extends AdminController {
 
     public function message_del_submit(){
         $message_id = I('message_id', 0, 'intval');
-
         if(empty($message_id)){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Message ID is invalid.', 'location' => ''));
         }
 
         $mMessage = new MessageModel();
         $ret = $mMessage->remove_message($message_id);
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/message'), 'location' => ''));
+        }
     }
 
     public function location(){
