@@ -28,8 +28,8 @@ class MessageModel extends MongoModel{
         array('category', 0, self::MODEL_INSERT),
         array('link', '', self::MODEL_INSERT),
         array('pubdate', NOW_TIME, self::MODEL_INSERT),
-        array('status', 0, self::MODEL_INSERT),
-        array('level', 0, self::MODEL_INSERT),
+        array('status', 0, self::MODEL_INSERT), //0, no handle; 1, handled.
+        array('level', 0, self::MODEL_INSERT), //0, no level; 1...9
         array('tags', array(), self::MODEL_INSERT),
         array('desc', '', self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
