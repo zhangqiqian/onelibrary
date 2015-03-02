@@ -30,7 +30,7 @@
             <tr>
               <th width="50">ID</th>
               <th>Nick Name</th>
-              <th>Sex</th>
+              <th>Gender</th>
               <th>Major</th>
               <th>Grade</th>
               <th>Description</th>
@@ -46,7 +46,7 @@
             <tr>
               <td>{$member.uid}</td>
               <td>{$member.nickname}</td>
-              <td><eq name="member.sex" value="1">Male<else/>Female</eq></td>
+              <td><eq name="member.gender" value="1">Male<else/>Female</eq></td>
               <td>{$member.major|default='Unknown'}</td>
               <td>{$member.grade|ucwords}</td>
               <td>{$member.desc|ucfirst}</td>
