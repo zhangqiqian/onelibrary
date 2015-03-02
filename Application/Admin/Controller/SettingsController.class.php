@@ -228,9 +228,9 @@ class SettingsController extends AdminController {
         $priority = I('priority', 0, 'intval');
 
         if(empty($datetime)){
-            $datetime = time();
+            $date_time = time();
         }else{
-            $datetime = strtotime($datetime);
+            $date_time = strtotime($datetime);
         }
 
         $match = array(
@@ -239,7 +239,7 @@ class SettingsController extends AdminController {
             'user_major' => $major,
             'user_gender' => $gender,
             'region_id' => $region_id,
-            'datetime' => $datetime,
+            'datetime' => $date_time,
             'message_id' => $message_id,
             'priority' => $priority
         );
