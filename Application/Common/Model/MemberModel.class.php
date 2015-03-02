@@ -27,7 +27,7 @@ class MemberModel extends MongoModel{
         array('mtime', NOW_TIME),
         array('ctime', NOW_TIME),
         array('status', 1, self::MODEL_INSERT),
-        array('sex', 1, self::MODEL_INSERT),
+        array('gender', 1, self::MODEL_INSERT),
         array('birthday', NOW_TIME),
         array('major', ""),
         array('grade', 1),
