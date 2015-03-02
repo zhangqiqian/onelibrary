@@ -106,6 +106,7 @@ class MemberModel extends MongoModel{
             $members = array();
         }
         $grades = C('USER_GRADES');
+        $majors = C('MAJOR_MAPPING');
         $ret = array();
         foreach ($members as $member) {
             unset($member['_id']);
@@ -113,6 +114,7 @@ class MemberModel extends MongoModel{
             unset($member['ctime']);
             unset($member['mtime']);
             $member['grade'] = $grades[$member['grade']];
+            $member['major'] = $majors[$member['major']];
             $ret[] = $member;
         }
         return $ret;
