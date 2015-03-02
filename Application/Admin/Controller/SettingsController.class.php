@@ -210,6 +210,9 @@ class SettingsController extends AdminController {
         $majors = C('MAJOR_MAPPING');
         $this->assign('majors', $majors);
 
+        $priorities = C('MESSAGE_PRIORITY');
+        $this->assign('priorities', $priorities);
+
         $mLocation = new LocationModel();
         $locations = $mLocation->get_location_list();
         $this->assign('regions', $locations);
