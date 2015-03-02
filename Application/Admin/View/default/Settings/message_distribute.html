@@ -75,9 +75,9 @@
         <label for="priority" class="col-sm-3 control-label">Priority</label>
         <div class="col-sm-5">
             <select id="priority" name="priority" placeholder="Priority" class="form-control">
-                <option value="1">Low</option>
-                <option value="2">Medium</option>
-                <option value="3">High</option>
+                <foreach name="priorities" item="priority" >
+                    <option value="{$key}">{$priority}</option>
+                </foreach>
             </select>
         </div>
     </div>
