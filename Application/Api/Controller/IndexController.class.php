@@ -28,6 +28,7 @@ class IndexController extends ApiController {
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
         $last_time = I('last_time', 0, 'intval');
+        $last_message_id = I('last_message_id', 0, 'intval');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 10, 'intval');
 
@@ -40,7 +41,7 @@ class IndexController extends ApiController {
         $locations = $mLocation->get_locations_by_location($longitude, $latitude);
 
         $mMatch = new MatchModel();
-        $matches = $mMatch->get_matches_by_user_features($locations, $member, $last_time, $start, $limit);
+        $matches = $mMatch->get_matches_by_user_features($locations, $member, $last_message_id, $last_time, $start, $limit);
         $messages = array();
         $mMessage = new MessageModel();
         foreach ($matches as $match) {
