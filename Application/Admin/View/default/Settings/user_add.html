@@ -19,7 +19,11 @@
     <div class="form-group">
         <label for="major" class="col-sm-3 control-label">Major</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="major" name="major" placeholder="Major">
+            <select id="major" name="major" placeholder="Major" class="form-control">
+                <foreach name="majors" item="major" >
+                    <option value="{$key}">{$major}</option>
+                </foreach>
+            </select>
         </div>
     </div>
     <div class="form-group">

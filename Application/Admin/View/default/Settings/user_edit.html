@@ -20,17 +20,20 @@
     <div class="form-group">
         <label for="major" class="col-sm-3 control-label">Major</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="major" name="major" value="{$member.major}" placeholder="Major">
+            <select id="major" name="major" placeholder="Major" class="form-control">
+                <foreach name="majors" item="major" >
+                    <option value="{$key}">{$major}</option>
+                </foreach>
+            </select>
         </div>
     </div>
     <div class="form-group">
         <label for="grade" class="col-sm-3 control-label">Grade</label>
         <div class="col-sm-5">
             <select id="grade" name="grade" placeholder="Grade" class="form-control">
-                <option value="1" <eq name="member.grade" value="1">checked</eq> >Freshman</option>
-                <option value="2" <eq name="member.grade" value="2">checked</eq> >Sophomore</option>
-                <option value="3" <eq name="member.grade" value="3">checked</eq> >Junior</option>
-                <option value="4" <eq name="member.grade" value="4">checked</eq> >Senior</option>
+                <foreach name="grades" item="grade" >
+                    <option value="{$key}">{$grade}</option>
+                </foreach>
             </select>
         </div>
     </div>
@@ -41,3 +44,9 @@
         </div>
     </div>
 </form>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#major").val("{$member.major}");
+        $("#grade").val("{$member.grade}");
+    });
+</script>
