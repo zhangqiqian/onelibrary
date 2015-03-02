@@ -8,6 +8,8 @@
 // +----------------------------------------------------------------------
 
 namespace Admin\Controller;
+use Common\Model\LocationModel;
+use Common\Model\MatchModel;
 use Think\Controller;
 
 class DashboardController extends AdminController {
@@ -20,6 +22,9 @@ class DashboardController extends AdminController {
     }
 
     public function message(){
+        $mMatch = new MatchModel();
+        $matches = $mMatch->get_match_list();
+        $this->assign('matches', $matches);
         $this->display();
     }
 
