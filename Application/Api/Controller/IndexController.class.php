@@ -18,4 +18,9 @@ class IndexController extends ApiController {
     public function index(){
         $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Welcome to Api'));
     }
+
+    public function messages(){
+        $location_id = I('location_id', 0, 'intval');
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Welcome to Api'));
+    }
 }
