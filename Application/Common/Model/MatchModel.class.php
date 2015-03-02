@@ -45,10 +45,45 @@ class MatchModel extends MongoModel{
             $matches = array();
         }
         $ret = array();
+        $grades = C('USER_GRADES');
+        $majors = C('MAJOR_MAPPING');
+        $priorities = C('MESSAGE_PRIORITY');
+        $mMember = new MemberModel();
+        $mLocation = new LocationModel();
+        $mMessage = new MessageModel();
         foreach ($matches as $match) {
             unset($match['_id']);
             unset($match['ctime']);
             unset($match['mtime']);
+            $match['user_grade'] = $match['user_grade'] == 0 ? 'All' : $grades[$match['user_grade']];
+            $match['user_major'] = $match['user_major'] == 0 ? 'All' : $majors[$match['user_major']];
+
+            if($match['user_gender'] == 0){
+                $match['user_gender'] = 'Female';
+            }elseif($match['user_gender'] == 0){
+                $match['user_gender'] = 'Male';
+            }else{
+                $match['user_gender'] = 'All';
+            }
+
+            if($match['user_uid'] == 0){
+                $match['user_name'] = 'All';
+            }else{
+                $member = $mMember->get_member($match['user_uid']);
+                $match['user_name'] = $member['nickname'];
+            }
+
+            $match['priority'] = $priorities[$match['priority']];
+
+            if($match['region_id'] == 0){
+                $match['region_name'] = 'All';
+            }else{
+                $location = $mLocation->get_location($match['region_id']);
+                $match['region_name'] = $location['name'];
+            }
+
+            $message = $mMessage->get_message($match['message_id']);
+            $match['message'] = $message['title'];
             $ret[] = $match;
         }
         return $ret;
