@@ -61,7 +61,7 @@ class DashboardController extends AdminController {
         $major = I('user_major', 0, 'intval');
         $gender = I('user_gender', 0, 'intval');
         $region_id = I('region_id', 0, 'intval');
-        $datetime = I('datetime', '', 'trim');
+        $datetime = I('expire_time', '', 'trim');
         $message_id = I('message_id', 0, 'intval');
         $priority = I('priority', 0, 'intval');
 
@@ -81,7 +81,7 @@ class DashboardController extends AdminController {
             'user_major' => $major,
             'user_gender' => $gender,
             'region_id' => $region_id,
-            'datetime' => $date_time,
+            'expire_time' => $date_time,
             'message_id' => $message_id,
             'status' => 0,
             'priority' => $priority

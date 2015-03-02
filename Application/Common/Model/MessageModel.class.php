@@ -76,6 +76,28 @@ class MessageModel extends MongoModel{
     }
 
     /**
+     * 获取返回给APP的Message信息
+     * @param $message_id
+     * @return array
+     */
+    public function get_message_for_app($message_id){
+        $message = $this->where(array('message_id' => $message_id))->find();
+        if(empty($message)){
+            $message = array();
+        }
+        unset($message['_id']);
+        unset($message['ctime']);
+        unset($message['mtime']);
+        unset($message['desc']);
+        unset($message['status']);
+        unset($message['level']);
+        $categories = C('MESSAGE_CATEGORIES');
+        $message['category'] = $categories[$message['category']];
+        $message['tags'] = implode(', ', $message['tags']);
+        return $message;
+    }
+
+    /**
      * 添加Message
      * @param $message
      * @return array

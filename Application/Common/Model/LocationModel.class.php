@@ -72,6 +72,26 @@ class LocationModel extends MongoModel{
     }
 
     /**
+     * 根据经纬度获取Location信息
+     * @param $longitude
+     * @param $latitude
+     * @return array
+     */
+    public function get_locations_by_location($longitude, $latitude){
+        $map['longitude']  = array(array('gt',$longitude-0.1),array('lt',$longitude+0.1)) ;
+        $map['latitude']  = array(array('gt',$latitude-0.1),array('lt',$latitude+0.1));
+        $locations = $this->where($map)->select();
+        $ret = array();
+        foreach ($locations as $location) {
+            unset($location['_id']);
+            unset($location['mtime']);
+            unset($location['ctime']);
+            $ret[] = $location;
+        }
+        return $ret;
+    }
+
+    /**
      * 添加Location
      * @param $location
      * @return array

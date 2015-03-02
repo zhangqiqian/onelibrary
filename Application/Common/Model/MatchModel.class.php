@@ -27,7 +27,7 @@ class MatchModel extends MongoModel{
         array('user_major', 0, self::MODEL_INSERT),
         array('user_gender', 2, self::MODEL_INSERT), //0: female, 1: male, 2: all
         array('region_id', 0, self::MODEL_INSERT),
-        array('datetime', '', self::MODEL_INSERT),
+        array('expire_time', '', self::MODEL_INSERT),
         array('message_id', 0, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0, no read; 1, read
         array('priority', 0, self::MODEL_INSERT), //order by priority
@@ -40,7 +40,7 @@ class MatchModel extends MongoModel{
      * @return array
      */
     public function get_match_list(){
-        $matches = $this->order('mtime desc')->select();
+        $matches = $this->order('match_id desc')->select();
         if(!$matches){
             $matches = array();
         }
@@ -87,6 +87,89 @@ class MatchModel extends MongoModel{
             $ret[] = $match;
         }
         return $ret;
+    }
+
+    /**
+     * 获取所有match by uid
+     * @param $region_id
+     * @param $uid
+     * @return array
+     */
+    public function get_matches_by_uid($region_id, $uid){
+        $params = array(
+            'uid' => $uid, //who
+            'region_id' => $region_id, //where
+            'expire_time' => array('$gte', time()), //when
+            'status' => 0, //no read
+        );
+        $matches = $this->where($params)->order('mtime desc')->select();
+        $ret = array();
+        $mMessage = new MessageModel();
+        foreach ($matches as $match) {
+            $message = $mMessage->get_message($match['message_id']);
+            $ret[] = $message;
+        }
+        return $ret;
+    }
+
+    /**
+     * 获取所有match by user features
+     * {"$or":[
+     *      {"$and" : [
+     *                  {"user_uid": 1},
+     *                  {"region_id": {"$in": [0,1]}},
+     *                  {"status" : 0},
+     *                  {"expire_time" : {"$gte" : time()}}
+     *               ]
+     *      },
+     *      {"$and" : [
+     *                  {"$and" : [
+     *                              {"user_uid": 0},
+     *                              {"region_id": {"$in": [0,1]}},
+     *                              {"status" : 0},
+     *                              {"expire_time" : {"$gte" : time()}}
+     *                      ]
+     *                  },
+     *                  {"$or" : [
+     *                              {"user_grade": {"$in": [0,1]}},
+     *                              {"user_major": {"$in": [0,1]}},
+     *                              {"user_gender": {"$in": [0,1]}}
+     *                      ]
+     *                  }
+     *              ]
+     *      ]}
+     * }
+     * @param $locations
+     * @param $user
+     * @param $last_time
+     * @param $start
+     * @param $limit
+     * @return array
+     */
+    public function get_matches_by_user_features($locations, $user, $last_time = 0, $start = 0, $limit = 10){
+        $region_ids = array(0);
+        foreach ($locations as $location) {
+            $region_ids[] = $location['location_id'];
+        }
+
+        $last_time = $last_time == 0 ? time() : $last_time;
+
+        $where['user_uid']  = array('in', array(0, $user['uid']));
+        $where['user_grade']  = array('in', array(0, $user['grade']));
+        $where['user_major']  = array('in', array(0, $user['major']));
+        $where['user_gender']  = array('in', array(0, $user['gender']));
+        $where['_logic'] = 'or';
+
+        $map['_complex'] = $where;
+        $map['status']  = 0;
+        $map['expire_time']  = array('gte', $last_time);
+        $map['region_id']  = array('in', $region_ids);
+
+        $matches = $this->where($map)->order('mtime desc')->limit($start.','.$limit)->select();
+        if(empty($matches)){
+            $matches = array();
+        }
+        return $matches;
     }
 
     /**
@@ -152,4 +235,5 @@ class MatchModel extends MongoModel{
         $ret = $this->where(array('message_id' => $message_id))->delete();
         return $ret;
     }
+
 }
