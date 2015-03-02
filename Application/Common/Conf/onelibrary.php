@@ -22,6 +22,13 @@ return array(
     ),
 
     /* Message Category Mapping */
+    'MESSAGE_PRIORITY' => array(
+        1 => 'Low',
+        2 => 'Medium',
+        3 => 'High',
+    ),
+
+    /* Message Category Mapping */
     'MAJOR_MAPPING' => array(
         0 => 'Unknown',
         1 => 'Agriculture, Agriculture Operations, and Related Sciences',
