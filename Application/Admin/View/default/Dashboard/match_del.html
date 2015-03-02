@@ -1,0 +1,7 @@
+<form id="delMatchForm" class="form-horizontal" action="{:U('Dashboard/match_del_submit')}">
+    <input type="hidden" id="match_id" name="match_id" value="{$match.match_id}">
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        Are you sure to delete the matched message <strong><em>{$match.message}</em></strong>?
+    </div>
+</form>

@@ -124,7 +124,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="delModalLabel">Edit Message</h4>
+          <h4 class="modal-title" id="delModalLabel">Delete Message</h4>
         </div>
         <div id="delFormPage" class="modal-body">
         </div>
@@ -150,12 +150,19 @@
       if(tag == 'add'){
         $("#editFormPage").empty();
         $("#delFormPage").empty();
+        $("#distributeFormPage").empty();
       }else if(tag == 'edit'){
         $("#addFormPage").empty();
         $("#delFormPage").empty();
+        $("#distributeFormPage").empty();
       }else if(tag == 'del'){
         $("#addFormPage").empty();
         $("#editFormPage").empty();
+        $("#distributeFormPage").empty();
+      }else if(tag == 'distribute'){
+        $("#addFormPage").empty();
+        $("#editFormPage").empty();
+        $("#delFormPage").empty();
       }
       $("#"+tag+"-tips").empty();
       $("#"+tag+"FormPage").load(url);

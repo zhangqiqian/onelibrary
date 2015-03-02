@@ -244,6 +244,7 @@ class SettingsController extends AdminController {
             'region_id' => $region_id,
             'datetime' => $date_time,
             'message_id' => $message_id,
+            'status' => 0,
             'priority' => $priority
         );
 
@@ -270,9 +271,20 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Message ID is invalid.', 'location' => ''));
         }
 
+        $remove_result = true;
         $mMessage = new MessageModel();
         $ret = $mMessage->remove_message($message_id);
-        if($ret['ok']){
+        if(!$ret['ok']){
+            $remove_result = false;
+        }
+
+        $mMatch = new MatchModel();
+        $ret = $mMatch->remove_match_by_msg_id($message_id);
+        if(!$ret['ok']){
+            $remove_result = false;
+        }
+
+        if($remove_result){
             $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/message'), 'location' => ''));
         }else{
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/message'), 'location' => ''));

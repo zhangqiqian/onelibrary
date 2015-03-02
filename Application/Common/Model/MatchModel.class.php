@@ -40,7 +40,7 @@ class MatchModel extends MongoModel{
      * @return array
      */
     public function get_match_list(){
-        $matches = $this->order('match_id')->select();
+        $matches = $this->order('mtime desc')->select();
         if(!$matches){
             $matches = array();
         }
@@ -60,7 +60,7 @@ class MatchModel extends MongoModel{
 
             if($match['user_gender'] == 0){
                 $match['user_gender'] = 'Female';
-            }elseif($match['user_gender'] == 0){
+            }elseif($match['user_gender'] == 1){
                 $match['user_gender'] = 'Male';
             }else{
                 $match['user_gender'] = 'All';
@@ -102,7 +102,10 @@ class MatchModel extends MongoModel{
         unset($match['_id']);
         unset($match['ctime']);
         unset($match['mtime']);
-        $match['tags'] = implode(', ', $match['tags']);
+        $mMessage = new MessageModel();
+        $message = $mMessage->get_message($match['message_id']);
+        $match['message'] = $message['title'];
+
         return $match;
     }
 
@@ -137,6 +140,16 @@ class MatchModel extends MongoModel{
      */
     public function remove_match($match_id){
         $ret = $this->where(array('match_id' => $match_id))->delete();
+        return $ret;
+    }
+
+    /**
+     * 删除match by message_id
+     * @param $message_id
+     * @return bool
+     */
+    public function remove_match_by_msg_id($message_id){
+        $ret = $this->where(array('message_id' => $message_id))->delete();
         return $ret;
     }
 }

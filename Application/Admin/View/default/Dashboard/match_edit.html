@@ -1,0 +1,95 @@
+<form id="editMatchForm" class="form-horizontal" action="{:U('Dashboard/match_edit_submit')}">
+    <div class="form-group">
+        <label for="user_uid" class="col-sm-3 control-label">User</label>
+        <div class="col-sm-5">
+            <input type="hidden" id="match_id" name="match_id" value="{$match.match_id}">
+            <input type="hidden" id="message_id" name="message_id" value="{$match.message_id}">
+            <select id="user_uid" name="user_uid" placeholder="User" class="form-control">
+                <option value="0">All</option>
+                <foreach name="members" item="member" >
+                    <option value="{$member.uid}">{$member.nickname}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="user_grade" class="col-sm-3 control-label">User Grade</label>
+        <div class="col-sm-5">
+            <select id="user_grade" name="user_grade" placeholder="User Grade" class="form-control">
+                <option value="0">All</option>
+                <foreach name="grades" item="grade" >
+                    <option value="{$key}">{$grade}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="user_major" class="col-sm-3 control-label">User Major</label>
+        <div class="col-sm-5">
+            <select id="user_major" name="user_major" placeholder="User Major" class="form-control">
+                <option value="0">All</option>
+                <foreach name="majors" item="major" >
+                    <option value="{$key}">{$major}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="user_gender" class="col-sm-3 control-label">User Gender</label>
+        <div class="col-sm-5">
+            <select id="user_gender" name="user_gender" placeholder="User Gender" class="form-control">
+                <option value="2">All</option>
+                <option value="0">Female</option>
+                <option value="1">Male</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="datetime" class="col-sm-3 control-label">Time</label>
+        <div class="col-sm-5">
+            <div id="datetimepicker" class="input-group date">
+                <input type="text" class="form-control" id="datetime" name="datetime" value="{$match.datetime|date='Y-m-d H:i:s',###}" placeholder="Default is now.">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#datetimepicker').datetimepicker({
+                    //locale: 'zh-CN',
+                    format: 'YYYY-MM-DD HH:mm:SS'
+                });
+            });
+        </script>
+    </div>
+    <div class="form-group">
+        <label for="region_id" class="col-sm-3 control-label">Region</label>
+        <div class="col-sm-5">
+            <select id="region_id" name="region_id" placeholder="Region" class="form-control">
+                <option value="0">All</option>
+                <foreach name="regions" item="region" >
+                    <option value="{$region.location_id}">{$region.name}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="priority" class="col-sm-3 control-label">Priority</label>
+        <div class="col-sm-5">
+            <select id="priority" name="priority" placeholder="Priority" class="form-control">
+                <foreach name="priorities" item="priority" >
+                    <option value="{$key}">{$priority}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#user_uid").val("{$match.user_uid}");
+        $("#user_grade").val("{$match.user_grade}");
+        $("#user_major").val("{$match.user_major}");
+        $("#user_gender").val("{$match.user_gender}");
+        $("#region_id").val("{$match.region_id}");
+        $("#priority").val("{$match.priority}");
+    });
+</script>
