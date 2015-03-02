@@ -22,9 +22,12 @@ class MatchModel extends MongoModel{
     /* match模型自动完成 */
     protected $_auto = array(
         array('match_id', 0, self::MODEL_INSERT),
-        array('uid', 0, self::MODEL_INSERT),
+        array('user_uid', 0, self::MODEL_INSERT),
+        array('user_grade', 0, self::MODEL_INSERT),
+        array('user_major', 0, self::MODEL_INSERT),
+        array('user_gender', 2, self::MODEL_INSERT), //0: female, 1: male, 2: all
         array('region_id', 0, self::MODEL_INSERT),
-        array('time', '', self::MODEL_INSERT),
+        array('datetime', '', self::MODEL_INSERT),
         array('message_id', 0, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0, no read; 1, read
         array('priority', 0, self::MODEL_INSERT), //order by priority
