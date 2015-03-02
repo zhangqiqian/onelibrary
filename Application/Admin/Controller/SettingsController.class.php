@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Admin\Controller;
+use Common\Model\MatchModel;
 use Think\Controller;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
@@ -28,6 +29,8 @@ class SettingsController extends AdminController {
     public function user_add(){
         $grades = C('USER_GRADES');
         $this->assign('grades', $grades);
+        $majors = C('MAJOR_MAPPING');
+        $this->assign('majors', $majors);
         $this->display();
     }
 
@@ -40,13 +43,20 @@ class SettingsController extends AdminController {
         $uid = I('uid', 0, 'intval');
         $mMember = new MemberModel();
         $member = $mMember->get_member($uid);
+
+        $grades = C('USER_GRADES');
+        $this->assign('grades', $grades);
+
+        $majors = C('MAJOR_MAPPING');
+        $this->assign('majors', $majors);
+
         $this->assign('member', $member);
         $this->display();
     }
 
     public function user_edit_submit(){
         $uid = I('uid', 0, 'intval');
-        $sex = I('sex', 1, 'intval');
+        $gender = I('gender', 1, 'intval');
         $major = I('major', '');
         $grade = I('grade', 1, 'intval');
         $desc = I('desc', '');
@@ -54,16 +64,16 @@ class SettingsController extends AdminController {
         if(empty($uid)){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
         }
-        if(!in_array($sex, array(0,1))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Sex value is invalid.', 'location' => 'sex'));
+        if(!in_array($gender, array(0,1))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Gender value is invalid.', 'location' => 'gender'));
         }
         $grades = C('USER_GRADES');
         if(!in_array($grade, array_keys($grades))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'sex'));
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'gender'));
         }
 
         $userinfo = array(
-            'sex' => $sex,
+            'gender' => $gender,
             'major' => $major,
             'grade' => $grade,
             'desc' => $desc,
@@ -186,6 +196,63 @@ class SettingsController extends AdminController {
         }
     }
 
+    public function message_distribute(){
+        $message_id = I('message_id', 0, 'intval');
+        $this->assign('message_id', $message_id);
+
+        $mMember = new MemberModel();
+        $members = $mMember->get_member_list();
+        $this->assign('members', $members);
+
+        $grades = C('USER_GRADES');
+        $this->assign('grades', $grades);
+
+        $majors = C('MAJOR_MAPPING');
+        $this->assign('majors', $majors);
+
+        $mLocation = new LocationModel();
+        $locations = $mLocation->get_location_list();
+        $this->assign('regions', $locations);
+
+        $this->display();
+    }
+
+    public function message_distribute_submit(){
+        $uid = I('user_uid', 0, 'intval');
+        $grade = I('user_grade', 0, 'intval');
+        $major = I('user_major', 0, 'intval');
+        $gender = I('user_gender', 0, 'intval');
+        $region_id = I('region_id', 0, 'intval');
+        $datetime = I('datetime', '', 'trim');
+        $message_id = I('message_id', 0, 'intval');
+        $priority = I('priority', 0, 'intval');
+
+        if(empty($datetime)){
+            $datetime = time();
+        }else{
+            $datetime = strtotime($datetime);
+        }
+
+        $match = array(
+            'user_uid' => $uid,
+            'user_grade' => $grade,
+            'user_major' => $major,
+            'user_gender' => $gender,
+            'region_id' => $region_id,
+            'datetime' => $datetime,
+            'message_id' => $message_id,
+            'priority' => $priority
+        );
+
+        $mMatch = new MatchModel();
+        $ret = $mMatch->insert_match($match);
+        if($ret){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to distribute.', 'url' => '', 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to distribute.', 'url' => '', 'location' => ''));
+        }
+    }
+
     public function message_del(){
         $message_id = I('message_id', 0, 'intval');
         $mMessage = new MessageModel();
@@ -284,7 +351,7 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Location id is invalid.', 'location' => ''));
         }
         if(!in_array($status, array(0,1))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Status is invalid.', 'location' => 'sex'));
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Status is invalid.', 'location' => 'gender'));
         }
 
         $location_info = array(
