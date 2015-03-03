@@ -114,31 +114,25 @@ class MatchModel extends MongoModel{
 
     /**
      * 获取所有match by user features
-     * {"$or":[
-     *      {"$and" : [
-     *                  {"user_uid": 1},
-     *                  {"region_id": {"$in": [0,1]}},
-     *                  {"status" : 0},
-     *                  {"expire_time" : {"$gte" : time()}}
-     *               ]
-     *      },
-     *      {"$and" : [
-     *                  {"$and" : [
-     *                              {"user_uid": 0},
-     *                              {"region_id": {"$in": [0,1]}},
-     *                              {"status" : 0},
-     *                              {"expire_time" : {"$gte" : time()}}
-     *                      ]
-     *                  },
-     *                  {"$or" : [
-     *                              {"user_grade": {"$in": [0,1]}},
-     *                              {"user_major": {"$in": [0,1]}},
-     *                              {"user_gender": {"$in": [0,1]}}
-     *                      ]
-     *                  }
-     *              ]
-     *      ]}
-     * }
+     * $map = array(
+     *       'or' => array(
+     *                  array(
+     *                      'user_uid' => $user['uid'],
+     *                  ),
+     *               array(
+     *                  'user_uid' => 0,
+     *                  'or' => array(
+     *                      'user_grade' => array('in', array(0, $user['grade'])),
+     *                      'user_major' => array('in', array(0, $user['major'])),
+     *                      'user_gender' => array('in', array(0, $user['gender'])),
+     *                  ),
+     *              ),
+     *        ),
+     *       'status' => 0,
+     *       'message_id' => array('gt', $last_message_id),
+     *       'expire_time' => array('gte', $last_time),
+     *       'region_id' => array('in', $region_ids)
+     *  );
      * @param $locations
      * @param $user
      * @param $last_message_id
@@ -166,7 +160,6 @@ class MatchModel extends MongoModel{
         $map['message_id']  = array('gt', $last_message_id);
         $map['expire_time']  = array('gte', $last_time);
         $map['region_id']  = array('in', $region_ids);
-
         $matches = $this->where($map)->order('mtime desc')->limit($start.','.$limit)->select();
         if(empty($matches)){
             $matches = array();

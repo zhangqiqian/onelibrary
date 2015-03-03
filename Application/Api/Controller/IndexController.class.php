@@ -46,14 +46,17 @@ class IndexController extends ApiController {
         $mMessage = new MessageModel();
         foreach ($matches as $match) {
             $message = $mMessage->get_message_for_app($match['message_id']);
-            $messages[] = $message;
+            if(!isset($messages[$message['message_id']])){
+                $messages[$message['message_id']] = $message;
+            }
             if($message && $match['user_uid'] > 0 ){
                 $params = array('status' => 1); //switch to read
                 $mMatch->update_match($match['match_id'], $params);
             }
+            //TODO log record.
         }
 
         $next_start = empty($message) ? 0 : $start + $limit;
-        $this->ajaxReturn(array('errno' => 0, 'result' => $messages, 'start' => $next_start));
+        $this->ajaxReturn(array('errno' => 0, 'result' => array_values($messages), 'start' => $next_start));
     }
 }
