@@ -94,6 +94,7 @@ class MessageModel extends MongoModel{
         $categories = C('MESSAGE_CATEGORIES');
         $message['category'] = $categories[$message['category']];
         $message['tags'] = implode(', ', $message['tags']);
+        $message['pubdate'] = date('Y-m-d h:i:s', $message['pubdate']);
         return $message;
     }
 
