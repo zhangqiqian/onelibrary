@@ -34,7 +34,7 @@
                 <th>Category</th>
                 <th>Content</th>
                 <th>Tag</th>
-                <th width="150">Publish Date</th>
+                <th width="150">DateTime</th>
                 <th width="150">Operation</th>
               </tr>
               </thead>
@@ -50,7 +50,7 @@
                   <td>{$message.pubdate|date="Y-m-d H:i:s",###}</td>
                   <td>
                     <a href="javascript:open_dialog('edit', '{:U('Settings/message_edit')}/message_id/{$message.message_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
-                    <a href="javascript:open_dialog('distribute', '{:U('Settings/message_distribute')}/message_id/{$message.message_id}');" title="Distribute"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a>&nbsp;
+                    <a href="javascript:open_dialog('publish', '{:U('Settings/message_publish')}/message_id/{$message.message_id}');" title="Publish"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a>&nbsp;
                     <a href="javascript:open_dialog('del', '{:U('Settings/message_del')}/message_id/{$message.message_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
                   </td>
                 </tr>
@@ -99,20 +99,20 @@
     </div>
   </div>
 
-  <!-- Distribute Modal -->
-  <div class="modal fade" id="distributeModal" tabindex="-1" role="dialog" aria-labelledby="distributeModalLabel" aria-hidden="true">
+  <!-- publish Modal -->
+  <div class="modal fade" id="publishModal" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="distributeModalLabel">Distribute Message</h4>
+          <h4 class="modal-title" id="publishModalLabel">Publish Message</h4>
         </div>
-        <div id="distributeFormPage" class="modal-body">
+        <div id="publishFormPage" class="modal-body">
         </div>
         <div class="modal-footer">
-          <div id="distribute-tips" class="Validform_checktip text-danger pull-left"></div>
+          <div id="publish-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="distribute_message();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="publish_message();">Save</button>
         </div>
       </div>
     </div>
@@ -150,16 +150,16 @@
       if(tag == 'add'){
         $("#editFormPage").empty();
         $("#delFormPage").empty();
-        $("#distributeFormPage").empty();
+        $("#publishFormPage").empty();
       }else if(tag == 'edit'){
         $("#addFormPage").empty();
         $("#delFormPage").empty();
-        $("#distributeFormPage").empty();
+        $("#publishFormPage").empty();
       }else if(tag == 'del'){
         $("#addFormPage").empty();
         $("#editFormPage").empty();
-        $("#distributeFormPage").empty();
-      }else if(tag == 'distribute'){
+        $("#publishFormPage").empty();
+      }else if(tag == 'publish'){
         $("#addFormPage").empty();
         $("#editFormPage").empty();
         $("#delFormPage").empty();
@@ -217,13 +217,13 @@
       }, "json");
     }
 
-    function distribute_message(){
-      var self = $("#distributeMessageForm");
+    function publish_message(){
+      var self = $("#publishMessageForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
-          $("#distribute-tips").addClass('text-success');
-          $("#distribute-tips").removeClass('text-danger');
-          $("#distribute-tips").text(data.errmsg);
+          $("#publish-tips").addClass('text-success');
+          $("#publish-tips").removeClass('text-danger');
+          $("#publish-tips").text(data.errmsg);
           //window.location.href = data.url;
         } else {
           var location = data.location;
