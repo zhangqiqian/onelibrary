@@ -1,0 +1,7 @@
+<form id="readPublishForm" class="form-horizontal" action="{:U('Dashboard/publish_read_submit')}">
+    <input type="hidden" id="publish_id" name="publish_id" value="{$publish.publish_id}">
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        Are you sure to mark the message <strong><em>{$publish.message}</em></strong> to <eq name="publish.status" value="1">No Read<else/>Read</eq>?
+    </div>
+</form>

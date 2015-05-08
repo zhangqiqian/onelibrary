@@ -24,7 +24,7 @@
             <div id="message-chart" style="height:400px"></div>
           </div>
           <hr class="featurette-divider">
-          <h2 class="sub-header">Matched Messages</h2>
+          <h2 class="sub-header">Published Messages</h2>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -43,22 +43,22 @@
                 </tr>
               </thead>
               <tbody>
-              <foreach name="matches" item="match" >
+              <foreach name="publishes" item="publish" >
                 <tr>
-                  <td>{$match.match_id}</td>
-                  <td>{$match.user_name}</td>
-                  <td>{$match.user_grade|ucwords}</td>
-                  <td>{$match.user_major|ucwords}</td>
-                  <td>{$match.user_gender|ucwords}</td>
-                  <td>{$match.priority|ucfirst}</td>
-                  <td>{$match.region_name|default='All'}</td>
-                  <td>{$match.message}</td>
-                  <td><eq name="match.status" value="0">No Read<else/>Read</eq></td>
-                  <td>{$match.expire_time|date="Y-m-d H:i:s",###}</td>
+                  <td>{$publish.publish_id}</td>
+                  <td>{$publish.user_name}</td>
+                  <td>{$publish.user_grade|ucwords}</td>
+                  <td>{$publish.user_major|ucwords}</td>
+                  <td>{$publish.user_gender|ucwords}</td>
+                  <td>{$publish.priority|ucfirst}</td>
+                  <td>{$publish.region_name|default='All'}</td>
+                  <td>{$publish.message}</td>
+                  <td><eq name="publish.status" value="0">No Read<else/>Read</eq></td>
+                  <td>{$publish.expire_time|date="Y-m-d H:i:s",###}</td>
                   <td>
-                    <a href="javascript:open_dialog('edit', '{:U('Dashboard/match_edit')}/match_id/{$match.match_id}');" title="Read"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
-                    <a href="javascript:open_dialog('read', '{:U('Dashboard/match_read')}/match_id/{$match.match_id}');" title="Read"><span class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span></a>
-                    <a href="javascript:open_dialog('del', '{:U('Dashboard/match_del')}/match_id/{$match.match_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                    <a href="javascript:open_dialog('edit', '{:U('Dashboard/publish_edit')}/publish_id/{$publish.publish_id}');" title="Read"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                    <a href="javascript:open_dialog('read', '{:U('Dashboard/publish_read')}/publish_id/{$publish.publish_id}');" title="Read"><span class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span></a>
+                    <a href="javascript:open_dialog('del', '{:U('Dashboard/publish_del')}/publish_id/{$publish.publish_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
                   </td>
                 </tr>
               </foreach>
@@ -74,14 +74,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="editModalLabel">Edit Matched Message</h4>
+          <h4 class="modal-title" id="editModalLabel">Edit Published Message</h4>
         </div>
         <div id="editFormPage" class="modal-body">
         </div>
         <div class="modal-footer">
           <div id="edit-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="edit_match();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="edit_publish();">Save</button>
         </div>
       </div>
     </div>
@@ -100,7 +100,7 @@
         <div class="modal-footer">
           <div id="read-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="read_match();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="read_publish();">Save</button>
         </div>
       </div>
     </div>
@@ -112,14 +112,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="delModalLabel">Delete Matched Message</h4>
+          <h4 class="modal-title" id="delModalLabel">Delete Published Message</h4>
         </div>
         <div id="delFormPage" class="modal-body">
         </div>
         <div class="modal-footer">
           <div id="del-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="del_match();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="del_publish();">Save</button>
         </div>
       </div>
     </div>
@@ -152,8 +152,8 @@
       $('#'+tag+'Modal').modal('show');
     }
 
-    function edit_match(){
-      var self = $("#editMatchForm");
+    function edit_publish(){
+      var self = $("#editPublishForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
           $("#edit-tips").addClass('text-success');
@@ -176,8 +176,8 @@
       }, "json");
     }
 
-    function read_match(){
-      var self = $("#readMatchForm");
+    function read_publish(){
+      var self = $("#readPublishForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
           $("#read-tips").addClass('text-success');
@@ -200,8 +200,8 @@
       }, "json");
     }
 
-    function del_match(){
-      var self = $("#delMatchForm");
+    function del_publish(){
+      var self = $("#delPublishForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
           $("#del-tips").addClass('text-success');
