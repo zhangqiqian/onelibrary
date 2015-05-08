@@ -299,8 +299,6 @@ class SettingsController extends AdminController {
     }
 
     public function location_add(){
-        $countries = C('COUNTRY_CODE_MAP');
-        $this->assign('countries', $countries);
         $this->display();
     }
 
