@@ -10,7 +10,7 @@
 namespace Api\Controller;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
-use Common\Model\MatchModel;
+use Common\Model\PublishModel;
 use Common\Model\MessageModel;
 
 use Think\Controller;
@@ -40,18 +40,18 @@ class IndexController extends ApiController {
         $mLocation = new LocationModel();
         $locations = $mLocation->get_locations_by_location($longitude, $latitude);
 
-        $mMatch = new MatchModel();
-        $matches = $mMatch->get_matches_by_user_features($locations, $member, $last_message_id, $last_time, $start, $limit);
+        $mPublish = new PublishModel();
+        $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $last_message_id, $last_time, $start, $limit);
         $messages = array();
         $mMessage = new MessageModel();
-        foreach ($matches as $match) {
-            $message = $mMessage->get_message_for_app($match['message_id']);
+        foreach ($publishes as $publish) {
+            $message = $mMessage->get_message_for_app($publish['message_id']);
             if(!isset($messages[$message['message_id']])){
                 $messages[$message['message_id']] = $message;
             }
-            if($message && $match['user_uid'] > 0 ){
+            if($message && $publish['user_uid'] > 0 ){
                 $params = array('status' => 1); //switch to read
-                $mMatch->update_match($match['match_id'], $params);
+                $mPublish->update_publish($publish['publish_id'], $params);
             }
             //TODO log record.
         }
