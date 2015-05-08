@@ -76,14 +76,14 @@ class PublishModel extends MongoModel{
             $publish['priority'] = $priorities[$publish['priority']];
 
             if($publish['location_id'] == 0){
-                $publish['region_name'] = 'All';
+                $publish['location_name'] = 'All';
             }else{
                 $location = $mLocation->get_location($publish['location_id']);
-                $publish['region_name'] = $location['name'];
+                $publish['location_name'] = $location['name'];
             }
 
             $message = $mMessage->get_message($publish['message_id']);
-            $publish['message'] = $message['title'];
+            $publish['title'] = $message['title'];
             $ret[] = $publish;
         }
         return $ret;

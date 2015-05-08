@@ -41,7 +41,7 @@ class MessageModel extends MongoModel{
      * @return array
      */
     public function get_message_list(){
-        $messages = $this->order('message_id')->select();
+        $messages = $this->order('message_id desc')->select();
         if(!$messages){
             $messages = array();
         }
@@ -52,6 +52,7 @@ class MessageModel extends MongoModel{
             unset($message['ctime']);
             unset($message['mtime']);
             $message['tags'] = implode(', ', $message['tags']);
+            $message['author'] = implode(', ', $message['author']);
             $message['category'] = $categories[$message['category']];
             $ret[] = $message;
         }
@@ -68,10 +69,20 @@ class MessageModel extends MongoModel{
         if(empty($message)){
             $message = array();
         }
+        $categories = C('MESSAGE_CATEGORIES');
         unset($message['_id']);
         unset($message['ctime']);
         unset($message['mtime']);
         $message['tags'] = implode(', ', $message['tags']);
+        $message['author'] = implode(', ', $message['author']);
+        $message['category'] = $categories[$message['category']];
+        $link = parse_url($message['link']);
+        if(isset($link['host'])){
+            $message['link_host'] = $link['scheme'].'://'.$link['host'];
+        }else{
+            $message['link_host'] = 'Unknown';
+            $message['link'] = 'http://'.$message['link'];
+        }
         return $message;
     }
 
@@ -94,6 +105,7 @@ class MessageModel extends MongoModel{
         $categories = C('MESSAGE_CATEGORIES');
         $message['category'] = $categories[$message['category']];
         $message['tags'] = implode(', ', $message['tags']);
+        $message['author'] = implode(', ', $message['author']);
         return $message;
     }
 
