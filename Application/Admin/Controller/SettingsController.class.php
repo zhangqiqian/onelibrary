@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Admin\Controller;
-use Common\Model\MatchModel;
+use Common\Model\PublishModel;
 use Think\Controller;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
@@ -196,7 +196,7 @@ class SettingsController extends AdminController {
         }
     }
 
-    public function message_distribute(){
+    public function message_publish(){
         $message_id = I('message_id', 0, 'intval');
         $this->assign('message_id', $message_id);
 
@@ -215,45 +215,45 @@ class SettingsController extends AdminController {
 
         $mLocation = new LocationModel();
         $locations = $mLocation->get_location_list();
-        $this->assign('regions', $locations);
+        $this->assign('locations', $locations);
 
         $this->display();
     }
 
-    public function message_distribute_submit(){
+    public function message_publish_submit(){
         $uid = I('user_uid', 0, 'intval');
         $grade = I('user_grade', 0, 'intval');
         $major = I('user_major', 0, 'intval');
         $gender = I('user_gender', 0, 'intval');
-        $region_id = I('region_id', 0, 'intval');
+        $location_id = I('location_id', 0, 'intval');
         $datetime = I('expire_time', '', 'trim');
         $message_id = I('message_id', 0, 'intval');
         $priority = I('priority', 0, 'intval');
 
         if(empty($datetime)){
-            $date_time = time();
+            $date_time = time() + 24 * 3600;
         }else{
             $date_time = strtotime($datetime);
         }
 
-        $match = array(
+        $publish = array(
             'user_uid' => $uid,
             'user_grade' => $grade,
             'user_major' => $major,
             'user_gender' => $gender,
-            'region_id' => $region_id,
+            'location_id' => $location_id,
             'expire_time' => $date_time,
             'message_id' => $message_id,
             'status' => 0,
             'priority' => $priority
         );
 
-        $mMatch = new MatchModel();
-        $ret = $mMatch->insert_match($match);
+        $mPublish = new PublishModel();
+        $ret = $mPublish->insert_publish($publish);
         if($ret){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to distribute.', 'url' => '', 'location' => ''));
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to publish.', 'url' => '', 'location' => ''));
         }else{
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to distribute.', 'url' => '', 'location' => ''));
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to publish.', 'url' => '', 'location' => ''));
         }
     }
 
@@ -278,8 +278,8 @@ class SettingsController extends AdminController {
             $remove_result = false;
         }
 
-        $mMatch = new MatchModel();
-        $ret = $mMatch->remove_match_by_msg_id($message_id);
+        $mPublish = new PublishModel();
+        $ret = $mPublish->remove_publish_by_msg_id($message_id);
         if(!$ret['ok']){
             $remove_result = false;
         }
@@ -307,24 +307,17 @@ class SettingsController extends AdminController {
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
         $status = I('status', 0, 'intval');
-        $country_code = I('country_code', '', 'trim');
-        $region = I('region', '', 'trim');
-        $city = I('city', '', 'trim');
+        $radius = I('radius', 0, 'intval');
+        $address = I('address', '', 'trim');
         $desc = I('desc', '', 'trim');
-
-        $country_codes = C('COUNTRY_CODE_MAP');
-        if(!in_array($country_code, array_keys($country_codes))){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Country code is invalid.', 'location' => 'country'));
-        }
 
         $location = array(
             'name' => $name,
             'longitude' => $longitude,
             'latitude' => $latitude,
             'status' => $status,
-            'country_code' => $country_code,
-            'region' => $region,
-            'city' => $city,
+            'radius' => $radius,
+            'address' => $address,
             'desc' => $desc
         );
         $mLocation = new LocationModel();
@@ -342,10 +335,6 @@ class SettingsController extends AdminController {
         $mLocation = new LocationModel();
         $location = $mLocation->get_location($location_id);
         $this->assign('location', $location);
-
-        $countries = C('COUNTRY_CODE_MAP');
-        $this->assign('countries', $countries);
-
         $this->display();
     }
 
@@ -355,9 +344,8 @@ class SettingsController extends AdminController {
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
         $status = I('status', 0, 'intval');
-        $country_code = I('country_code', '', 'trim');
-        $region = I('region', '', 'trim');
-        $city = I('city', '', 'trim');
+        $radius = I('radius', 0, 'intval');
+        $address = I('address', '', 'trim');
         $desc = I('desc', '', 'trim');
 
         if(empty($location_id)){
@@ -372,9 +360,8 @@ class SettingsController extends AdminController {
             'longitude' => $longitude,
             'latitude' => $latitude,
             'status' => $status,
-            'country_code' => $country_code,
-            'region' => $region,
-            'city' => $city,
+            'radius' => $radius,
+            'address' => $address,
             'desc' => $desc
         );
 

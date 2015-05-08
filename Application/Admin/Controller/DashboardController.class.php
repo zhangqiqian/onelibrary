@@ -9,7 +9,7 @@
 
 namespace Admin\Controller;
 use Common\Model\LocationModel;
-use Common\Model\MatchModel;
+use Common\Model\PublishModel;
 use Common\Model\MemberModel;
 use Think\Controller;
 
@@ -23,14 +23,14 @@ class DashboardController extends AdminController {
     }
 
     public function message(){
-        $mMatch = new MatchModel();
-        $matches = $mMatch->get_match_list();
-        $this->assign('matches', $matches);
+        $mPublish = new PublishModel();
+        $publishes = $mPublish->get_publish_list();
+        $this->assign('publishes', $publishes);
         $this->display();
     }
 
-    public function match_edit(){
-        $match_id = I('match_id', 0, 'intval');
+    public function publish_edit(){
+        $publish_id = I('publish_id', 0, 'intval');
         $mMember = new MemberModel();
         $members = $mMember->get_member_list();
         $this->assign('members', $members);
@@ -48,25 +48,25 @@ class DashboardController extends AdminController {
         $locations = $mLocation->get_location_list();
         $this->assign('regions', $locations);
 
-        $mMatch = new MatchModel();
-        $match = $mMatch->get_match($match_id);
-        $this->assign('match', $match);
+        $mPublish = new PublishModel();
+        $publish = $mPublish->get_publish($publish_id);
+        $this->assign('publish', $publish);
         $this->display();
     }
 
-    public function match_edit_submit(){
-        $match_id = I('match_id', 0, 'intval');
+    public function publish_edit_submit(){
+        $publish_id = I('publish_id', 0, 'intval');
         $uid = I('user_uid', 0, 'intval');
         $grade = I('user_grade', 0, 'intval');
         $major = I('user_major', 0, 'intval');
         $gender = I('user_gender', 0, 'intval');
-        $region_id = I('region_id', 0, 'intval');
+        $location_id = I('location_id', 0, 'intval');
         $datetime = I('expire_time', '', 'trim');
         $message_id = I('message_id', 0, 'intval');
         $priority = I('priority', 0, 'intval');
 
-        if(empty($match_id)){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Match ID is invalid.', 'location' => ''));
+        if(empty($publish_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Publish ID is invalid.', 'location' => ''));
         }
 
         if(empty($datetime)){
@@ -75,52 +75,51 @@ class DashboardController extends AdminController {
             $date_time = strtotime($datetime);
         }
 
-        $match = array(
+        $publish = array(
             'user_uid' => $uid,
             'user_grade' => $grade,
             'user_major' => $major,
             'user_gender' => $gender,
-            'region_id' => $region_id,
+            'location_id' => $location_id,
             'expire_time' => $date_time,
             'message_id' => $message_id,
             'status' => 0,
             'priority' => $priority
         );
 
-        $mMatch = new MatchModel();
-        $ret = $mMatch->update_match($match_id, $match);
+        $mPublish = new PublishModel();
+        $ret = $mPublish->update_publish($publish_id, $publish);
         if($ret['ok']){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to distribute.', 'url' => '', 'location' => ''));
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to publish.', 'url' => '', 'location' => ''));
         }else{
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to distribute.', 'url' => '', 'location' => ''));
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to publish.', 'url' => '', 'location' => ''));
         }
     }
 
-    public function match_read(){
-        $match_id = I('match_id', 0, 'intval');
-        $mMatch = new MatchModel();
-        $match = $mMatch->get_match($match_id);
-        $this->assign('match', $match);
+    public function publish_read(){
+        $publish_id = I('publish_id', 0, 'intval');
+        $mPublish = new PublishModel();
+        $publish = $mPublish->get_publish($publish_id);
+        $this->assign('publish', $publish);
         $this->display();
     }
 
-    public function match_read_submit(){
-        $match_id = I('match_id', 0, 'intval');
-        if(empty($match_id)){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Match ID is invalid.', 'location' => ''));
+    public function publish_read_submit(){
+        $publish_id = I('publish_id', 0, 'intval');
+        if(empty($publish_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Publish ID is invalid.', 'location' => ''));
         }
 
-        $mMatch = new MatchModel();
-        $match = $mMatch->get_match($match_id);
+        $mPublish = new PublishModel();
+        $publish = $mPublish->get_publish($publish_id);
         $params = array();
-        if($match['status'] == 0){
+        if($publish['status'] == 0){
             $params['status'] = 1;
         }else{
             $params['status'] = 0;
         }
 
-        $mMatch = new MatchModel();
-        $ret = $mMatch->update_match($match_id, $params);
+        $ret = $mPublish->update_publish($publish_id, $params);
         if($ret['ok']){
             $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Dashboard/message'), 'location' => ''));
         }else{
@@ -128,22 +127,22 @@ class DashboardController extends AdminController {
         }
     }
 
-    public function match_del(){
-        $match_id = I('match_id', 0, 'intval');
-        $mMatch = new MatchModel();
-        $match = $mMatch->get_match($match_id);
-        $this->assign('match', $match);
+    public function publish_del(){
+        $publish_id = I('publish_id', 0, 'intval');
+        $mPublish = new PublishModel();
+        $publish = $mPublish->get_publish($publish_id);
+        $this->assign('publish', $publish);
         $this->display();
     }
 
-    public function match_del_submit(){
-        $match_id = I('match_id', 0, 'intval');
-        if(empty($match_id)){
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Match ID is invalid.', 'location' => ''));
+    public function publish_del_submit(){
+        $publish_id = I('publish_id', 0, 'intval');
+        if(empty($publish_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Publish ID is invalid.', 'location' => ''));
         }
 
-        $mMatch = new MatchModel();
-        $ret = $mMatch->remove_match($match_id);
+        $mPublish = new PublishModel();
+        $ret = $mPublish->remove_publish($publish_id);
         if($ret['ok']){
             $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Dashboard/message'), 'location' => ''));
         }else{
