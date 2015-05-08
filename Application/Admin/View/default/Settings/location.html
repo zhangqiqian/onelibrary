@@ -20,20 +20,28 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <ol class="breadcrumb">
-            <li><a href="#">Settings</a></li>
+            <li><a href="{:U('Settings/user')}">Settings</a></li>
             <li class="active">Location</li>
           </ol>
 
           <div>
             <a href="javascript:open_dialog('add', '{:U('Settings/location_add')}');" class="btn btn-primary btn-sm pull-right" >Add Location</a>
-            <h1 class="page-header">Location List</h1>
+              <form id="search" class="form-inline" action="" method="post">
+                  <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Location Name">
+                      <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                      </span>
+                  </div>
+              </form>
           </div>
+            <hr class="featurette-divider">
           <div id="main" class="table-responsive">
             <table class="table table-striped table-hover">
               <thead>
               <tr>
                 <th width="50">ID</th>
-                <th>Name</th>
+                <th>Location Name</th>
                 <th>Longitude</th>
                 <th>Latitude</th>
                 <th>Radius</th>
@@ -54,12 +62,26 @@
                   <td><eq name="location.status" value="1">Enabled<else/>Disabled</eq></td>
                   <td>
                       <a href="javascript:open_dialog('edit', '{:U('Settings/location_edit')}/location_id/{$location.location_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
-                      <a href="javascript:open_dialog('del', '{:U('Settings/location_del')}/location_id/{$location.location_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                      <a href="javascript:open_dialog('locate', '{:U('Settings/location_locate')}/location_id/{$location.location_id}');" title="Locate in map"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a>
+                      <a href="javascript:open_dialog('del', '{:U('Settings/location_del')}/location_id/{$location.location_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>&nbsp;
                   </td>
                 </tr>
               </foreach>
               </tbody>
             </table>
+          </div>
+          <div class="text-center">
+            <nav>
+                <ul class="pagination">
+                    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                </ul>
+            </nav>
           </div>
         </div>
       </div>

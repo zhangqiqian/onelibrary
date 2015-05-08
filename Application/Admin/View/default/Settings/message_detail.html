@@ -1,0 +1,43 @@
+<extend name="Base/common-nofooter"/>
+
+<block name="body">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li>
+              <a href="{:U('Settings/user')}">User</a>
+            </li>
+            <li class="active">
+              <a href="{:U('Settings/message')}">Message</a>
+            </li>
+            <li>
+              <a href="{:U('Settings/publish')}">Publish</a>
+            </li>
+            <li>
+              <a href="{:U('Settings/location')}">Location</a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <ol class="breadcrumb">
+            <li><a href="{:U('Settings/user')}">Settings</a></li>
+            <li><a href="{:U('Settings/message')}">Message</a></li>
+            <li class="active">Detail</li>
+          </ol>
+          <div>
+            <a href="javascript:history.go(-1);" title="Return last page." class="btn pull-right" ><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a>
+            <h4><span class="label label-info">[{$message.category}]</span>&nbsp;{$message.title}</h4>
+          </div>
+            <div style="margin-top: 20px;">
+                <span class="pull-right" style="color: #888888">发布: {$message.pubdate|date="Y-m-d H:i:s",###}</span>
+                <span>作者: {$message.author}</span>
+            </div>
+            <hr class="featurette-divider">
+            <p>{$message.content}</p>
+            <div style="margin-top: 20px;">
+                <span class="text-info pull-right">来源: <a href="{$message.link}">{$message.link_host}</a></span>
+                <span class="text-success">Tag: {$message.tags}</span>
+            </div>
+        </div>
+      </div>
+</block>
