@@ -33,9 +33,8 @@
                 <th>Name</th>
                 <th>Longitude</th>
                 <th>Latitude</th>
-                <th>Country</th>
-                <th>Region</th>
-                <th>City</th>
+                <th>Radius</th>
+                <th>Address</th>
                 <th>Description</th>
                 <th width="150">Status</th>
                 <th width="150">Operation</th>
@@ -48,9 +47,8 @@
                   <td>{$location.name}</td>
                   <td>{$location.longitude|default='0'}</td>
                   <td>{$location.latitude|default='0'}</td>
-                  <td>{$location.country|ucfirst}</td>
-                  <td>{$location.region|ucfirst}</td>
-                  <td>{$location.city|ucfirst}</td>
+                  <td>{$location.radius|default='0'} m</td>
+                  <td>{$location.address|ucfirst}</td>
                   <td>{$location.desc|ucfirst}</td>
                   <td><eq name="location.status" value="1">Enabled<else/>Disabled</eq></td>
                   <td>
