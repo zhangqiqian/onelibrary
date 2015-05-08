@@ -98,7 +98,7 @@ class SettingsController extends AdminController {
 
     public function message_add_submit(){
         $title = I('title', '', 'trim');
-        $author = I('author', '', 'trim');
+        $author_str = I('author', '', 'trim');
         $category = I('category', 0, 'intval');
         $content = I('content', '', 'trim');
         $link = I('link', '', 'trim');
@@ -110,6 +110,14 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Category value is invalid.', 'location' => 'category'));
         }
 
+        $authors = array();
+        if($author_str){
+            $authors_arr = explode(',', $author_str);
+            foreach ($authors_arr as $author) {
+                $authors[] = $author;
+            }
+        }
+
         $tags = array();
         if($tag_str){
             $tags_arr = explode(',', $tag_str);
@@ -119,7 +127,7 @@ class SettingsController extends AdminController {
         }
         $message = array(
             'title' => $title,
-            'author' => $author,
+            'author' => $authors,
             'category' => $category,
             'content' => $content,
             'link' => $link,
@@ -153,7 +161,7 @@ class SettingsController extends AdminController {
     public function message_edit_submit(){
         $message_id = I('message_id', 0, 'intval');
         $title = I('title', '', 'trim');
-        $author = I('author', '', 'trim');
+        $author_str = I('author', '', 'trim');
         $category = I('category', 0, 'intval');
         $content = I('content', '', 'trim');
         $link = I('link', '', 'trim');
@@ -169,6 +177,14 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Category value is invalid.', 'location' => 'category'));
         }
 
+        $authors = array();
+        if($author_str){
+            $authors_arr = explode(',', $author_str);
+            foreach ($authors_arr as $author) {
+                $authors[] = $author;
+            }
+        }
+
         $tags = array();
         if($tag_str){
             $tags_arr = explode(',', $tag_str);
@@ -179,7 +195,7 @@ class SettingsController extends AdminController {
 
         $message = array(
             'title' => $title,
-            'author' => $author,
+            'author' => $authors,
             'category' => $category,
             'content' => $content,
             'pubdate' => time(),
@@ -251,7 +267,7 @@ class SettingsController extends AdminController {
         $mPublish = new PublishModel();
         $ret = $mPublish->insert_publish($publish);
         if($ret){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to publish.', 'url' => '', 'location' => ''));
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to publish.', 'url' => U('Settings/publish'), 'location' => ''));
         }else{
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to publish.', 'url' => '', 'location' => ''));
         }
@@ -289,6 +305,14 @@ class SettingsController extends AdminController {
         }else{
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/message'), 'location' => ''));
         }
+    }
+
+    public function message_detail(){
+        $message_id = I('message_id', 0, 'intval');
+        $mMessage = new MessageModel();
+        $message = $mMessage->get_message($message_id);
+        $this->assign('message', $message);
+        $this->display();
     }
 
     public function publish(){
@@ -523,6 +547,14 @@ class SettingsController extends AdminController {
         }else{
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/location'), 'location' => ''));
         }
+    }
+
+    public function location_locate(){
+        $location_id = I('location_id', 0, 'intval');
+        $mLocation = new LocationModel();
+        $location = $mLocation->get_location($location_id);
+        $this->assign('location', $location);
+        $this->display();
     }
 
 }
