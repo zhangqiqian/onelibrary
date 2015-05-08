@@ -38,7 +38,6 @@
                 <th>Latitude</th>
                 <th>Radius</th>
                 <th>Address</th>
-                <th>Description</th>
                 <th width="150">Status</th>
                 <th width="150">Operation</th>
               </tr>
@@ -52,7 +51,6 @@
                   <td>{$location.latitude|default='0'}</td>
                   <td>{$location.radius|default='0'} m</td>
                   <td>{$location.address|ucfirst}</td>
-                  <td>{$location.desc|ucfirst}</td>
                   <td><eq name="location.status" value="1">Enabled<else/>Disabled</eq></td>
                   <td>
                       <a href="javascript:open_dialog('edit', '{:U('Settings/location_edit')}/location_id/{$location.location_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;

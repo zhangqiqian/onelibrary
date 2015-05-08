@@ -36,9 +36,7 @@
               <th>Gender</th>
               <th>Major</th>
               <th>Grade</th>
-              <th>Description</th>
               <th>Last Login IP</th>
-              <th>Last Login Time</th>
               <th>Login Count</th>
               <th width="120">Status</th>
               <th width="150">Operation</th>
@@ -52,9 +50,7 @@
               <td><eq name="member.gender" value="1">Male<else/>Female</eq></td>
               <td>{$member.major|default='Unknown'}</td>
               <td>{$member.grade|ucwords}</td>
-              <td>{$member.desc|ucfirst}</td>
               <td>{$member.last_login_ip|long2ip}</td>
-              <td>{$member.last_login_time|date="Y-m-d H:i:s",###}</td>
               <td>{$member.login_count}</td>
               <td><eq name="member.status" value="1">Enabled<else/>Disabled</eq></td>
               <td><a href="javascript:open_dialog('edit', '{:U('Settings/user_edit')}/uid/{$member.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
