@@ -32,7 +32,7 @@ return array(
 
     /* Message Category Mapping */
     'MAJOR_MAPPING' => array(
-        0 => 'Unknown',
+        0 => '未知',
         1 => '图书馆学',
         2 => '情报学',
         3 => '档案学',
