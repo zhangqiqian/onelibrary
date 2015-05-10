@@ -364,3 +364,29 @@ function api($name, $vars = array()){
     }
     return call_user_func_array($callback,$vars);
 }
+
+function rad($d)
+{
+    return $d * 3.1415926535898 / 180.0;
+}
+
+/**
+ * get distance by two latitude and longitude
+ * @param $latitude1
+ * @param $longitude1
+ * @param $latitude2
+ * @param $longitude2
+ * @return float|int
+ */
+function get_distance($latitude1, $longitude1, $latitude2, $longitude2)
+{
+    $EARTH_RADIUS = 6378.137;
+    $radLat1 = rad($latitude1);
+    $radLat2 = rad($latitude2);
+    $a = $radLat1 - $radLat2;
+    $b = rad($longitude1) - rad($longitude2);
+    $s = 2 * asin(sqrt(pow(sin($a/2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b/2),2)));
+    $s = $s *$EARTH_RADIUS;
+    $s = round($s * 10000) / 10000;
+    return $s;
+}
