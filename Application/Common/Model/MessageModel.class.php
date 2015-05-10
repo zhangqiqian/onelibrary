@@ -69,13 +69,11 @@ class MessageModel extends MongoModel{
         if(empty($message)){
             $message = array();
         }
-        $categories = C('MESSAGE_CATEGORIES');
         unset($message['_id']);
         unset($message['ctime']);
         unset($message['mtime']);
         $message['tags'] = implode(', ', $message['tags']);
         $message['author'] = implode(', ', $message['author']);
-        $message['category'] = $categories[$message['category']];
         $link = parse_url($message['link']);
         if(isset($link['host'])){
             $message['link_host'] = $link['scheme'].'://'.$link['host'];
