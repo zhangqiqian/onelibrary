@@ -1,103 +1,118 @@
 <extend name="Base/common"/>
 
 <block name="body">
-  <div class="row row-offcanvas row-offcanvas-right">
-      <!-- Jumbotron -->
-      <div class="jumbotron" style="background-color:rgba(0, 0, 0, 0.8)">
-          <div class="row">
-              <div class="col-md-9">
-                  <h1>
-                    <span class="common-logo">OneLibrary</span>
-                  </h1>
-                  <h2 class="text-info">Simple life, Intelligent perception.</h2>
-              </div>
-              <div class="col-md-3 text-center">
-                  <p><img src="__STATIC__/img/onelibrary-apk-code.png" alt="Android apk"></p>
-                  <a class="btn btn-lg btn-success btn-block" href="{:U('Download/android')}" role="button">Android</a>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <div class="row">
-      <div class="col-lg-4">
-        <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="64x64" style="width: 140px; height: 140px;">
-        <h2>Heading</h2>
-        <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
-        <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-      </div><!-- /.col-lg-4 -->
-      <div class="col-lg-4">
-        <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="64x64" style="width: 140px; height: 140px;">
-        <h2>Heading</h2>
-        <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-        <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-      </div><!-- /.col-lg-4 -->
-      <div class="col-lg-4">
-        <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="64x64" style="width: 140px; height: 140px;">
-        <h2>Heading</h2>
-        <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-        <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-      </div><!-- /.col-lg-4 -->
-  </div>
-
-  <hr class="featurette-divider">
-
-  <div class="row">
-      <!-- Example row of columns -->
-      <div class="media">
-        <a class="media-left" href="#">
-          <img class="media-object" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjQ2ODc1IiB5PSIzMiIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjY0eDY0PC90ZXh0PjwvZz48L3N2Zz4=" alt="64x64" style="width: 64px;
-  height: 64px;">
-        </a>
-        <div class="media-body">
-          <h4 class="media-heading">Media heading</h4>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-        </div>
-      </div>
-      <div class="media">
-        <a class="media-left" href="#">
-          <img class="media-object" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjQ2ODc1IiB5PSIzMiIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjY0eDY0PC90ZXh0PjwvZz48L3N2Zz4=" alt="64x64" style="width: 64px;
-  height: 64px;">
-        </a>
-        <div class="media-body">
-          <h4 class="media-heading">Media heading</h4>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-          <div class="media">
-            <a class="media-left" href="#">
-              <img class="media-object" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjQ2ODc1IiB5PSIzMiIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjY0eDY0PC90ZXh0PjwvZz48L3N2Zz4=" alt="64x64" style="width: 64px;
-  height: 64px;">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">Nested media heading</h4>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+    <div class="row">
+        <!-- Jumbotron -->
+        <div class="jumbotron" style="background-color:rgba(0, 0, 0, 0.8)">
+            <div class="row">
+                <div class="col-md-9">
+                    <h1><span class="common-logo">OneLibrary</span></h1>
+                    <h2 class="text-info">Simple life, Intelligent perception.</h2>
+                </div>
+                <div class="col-md-3 text-center">
+                    <p><img src="__STATIC__/img/onelibrary-apk-code.png" alt="Android apk"></p>
+                    <a class="btn btn-lg btn-primary btn-block" href="{:U('Download/android')}" role="button">Android</a>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      <div class="media">
-        <div class="media-body">
-          <h4 class="media-heading">Media heading</h4>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.
-        </div>
-        <a class="media-right" href="#">
-          <img class="media-object" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjQ2ODc1IiB5PSIzMiIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjY0eDY0PC90ZXh0PjwvZz48L3N2Zz4=" alt="64x64" style="width: 64px;
-  height: 64px;">
-        </a>
-      </div>
-      <div class="media">
-        <a class="media-left" href="#">
-          <img class="media-object" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjQ2ODc1IiB5PSIzMiIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjY0eDY0PC90ZXh0PjwvZz48L3N2Zz4=" alt="64x64" style="width: 64px;
-  height: 64px;">
-        </a>
-        <div class="media-body">
-          <h4 class="media-heading">Media heading</h4>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.
-        </div>
-        <a class="media-right" href="#">
-          <img class="media-object" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjQ2ODc1IiB5PSIzMiIgc3R5bGU9ImZpbGw6I0FBQUFBQTtmb250LXdlaWdodDpib2xkO2ZvbnQtZmFtaWx5OkFyaWFsLCBIZWx2ZXRpY2EsIE9wZW4gU2Fucywgc2Fucy1zZXJpZiwgbW9ub3NwYWNlO2ZvbnQtc2l6ZToxMHB0O2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjY0eDY0PC90ZXh0PjwvZz48L3N2Zz4=" alt="64x64" style="width: 64px;
-  height: 64px;">
-        </a>
-      </div>
     </div>
-  </div>
+
+    <div class="row">
+        <div class="col-sm-4" style="padding-left: 0;">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                    <h3 class="panel-title">学术</h3>
+                </div>
+                <div id="panel1" class="panel-body" style="min-height: 200px;">
+                    <p class="text-center">No Data.</p>
+                </div>
+            </div>
+        </div><!-- /.col-sm-4 -->
+        <div class="col-sm-4" style="padding-left: 0;padding-right: 0;">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                    <h3 class="panel-title">科学</h3>
+                </div>
+                <div id="panel2" class="panel-body" style="min-height: 200px;">
+                    <p class="text-center">No Data.</p>
+                </div>
+            </div>
+        </div><!-- /.col-sm-4 -->
+        <div class="col-sm-4" style="padding-right: 0;">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                    <h3 class="panel-title">教育</h3>
+                </div>
+                <div id="panel3" class="panel-body" style="min-height: 200px;">
+                    <p class="text-center">No Data.</p>
+                </div>
+            </div>
+        </div><!-- /.col-sm-4 -->
+    </div>
+    <div class="row">
+        <div class="col-sm-4" style="padding-left: 0;">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                    <h3 class="panel-title">技能</h3>
+                </div>
+                <div id="panel4" class="panel-body" style="min-height: 200px;">
+                    <p class="text-center">No Data.</p>
+                </div>
+            </div>
+        </div><!-- /.col-sm-4 -->
+        <div class="col-sm-4" style="padding-left: 0;padding-right: 0;">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                    <h3 class="panel-title">知识</h3>
+                </div>
+                <div id="panel5" class="panel-body" style="min-height: 200px;">
+                    <p class="text-center">No Data.</p>
+                </div>
+            </div>
+        </div><!-- /.col-sm-4 -->
+        <div class="col-sm-4" style="padding-right: 0;">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                    <h3 class="panel-title">生活</h3>
+                </div>
+                <div id="panel6" class="panel-body" style="min-height: 200px;">
+                    <p>No Data.</p>
+                </div>
+            </div>
+        </div><!-- /.col-sm-4 -->
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            get_message_by_category(1);
+            get_message_by_category(2);
+            get_message_by_category(3);
+            get_message_by_category(4);
+            get_message_by_category(5);
+            get_message_by_category(6);
+        });
+
+        function get_message_by_category(category_id){
+            $.post("{:U('Index/messages_by_category')}", {'category_id': category_id}, function(data){
+                var html_str = '<p class="text-center text-info"><strong>No Data.</strong></p>'
+                if(data.errno == 0){
+                    if(data.result.length > 0){
+                        html_str = '<ul class="list-unstyled">';
+                        for (var i=0;i<data.result.length;i++){
+                            html_str = html_str + '<li style="margin-bottom: 3px;"><a href="message_detail/message_id/'+data.result[i].message_id+'">' + data.result[i].title + '</a></li>';
+                        }
+                        html_str += '</ul>';
+                    }
+                    $("#panel"+category_id).html(html_str);
+                } else {
+                    $("#panel"+category_id).html(html_str);
+                }
+            }, "json");
+        }
+    </script>
 </block>
