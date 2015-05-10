@@ -4,28 +4,28 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li>
-              <a href="{:U('Settings/user')}">User</a>
-            </li>
-            <li class="active">
-              <a href="{:U('Settings/message')}">Message</a>
-            </li>
-            <li>
-              <a href="{:U('Settings/publish')}">Publish</a>
-            </li>
-            <li>
-              <a href="{:U('Settings/location')}">Location</a>
-            </li>
+              <li>
+                  <a href="{:U('Settings/publish')}">Publish</a>
+              </li>
+              <li class="active">
+                  <a href="{:U('Settings/message')}">Message</a>
+              </li>
+              <li>
+                  <a href="{:U('Settings/location')}">Location</a>
+              </li>
+              <li>
+                  <a href="{:U('Settings/user')}">User</a>
+              </li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <ol class="breadcrumb">
-            <li><a href="{:U('Settings/user')}">Settings</a></li>
+            <li><a href="{:U('Settings/publish')}">Settings</a></li>
             <li><a href="{:U('Settings/message')}">Message</a></li>
             <li class="active">Detail</li>
           </ol>
           <div>
-            <a href="javascript:history.go(-1);" title="Return last page." class="btn pull-right" ><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a>
+            <a href="javascript:history.go(-1);" title="Return last page." class="btn btn-primary btn-sm pull-right" ><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>&nbsp;Return</a>
             <h4><span class="label label-info">[{$message.category}]</span>&nbsp;{$message.title}</h4>
           </div>
             <div style="margin-top: 20px;">
