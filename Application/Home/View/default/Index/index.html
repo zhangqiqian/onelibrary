@@ -102,9 +102,10 @@
                 var html_str = '<p class="text-center text-info"><strong>No Data.</strong></p>'
                 if(data.errno == 0){
                     if(data.result.length > 0){
-                        html_str = '<ul class="list-unstyled">';
+                        html_str = '<ul style="padding-left: 10px;">';
+                        var url = "{:U('Index/message_detail')}";
                         for (var i=0;i<data.result.length;i++){
-                            html_str = html_str + '<li style="margin-bottom: 3px;"><a href="message_detail/message_id/'+data.result[i].message_id+'">' + data.result[i].title + '</a></li>';
+                            html_str = html_str + '<li style="margin-bottom: 5px;"><a href="'+url+'/message_id/'+data.result[i].message_id+'">' + data.result[i].title + '</a></li>';
                         }
                         html_str += '</ul>';
                     }
