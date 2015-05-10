@@ -120,6 +120,28 @@ class MessageModel extends MongoModel{
     }
 
     /**
+     * 获取Message by category_id
+     * @param $category_id
+     * @return array
+     */
+    public function get_messages_by_category($category_id){
+        if($category_id == 0){
+            return array();
+        }
+        $messages = $this->field('message_id,title')->where(array('category' => $category_id))->order('pubdate desc')->limit(10)->select();
+        if(!$messages){
+            $messages = array();
+        }
+        $ret = array();
+        foreach ($messages as $message) {
+            unset($message['_id']);
+            $ret[] = $message;
+        }
+
+        return $ret;
+    }
+
+    /**
      * 更新Message
      * @param $message_id
      * @param $message
