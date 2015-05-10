@@ -311,6 +311,9 @@ class SettingsController extends AdminController {
         $message_id = I('message_id', 0, 'intval');
         $mMessage = new MessageModel();
         $message = $mMessage->get_message($message_id);
+
+        $categories = C('MESSAGE_CATEGORIES');
+        $message['category'] = $categories[$message['category']];
         $this->assign('message', $message);
         $this->display();
     }
