@@ -388,5 +388,5 @@ function get_distance($latitude1, $longitude1, $latitude2, $longitude2)
     $s = 2 * asin(sqrt(pow(sin($a/2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b/2),2)));
     $s = $s *$EARTH_RADIUS;
     $s = round($s * 10000) / 10000;
-    return $s;
+    return $s * 1000;
 }
