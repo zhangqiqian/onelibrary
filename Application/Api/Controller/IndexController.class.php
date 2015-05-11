@@ -37,9 +37,7 @@ class IndexController extends ApiController {
         $mMember = new MemberModel();
         $member = $mMember->get_member(UID);
 
-        $mLocation = new LocationModel();
-        $locations = $mLocation->get_locations_by_location($longitude, $latitude);
-
+        $locations = $this->get_near_locations($longitude, $latitude);
         $mPublish = new PublishModel();
         $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $last_message_id, $last_time, $start, $limit);
         $messages = array();
@@ -53,10 +51,24 @@ class IndexController extends ApiController {
                 $params = array('status' => 1); //switch to read
                 $mPublish->update_publish($publish['publish_id'], $params);
             }
-            //TODO log record.
         }
 
         $next_start = empty($message) ? 0 : $start + $limit;
         $this->ajaxReturn(array('errno' => 0, 'result' => array_values($messages), 'start' => $next_start));
+    }
+
+    private function get_near_locations($longitude, $latitude){
+        $mLocation = new LocationModel();
+        $locations = $mLocation->get_locations_by_location($longitude, $latitude);
+        $near_locations = array();
+        foreach ($locations as $location) {
+            if($location['status'] > 0){
+                $distance = get_distance($latitude, $longitude, $location['latitude'], $location['longitude']);
+                if($distance <= $location['radius']){
+                    $near_locations[] = $location;
+                }
+            }
+        }
+        $this->ajaxReturn($near_locations);
     }
 }
