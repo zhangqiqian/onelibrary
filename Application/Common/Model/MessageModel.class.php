@@ -72,7 +72,7 @@ class MessageModel extends MongoModel{
         unset($message['_id']);
         unset($message['ctime']);
         unset($message['mtime']);
-        $message['tags'] = implode(', ', $message['tags']);
+        $message['tags'] = implode(' ', $message['tags']);
         $message['author'] = implode(', ', $message['author']);
         $link = parse_url($message['link']);
         if(isset($link['host'])){
