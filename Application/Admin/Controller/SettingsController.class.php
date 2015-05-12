@@ -566,4 +566,20 @@ class SettingsController extends AdminController {
         $this->display();
     }
 
+    public function get_near_locations(){
+        $longitude = I('longitude', 0, 'doubleval');
+        $latitude = I('latitude', 0, 'doubleval');
+        $mLocation = new LocationModel();
+        $locations = $mLocation->get_locations_by_location($longitude, $latitude);
+        $near_locations = array();
+        foreach ($locations as $location) {
+            if($location['status'] > 0){
+                $distance = get_distance($latitude, $longitude, $location['latitude'], $location['longitude']);
+                if($distance <= $location['radius']){
+                    $near_locations[] = $location;
+                }
+            }
+        }
+        $this->ajaxReturn($near_locations);
+    }
 }
