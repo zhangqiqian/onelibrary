@@ -125,7 +125,7 @@
               <foreach name="publishes" item="publish" >
                 <tr>
                   <td>{$publish.publish_id}</td>
-                  <td><a href="{:U('Settings/message_detail')}/message_id/{$publish.message_id}">{$publish.title}</a></td>
+                  <td><a href="{:U('Settings/message_detail')}/message/{$publish.message_id}">{$publish.title}</a></td>
                   <td>{$publish.user_name}</td>
                   <td>{$publish.user_grade|ucwords}</td>
                   <td>{$publish.user_major|ucwords}</td>

@@ -26,14 +26,18 @@
           </ol>
           <div>
             <a href="javascript:history.go(-1);" title="Return last page." class="btn btn-primary btn-sm pull-right" ><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>&nbsp;Return</a>
-            <h4><span class="label label-info">[{$message.category}]</span>&nbsp;{$message.title}</h4>
+            <h4><span class="label label-info">{$message.category}</span>&nbsp;{$message.title}</h4>
           </div>
             <div style="margin-top: 20px;">
                 <span class="pull-right" style="color: #888888">发布: {$message.pubdate|date="Y-m-d H:i:s",###}</span>
                 <span>作者: {$message.author}</span>
             </div>
             <hr class="featurette-divider">
-            <p>{$message.content}</p>
+            <div id="content">
+                <foreach name="message.content" item="item" >
+                    <p class="text-cn">{$item}</p>
+                </foreach>
+            </div>
             <div style="margin-top: 20px;">
                 <span class="text-info pull-right">来源: <a href="{$message.link}" target="_blank">{$message.link_host}</a></span>
                 <span class="text-success">Tag: {$message.tags}</span>
