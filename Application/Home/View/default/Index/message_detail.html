@@ -2,20 +2,30 @@
 
 <block name="body">
     <div class="row" style="min-height: 480px;">
+        <a class="pull-left" href="javascript:history.go(-1);" title="Return last page."><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a>
         <div>
-            <a href="javascript:history.go(-1);" title="Return last page."><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></a>
-            <span class="label label-primary" style="font-size: 14px;">{$message.category}</span>
             <h3 class="text-center">{$message.title}</h3>
-            <div class="text-center">作者: {$message.author}</div>
+            <div class="text-center">作者：{$message.author}</div>
         </div>
-        <div style="margin-top: 20px;">
-            <span class="pull-right" style="color: #888888">发布: {$message.pubdate|date="Y-m-d H:i:s",###}</span>
+        <div class="pull-left">
+            <span class="text-primary">[ {$message.category} ]</span> |
+            <span  style="color: #888888"> {$message.pubdate|date="Y-m-d H:i",###}</span> |
+            <span class="glyphicon glyphicon-share-alt text-warning" aria-hidden="true" title="分享"></span>
+        </div>
+        <div class="pull-right">
+            <span class="glyphicon glyphicon-thumbs-up text-success" aria-hidden="true"></span>&nbsp;
+            <span class="glyphicon glyphicon-thumbs-down text-danger" aria-hidden="true"></span>&nbsp;
+            <span class="glyphicon glyphicon-comment text-info" aria-hidden="true"></span>
         </div>
         <hr class="featurette-divider">
-        <p>{$message.content}</p>
+        <div>
+        <foreach name="message.content" item="item" >
+            <p class="text-cn">{$item}</p>
+        </foreach>
+        </div>
         <div style="margin-top: 20px;">
             <span class="text-info pull-right">来源: <a href="{$message.link}" target="_blank">{$message.link_host}</a></span>
-            <span class="text-success">Tag: {$message.tags}</span>
+            <span class="text-success">标签: {$message.tags}</span>
         </div>
     </div>
 </block>

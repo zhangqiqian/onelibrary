@@ -28,10 +28,18 @@ class IndexController extends HomeController {
     }
 
     public function message_detail(){
-        $message_id = I('message_id', 0, 'intval');
+        $message_id = I('message', 0, 'intval');
 
         $mMessage = new MessageModel();
         $message = $mMessage->get_message($message_id);
+
+        $new_contents = array();
+        $contents = explode("\r\n", $message['content']);
+        foreach ($contents as $new_content) {
+                $new_contents[] = $new_content;
+        }
+        $message['content'] = $new_contents;
+
         $categories = C('MESSAGE_CATEGORIES');
         $message['category'] = $categories[$message['category']];
 

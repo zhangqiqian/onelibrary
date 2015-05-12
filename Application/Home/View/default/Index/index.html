@@ -105,7 +105,7 @@
                         html_str = '<ul style="padding-left: 10px;">';
                         var url = "{:U('Index/message_detail')}";
                         for (var i=0;i<data.result.length;i++){
-                            html_str = html_str + '<li style="margin-bottom: 5px;"><a href="'+url+'/message_id/'+data.result[i].message_id+'">' + data.result[i].title + '</a></li>';
+                            html_str = html_str + '<li style="margin-bottom: 5px;"><a href="'+url+'/message/'+data.result[i].message_id+'">' + data.result[i].title + '</a></li>';
                         }
                         html_str += '</ul>';
                     }
