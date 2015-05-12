@@ -75,20 +75,16 @@ class LocationModel extends MongoModel{
      * @return array
      */
     public function get_locations_by_location($longitude, $latitude){
-        $longitude_start = $longitude - 0.001;
-        $longitude_end = $longitude + 0.001;
-        $latitude_start = $latitude - 0.001;
-        $latitude_end = $latitude + 0.001;
+        $longitude_start = $longitude - 0.002;
+        $longitude_end = $longitude + 0.002;
+        $latitude_start = $latitude - 0.002;
+        $latitude_end = $latitude + 0.002;
 
-        //$map['_string'] = '{"longitude":{"$gt": '.$longitude_start.', "$lt": '.$longitude_end.'},"latitude":{"$gt": '.$latitude_start.', "$lt": '.$latitude_end.'}}';
-        $map = array();
-        /*$map['_complex'] = array(
-            '_logic' => 'and',
-            array('longitude' => array('$gt', $longitude_start)),
-            array('longitude' => array('$lt', $longitude_end)),
-            array('latitude' => array('$gt', $latitude_start)),
-            array('latitude' => array('$lt', $latitude_end))
-        );*/
+        $map = array(
+            'longitude' => array('$gt' => $longitude_start, '$lt' => $longitude_end),
+            'latitude' => array('$gt' => $latitude_start, '$lt' => $latitude_end)
+        );
+
         $locations = $this->where($map)->select();
         $ret = array();
         foreach ($locations as $location) {
@@ -97,6 +93,13 @@ class LocationModel extends MongoModel{
             unset($location['ctime']);
             $ret[] = $location;
         }
+        $range = array(
+            'longitude_start' => $longitude_start,
+            'longitude_end' => $longitude_end,
+            'latitude_start' => $latitude_start,
+            'latitude_end' => $latitude_end
+        );
+        $ret['range'] = $range;
         return $ret;
     }
 
