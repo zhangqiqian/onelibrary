@@ -308,10 +308,16 @@ class SettingsController extends AdminController {
     }
 
     public function message_detail(){
-        $message_id = I('message_id', 0, 'intval');
+        $message_id = I('message', 0, 'intval');
         $mMessage = new MessageModel();
         $message = $mMessage->get_message($message_id);
 
+        $new_contents = array();
+        $contents = explode("\r\n", $message['content']);
+        foreach ($contents as $new_content) {
+            $new_contents[] = $new_content;
+        }
+        $message['content'] = $new_contents;
         $categories = C('MESSAGE_CATEGORIES');
         $message['category'] = $categories[$message['category']];
         $this->assign('message', $message);
@@ -342,7 +348,7 @@ class SettingsController extends AdminController {
 
         $mLocation = new LocationModel();
         $locations = $mLocation->get_location_list();
-        $this->assign('regions', $locations);
+        $this->assign('locations', $locations);
 
         $mPublish = new PublishModel();
         $publish = $mPublish->get_publish($publish_id);
