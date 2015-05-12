@@ -69,6 +69,6 @@ class IndexController extends ApiController {
                 }
             }
         }
-        $this->ajaxReturn($near_locations);
+        return $near_locations;
     }
 }
