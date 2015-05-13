@@ -39,6 +39,26 @@ return array(
         0 => '其他',
     ),
 
+    /* 1 -> section 1/2: 08:00~09:40; 2 -> section 3/4: 10:00~11:40; 3 -> section 5/6: 14:10~15:50; 4 -> section 7/8: 16:10~17:50 */
+    'COURSE_SECTION_TIME_MAPPING' => array(
+        1 => array(
+            'start' => 3600 * 8,
+            'end' => 3600 * 9 + 40 * 60,
+        ),
+        3 => array(
+            'start' => 3600 * 10,
+            'end' => 3600 * 11 + 40 * 60,
+        ),
+        5 => array(
+            'start' => 3600 * 14 + 10 * 60,
+            'end' => 3600 * 15 + 50 * 60,
+        ),
+        7 => array(
+            'start' => 3600 * 16 + 60 * 10,
+            'end' => 3600 * 17 + 50 * 60,
+        ),
+    ),
+
     'COUNTRY_CODE_MAP' => array(
         'AF' => 'Afghanistan',
         'AX' => 'Aland Islands',
