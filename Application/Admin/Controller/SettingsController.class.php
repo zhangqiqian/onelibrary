@@ -604,6 +604,20 @@ class SettingsController extends AdminController {
         $majors = C('MAJOR_MAPPING');
         $curricula['major'] = isset($majors[$curricula['major']]) ? $majors[$curricula['major']] : '其他';
 
+        $courses = array();
+        for($i = 1; $i < 8; $i += 2){
+            $courses[$i] = array();
+            for($j = 1; $j < 8; $j++){
+                $courses[$i][$j] = array();
+            }
+        }
+        $mMember = new MemberModel();
+        foreach ($curricula['courses'] as $course) {
+            $member = $mMember->get_member($course['teacher']);
+            $course['teacher'] = $member['nickname'];
+            $courses[$course['section']][$course['week']] = $course;
+        }
+        $curricula['courses'] = $courses;
         $this->assign('curricula', $curricula);
         $this->display();
     }
@@ -615,6 +629,7 @@ class SettingsController extends AdminController {
     }
 
     public function curricula_add_submit(){
+        $name = I('name', '', 'trim');
         $major = I('major', 0, 'intval');
         $class = I('class', '', 'trim');
         $grade = I('grade', 0, 'intval');
@@ -644,10 +659,11 @@ class SettingsController extends AdminController {
         $term_end_time = strtotime($term_end);
 
         $curricula = array(
+            'name' => $name,
             'major' => $major,
             'class' => $class,
             'grade' => $grade,
-            'curricula' => array(),
+            'courses' => array(),
             'term' => $term,
             'term_start' => $term_start_time,
             'term_end' => $term_end_time,
@@ -677,6 +693,7 @@ class SettingsController extends AdminController {
 
     public function curricula_edit_submit(){
         $curricula_id = I('curricula_id', 0, 'intval');
+        $name = I('name', '', 'trim');
         $major = I('major', 0, 'intval');
         $class = I('class', '', 'trim');
         $grade = I('grade', 0, 'intval');
@@ -710,10 +727,10 @@ class SettingsController extends AdminController {
         }
 
         $curricula = array(
+            'name' => $name,
             'major' => $major,
             'class' => $class,
             'grade' => $grade,
-            'curricula' => array(),
             'term' => $term,
             'term_start' => $term_start_time,
             'term_end' => $term_end_time,
@@ -755,6 +772,194 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/Curricula'), 'location' => ''));
         }else{
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/Curricula'), 'location' => ''));
+        }
+    }
+
+    public function course_add(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $course_week = I('week', 0, 'intval');
+
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        $this->assign('curricula_id', $curricula['curricula_id']);
+        $this->assign('course_week', $course_week);
+
+        $mMember = new MemberModel();
+        //TODO get teacher list by user role.
+        $members = $mMember->get_member_list();
+        $teachers = array();
+        foreach ($members as $member) {
+            $teachers[$member['uid']] = $member['nickname'];
+        }
+        $this->assign('teachers', $teachers);
+        $this->display();
+    }
+
+    public function course_add_submit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $course_name = I('course_name', '', 'trim');
+        $teacher = I('teacher', 0, 'intval');
+        $classroom = I('classroom', '', 'trim');
+        $course_week = I('course_week', 0, 'intval');
+        $course_section = I('course_section', 0, 'intval');
+        $course_period = I('course_period', 1, 'intval');
+
+        if($curricula_id == 0){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Curricula ID is invalid.', 'location' => ''));
+        }
+
+        if($course_week == 0 || $course_section == 0){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Week or section is invalid.', 'location' => ''));
+        }
+
+        $section_times = C('COURSE_SECTION_TIME_MAPPING');
+        $course = array(
+            'name' => $course_name,
+            'teacher' => $teacher,
+            'classroom' => $classroom,
+            'week' => $course_week,
+            'section' => $course_section,
+            'start_time' => $section_times[$course_section]['start'],
+            'end_time' => $section_times[$course_section]['end'],
+            'period' => $course_period,
+        );
+
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        unset($curricula['_id']);
+        $curricula['courses'][] = $course;
+
+        $mCurricula = new CurriculaModel();
+        $ret = $mCurricula->update_curricula($curricula_id, $curricula);
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/curricula_detail').'/curricula/'.$curricula_id, 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/curricula_detail').'/curricula/'.$curricula_id, 'location' => ''));
+        }
+    }
+
+    public function course_edit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $course_week = I('week', 0, 'intval');
+        $course_section = I('section', 0, 'intval');
+
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        $this->assign('curricula_id', $curricula['curricula_id']);
+        foreach ($curricula['courses'] as $course) {
+            if($course_week == $course['week'] && $course_section == $course['section']){
+                $this->assign('course', $course);
+                break;
+            }
+        }
+
+        $mMember = new MemberModel();
+        //TODO get teacher list by user role.
+        $members = $mMember->get_member_list();
+        $teachers = array();
+        foreach ($members as $member) {
+            $teachers[$member['uid']] = $member['nickname'];
+        }
+        $this->assign('teachers', $teachers);
+        $this->display();
+    }
+
+    public function course_edit_submit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $course_name = I('course_name', '', 'trim');
+        $teacher = I('teacher', 0, 'intval');
+        $classroom = I('classroom', '', 'trim');
+        $old_week = I('old_week', 0, 'intval');
+        $old_section = I('old_section', 0, 'intval');
+        $course_week = I('course_week', 0, 'intval');
+        $course_section = I('course_section', 0, 'intval');
+        $course_period = I('course_period', 1, 'intval');
+
+        if($curricula_id == 0){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Curricula ID is invalid.', 'location' => ''));
+        }
+
+        if($course_week == 0 || $course_section == 0){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Week or section is invalid.', 'location' => ''));
+        }
+
+        $section_times = C('COURSE_SECTION_TIME_MAPPING');
+        $course = array(
+            'name' => $course_name,
+            'teacher' => $teacher,
+            'classroom' => $classroom,
+            'week' => $course_week,
+            'section' => $course_section,
+            'start_time' => $section_times[$course_section]['start'],
+            'end_time' => $section_times[$course_section]['end'],
+            'period' => $course_period,
+        );
+
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        foreach ($curricula['courses'] as $key => $old_course) {
+            if($old_week == $old_course['week'] && $old_section == $old_course['section']){
+                unset($curricula['courses'][$key]);
+            }
+        }
+        unset($curricula['_id']);
+        $curricula['courses'][] = $course;
+
+        $mCurricula = new CurriculaModel();
+        $ret = $mCurricula->update_curricula($curricula_id, $curricula);
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/curricula_detail').'/curricula/'.$curricula_id, 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/curricula_detail').'/curricula/'.$curricula_id, 'location' => ''));
+        }
+    }
+
+    public function course_del(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $course_week = I('week', 0, 'intval');
+        $course_section = I('section', 0, 'intval');
+
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        $this->assign('curricula_id', $curricula['curricula_id']);
+        if($course_week > 0 && $course_section > 0){
+            foreach ($curricula['courses'] as $course) {
+                if($course_week == $course['week'] && $course_section == $course['section']){
+                    $this->assign('course', $course);
+                    break;
+                }
+            }
+        }
+        $this->display();
+    }
+
+    public function course_del_submit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $course_week = I('course_week', 0, 'intval');
+        $course_section = I('course_section', 0, 'intval');
+
+        if($curricula_id == 0){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Curricula ID is invalid.', 'location' => ''));
+        }
+
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        $new_key = count($curricula['courses']);
+        foreach ($curricula['courses'] as $key => $old_course) {
+            if($course_week == $old_course['week'] && $course_section == $old_course['section']){
+                $new_key = $key;
+                break;
+            }
+        }
+        unset($curricula['_id']);
+        unset($curricula['courses'][$new_key]);
+
+        $mCurricula = new CurriculaModel();
+        $ret = $mCurricula->update_curricula($curricula_id, $curricula);
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/curricula_detail').'/curricula/'.$curricula_id, 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/curricula_detail').'/curricula/'.$curricula_id, 'location' => ''));
         }
     }
 }
