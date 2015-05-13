@@ -10,13 +10,13 @@
               <li>
                   <a href="{:U('Settings/message')}">Message</a>
               </li>
-              <li class="active">
+              <li>
                   <a href="{:U('Settings/location')}">Location</a>
               </li>
               <li>
                   <a href="{:U('Settings/user')}">User</a>
               </li>
-              <li>
+              <li class="active">
                   <a href="{:U('Settings/curricula')}">Curricula</a>
               </li>
           </ul>
@@ -24,14 +24,67 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <ol class="breadcrumb">
             <li><a href="{:U('Settings/publish')}">Settings</a></li>
-            <li class="active">Location</li>
+            <li class="active">Curricula</li>
           </ol>
-
           <div>
-            <a href="javascript:open_dialog('add', '{:U('Settings/location_add')}');" class="btn btn-primary btn-sm pull-right" >Add Location</a>
+            <a href="javascript:open_dialog('add', '{:U('Settings/curricula_add')}');" class="btn btn-primary btn-sm pull-right" >Add Curricula</a>
               <form id="search" class="form-inline" action="" method="post">
+                  <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-success">Major</button>
+                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <span class="caret"></span>
+                          <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">All</a></li>
+                          <li class="divider"></li>
+                          <li><a href="#">Another action</a></li>
+                          <li><a href="#">Something else here</a></li>
+                          <li><a href="#">Separated link</a></li>
+                      </ul>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-info">Grade</button>
+                      <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <span class="caret"></span>
+                          <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">All</a></li>
+                          <li class="divider"></li>
+                          <li><a href="#">Another action</a></li>
+                          <li><a href="#">Something else here</a></li>
+                          <li><a href="#">Separated link</a></li>
+                      </ul>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-warning">Class</button>
+                      <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <span class="caret"></span>
+                          <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">All</a></li>
+                          <li class="divider"></li>
+                          <li><a href="#">Male</a></li>
+                          <li><a href="#">Female</a></li>
+                      </ul>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-danger">Term</button>
+                      <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <span class="caret"></span>
+                          <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">All</a></li>
+                          <li class="divider"></li>
+                          <li><a href="#">First</a></li>
+                          <li><a href="#">Second</a></li>
+                      </ul>
+                  </div>
                   <div class="input-group input-group-sm">
-                      <input type="text" class="form-control" placeholder="Location Name">
+                      <input type="text" class="form-control" placeholder="Curricula Name">
                       <span class="input-group-btn">
                         <button class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                       </span>
@@ -44,29 +97,33 @@
               <thead>
               <tr>
                 <th width="50">ID</th>
-                <th>Location Name</th>
-                <th>Longitude</th>
-                <th>Latitude</th>
-                <th>Radius</th>
-                <th>Address</th>
-                <th width="150">Status</th>
+                <th>Name</th>
+                <th>Major</th>
+                <th>Grade</th>
+                <th>Class</th>
+                <th>Term</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th width="100">Status</th>
                 <th width="150">Operation</th>
               </tr>
               </thead>
               <tbody>
-              <foreach name="locations" item="location" >
+              <foreach name="curriculas" item="curricula" >
                 <tr>
-                  <td>{$location.location_id}</td>
-                  <td>{$location.name}</td>
-                  <td>{$location.longitude|default='0'}</td>
-                  <td>{$location.latitude|default='0'}</td>
-                  <td>{$location.radius|default='0'} m</td>
-                  <td>{$location.address|ucfirst}</td>
-                  <td><eq name="location.status" value="1">Enabled<else/>Disabled</eq></td>
+                  <td>{$curricula.curricula_id}</td>
+                  <td>{$curricula.name}</td>
+                  <td>{$curricula.major|ucfirst}</td>
+                  <td>{$curricula.grade}</td>
+                  <td>{$curricula.class}</td>
+                  <td>第 {$curricula.term} 学期</td>
+                  <td>{$curricula.term_start|date="Y-m-d",###}</td>
+                  <td>{$curricula.term_end|date="Y-m-d",###}</td>
+                  <td><eq name="curricula.status" value="1" >Enabled<else/>Disabled</eq></td>
                   <td>
-                      <a href="javascript:open_dialog('edit', '{:U('Settings/location_edit')}/location_id/{$location.location_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
-                      <a href="javascript:open_dialog('locate', '{:U('Settings/location_locate')}/location_id/{$location.location_id}');" title="Locate in map"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a>
-                      <a href="javascript:open_dialog('del', '{:U('Settings/location_del')}/location_id/{$location.location_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>&nbsp;
+                      <a href="{:U('Settings/curricula_detail')}/curricula/{$curricula.curricula_id}" title="Detail"><span class="glyphicon glyphicon-th" aria-hidden="true"></span></a>&nbsp;
+                      <a href="javascript:open_dialog('edit', '{:U('Settings/curricula_edit')}/curricula_id/{$curricula.curricula_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+                      <a href="javascript:open_dialog('del', '{:U('Settings/curricula_del')}/curricula_id/{$curricula.curricula_id}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
                   </td>
                 </tr>
               </foreach>
@@ -95,14 +152,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="addModalLabel">Add Location</h4>
+          <h4 class="modal-title" id="addModalLabel">Add Curricula</h4>
         </div>
         <div id="addFormPage" class="modal-body">
         </div>
         <div class="modal-footer">
           <div id="add-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="add_location();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="add_curricula();">Save</button>
         </div>
       </div>
     </div>
@@ -114,14 +171,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="editModalLabel">Edit Location</h4>
+          <h4 class="modal-title" id="editModalLabel">Edit Curricula</h4>
         </div>
         <div id="editFormPage" class="modal-body">
         </div>
         <div class="modal-footer">
           <div id="edit-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="edit_location();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="edit_curricula();">Save</button>
         </div>
       </div>
     </div>
@@ -133,19 +190,22 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="delModalLabel">Delete Location</h4>
+          <h4 class="modal-title" id="delModalLabel">Delete Curricula</h4>
         </div>
         <div id="delFormPage" class="modal-body">
         </div>
         <div class="modal-footer">
           <div id="del-tips" class="Validform_checktip text-danger pull-left"></div>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm" onclick="del_location();">Save</button>
+          <button type="submit" class="btn btn-primary btn-sm" onclick="del_curricula();">Save</button>
         </div>
       </div>
     </div>
   </div>
-  <script>
+  <script type="text/javascript" src="__STATIC__/moment/moment-with-locales.min.js"></script>
+  <link href="__STATIC__/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+  <script type="text/javascript" src="__STATIC__/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+  <script type="text/javascript">
     $(document).ajaxStart(function(){
       $("button:submit").attr("disabled", true);
     }).ajaxStop(function(){
@@ -168,8 +228,8 @@
       $('#'+tag+'Modal').modal('show');
     }
 
-    function add_location(){
-      var self = $("#addLocationForm");
+    function add_curricula(){
+      var self = $("#addCurriculaForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
           $("#add-tips").addClass('text-success');
@@ -192,8 +252,8 @@
       }, "json");
     }
 
-    function edit_location(){
-      var self = $("#editLocationForm");
+    function edit_curricula(){
+      var self = $("#editCurriculaForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
           $("#edit-tips").addClass('text-success');
@@ -216,8 +276,8 @@
       }, "json");
     }
 
-    function del_location(){
-      var self = $("#delLocationForm");
+    function del_curricula(){
+      var self = $("#delCurriculaForm");
       $.post(self.attr("action"), self.serialize(), function(data){
         if(data.errno == 0){
           $("#del-tips").addClass('text-success');

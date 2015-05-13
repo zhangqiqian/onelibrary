@@ -1,0 +1,73 @@
+<form id="addCurriculaForm" class="form-horizontal" action="{:U('Settings/curricula_add_submit')}">
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">Name</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="major" class="col-sm-3 control-label">Major</label>
+        <div class="col-sm-4">
+            <select id="major" name="major" placeholder="Major" class="form-control">
+                <foreach name="majors" item="major" >
+                    <option value="{$key}">{$major}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="grade" class="col-sm-3 control-label">Grade</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="grade" name="grade" placeholder="Grade">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="class" class="col-sm-3 control-label">Class</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="class" name="class" placeholder="Class">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="term" class="col-sm-3 control-label">Term</label>
+        <div class="col-sm-4">
+            <select id="term" name="term" placeholder="Term" class="form-control">
+                <option value="1">First</option>
+                <option value="2">Second</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="term_start" class="col-sm-3 control-label">Term Period</label>
+        <div class="col-sm-4">
+            <div id="start_datetimepicker" class="input-group date">
+                <input type="text" class="form-control" id="term_start" name="term_start" placeholder="Default is 09-01.">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+            </div>
+        </div>
+        <label for="term_end" class="col-sm-1 control-label">To</label>
+        <div class="col-sm-4">
+            <div id="end_datetimepicker" class="input-group date">
+                <input type="text" class="form-control" id="term_end" name="term_end" placeholder="Default is 01-01.">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#start_datetimepicker').datetimepicker({
+                    //locale: 'zh-CN',
+                    format: 'YYYY-MM-DD'
+                });
+                $('#end_datetimepicker').datetimepicker({
+                    //locale: 'zh-CN',
+                    format: 'YYYY-MM-DD'
+                });
+            });
+        </script>
+    </div>
+    <div class="form-group">
+        <label for="desc" class="col-sm-3 control-label">Description</label>
+        <div class="col-sm-9">
+            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="2"></textarea>
+        </div>
+    </div>
+</form>
