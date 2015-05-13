@@ -13,6 +13,7 @@ use Think\Controller;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
 use Common\Model\LocationModel;
+use Common\Model\CurriculaModel;
 
 class SettingsController extends AdminController {
     /**
@@ -581,5 +582,179 @@ class SettingsController extends AdminController {
             }
         }
         $this->ajaxReturn($near_locations);
+    }
+
+    public function curricula(){
+        $mCurricula = new CurriculaModel();
+        $curriculas = $mCurricula->get_curricula_list();
+
+        $majors = C('MAJOR_MAPPING');
+        foreach ($curriculas as $key => $curricula) {
+            $curriculas[$key]['major'] = isset($majors[$curricula['major']]) ? $majors[$curricula['major']] : '其他';
+        }
+        $this->assign('curriculas', $curriculas);
+        $this->display();
+    }
+
+    public function curricula_detail(){
+        $curricula_id = I('curricula', 0, 'intval');
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+
+        $majors = C('MAJOR_MAPPING');
+        $curricula['major'] = isset($majors[$curricula['major']]) ? $majors[$curricula['major']] : '其他';
+
+        $this->assign('curricula', $curricula);
+        $this->display();
+    }
+
+    public function curricula_add(){
+        $majors = C('MAJOR_MAPPING');
+        $this->assign('majors', $majors);
+        $this->display();
+    }
+
+    public function curricula_add_submit(){
+        $major = I('major', 0, 'intval');
+        $class = I('class', '', 'trim');
+        $grade = I('grade', 0, 'intval');
+        $term = I('term', 1, 'intval');
+        $term_start = I('term_start', '', 'trim');
+        $term_end = I('term_end', '', 'trim');
+        $status = I('status', 1, 'intval');
+        $desc = I('desc', '', 'trim');
+
+        if(empty($term_start)){
+            if($term == 1){
+                $term_start = date('Y', time()).'-09-01';
+            }else{
+                $next_year = intval(date('Y', time())) + 1;
+                $term_start = $next_year.'-01-01';
+            }
+        }
+        if(empty($term_end)){
+            $next_year = intval(date('Y', time())) + 1;
+            if($term == 1){
+                $term_end = $next_year.'-01-01';
+            }else{
+                $term_end = $next_year.'-07-01';
+            }
+        }
+        $term_start_time = strtotime($term_start);
+        $term_end_time = strtotime($term_end);
+
+        $curricula = array(
+            'major' => $major,
+            'class' => $class,
+            'grade' => $grade,
+            'curricula' => array(),
+            'term' => $term,
+            'term_start' => $term_start_time,
+            'term_end' => $term_end_time,
+            'status' => $status,
+            'desc' => $desc,
+        );
+        $mCurricula = new CurriculaModel();
+        $ret = $mCurricula->insert_curricula($curricula);
+        if($ret){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/curricula'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/curricula'), 'location' => ''));
+        }
+    }
+
+    public function curricula_edit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        $this->assign('curricula', $curricula);
+
+        $majors = C('MAJOR_MAPPING');
+        $this->assign('majors', $majors);
+
+        $this->display();
+    }
+
+    public function curricula_edit_submit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $major = I('major', 0, 'intval');
+        $class = I('class', '', 'trim');
+        $grade = I('grade', 0, 'intval');
+        $term = I('term', 1, 'intval');
+        $term_start = I('term_start', '', 'trim');
+        $term_end = I('term_end', '', 'trim');
+        $status = I('status', 1, 'intval');
+        $desc = I('desc', '', 'trim');
+
+        if(empty($term_start)){
+            if($term == 1){
+                $term_start = date('Y', time()).'-09-01';
+            }else{
+                $next_year = intval(date('Y', time())) + 1;
+                $term_start = $next_year.'-01-01';
+            }
+        }
+        if(empty($term_end)){
+            $next_year = intval(date('Y', time())) + 1;
+            if($term == 1){
+                $term_end = $next_year.'-01-01';
+            }else{
+                $term_end = $next_year.'-07-01';
+            }
+        }
+        $term_start_time = strtotime($term_start);
+        $term_end_time = strtotime($term_end);
+
+        if($curricula_id == 0){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Curricula ID is invalid.', 'location' => ''));
+        }
+
+        $curricula = array(
+            'major' => $major,
+            'class' => $class,
+            'grade' => $grade,
+            'curricula' => array(),
+            'term' => $term,
+            'term_start' => $term_start_time,
+            'term_end' => $term_end_time,
+            'status' => $status,
+            'desc' => $desc,
+        );
+
+        $mCurricula = new CurriculaModel();
+        $ret = $mCurricula->update_curricula($curricula_id, $curricula);
+        if($ret['ok']){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/curricula'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/curricula'), 'location' => ''));
+        }
+    }
+
+    public function curricula_del(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        $mCurricula = new CurriculaModel();
+        $curricula = $mCurricula->get_curricula($curricula_id);
+        $this->assign('curricula', $curricula);
+        $this->display();
+    }
+
+    public function curricula_del_submit(){
+        $curricula_id = I('curricula_id', 0, 'intval');
+        if(empty($curricula_id)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Curricula ID is invalid.', 'location' => ''));
+        }
+
+        $remove_result = true;
+        $mCurricula = new CurriculaModel();
+        $ret = $mCurricula->remove_curricula($curricula_id);
+        if(!$ret['ok']){
+            $remove_result = false;
+        }
+
+        if($remove_result){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/Curricula'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/Curricula'), 'location' => ''));
+        }
     }
 }
