@@ -1,0 +1,9 @@
+<form id="delCourseForm" class="form-horizontal" action="{:U('Settings/course_del_submit')}">
+    <input type="hidden" id="curricula_id" name="curricula_id" value="{$curricula_id}">
+    <input type="hidden" id="course_week" name="course_week" value="{$course.week}">
+    <input type="hidden" id="course_section" name="course_section" value="{$course.section}">
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        Are you sure to delete the {$course.name} course?
+    </div>
+</form>
