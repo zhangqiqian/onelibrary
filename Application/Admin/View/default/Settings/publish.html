@@ -118,6 +118,7 @@
                   <th>Major</th>
                   <th>Gender</th>
                   <th>Priority</th>
+                  <th>Similarity</th>
                   <th>Location</th>
                   <th>Status</th>
                   <th width="180">Expires</th>
@@ -134,6 +135,7 @@
                   <td>{$publish.user_major|ucwords}</td>
                   <td>{$publish.user_gender|ucwords}</td>
                   <td>{$publish.priority|ucfirst}</td>
+                  <td>{$publish.similarity|default='1'} %</td>
                   <td>{$publish.location_name|default='All'}</td>
                   <td><eq name="publish.status" value="0">No Read<else/>Read</eq></td>
                   <td>{$publish.expire_time|date="Y-m-d H:i:s",###}</td>
