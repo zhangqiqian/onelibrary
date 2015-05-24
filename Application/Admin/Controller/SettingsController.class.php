@@ -367,6 +367,7 @@ class SettingsController extends AdminController {
         $datetime = I('expire_time', '', 'trim');
         $message_id = I('message_id', 0, 'intval');
         $priority = I('priority', 0, 'intval');
+        $similarity = I('similarity', 1, 'intval');
 
         if(empty($publish_id)){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Publish ID is invalid.', 'location' => ''));
@@ -387,7 +388,8 @@ class SettingsController extends AdminController {
             'expire_time' => $date_time,
             'message_id' => $message_id,
             'status' => 0,
-            'priority' => $priority
+            'priority' => $priority,
+            'similarity' => $similarity
         );
 
         $mPublish = new PublishModel();
