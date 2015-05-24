@@ -101,7 +101,7 @@ class MessageModel extends MongoModel{
         unset($message['status']);
         unset($message['level']);
         $categories = C('MESSAGE_CATEGORIES');
-        $message['category_name'] = $categories[$message['category']];
+        $message['category'] = $categories[$message['category']];
         $message['tags'] = implode(', ', $message['tags']);
         $message['author'] = implode(', ', $message['author']);
         $link = parse_url($message['link']);
