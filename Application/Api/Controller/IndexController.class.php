@@ -28,7 +28,7 @@ class IndexController extends ApiController {
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
         $last_time = I('last_time', 0, 'intval');
-        $last_message_id = I('last_message_id', 0, 'intval');
+        //$last_message_id = I('last_message_id', 0, 'intval');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 10, 'intval');
 
@@ -39,13 +39,17 @@ class IndexController extends ApiController {
 
         $locations = $this->get_near_locations($longitude, $latitude);
         $mPublish = new PublishModel();
-        $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $last_message_id, $last_time, $start, $limit);
+        $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $last_time, $start, $limit);
         $messages = array();
         $mMessage = new MessageModel();
         foreach ($publishes as $publish) {
             $message = $mMessage->get_message_for_app($publish['message_id']);
-            if(!isset($messages[$message['message_id']])){
-                $messages[$message['message_id']] = $message;
+            if(!isset($messages[$publish['publish_id']])){
+                $messages[$publish['publish_id']] = array(
+                    'publish_id' => $publish['publish_id'],
+                    'message_id' => $publish['message_id'],
+                    'title' => $message['title'],
+                );
             }
             if($message && $publish['user_uid'] > 0 ){
                 $params = array('status' => 1); //switch to read
@@ -58,6 +62,14 @@ class IndexController extends ApiController {
             $next_start = $start + $limit;
         }
         $this->ajaxReturn(array('errno' => 0, 'result' => array_values($messages), 'start' => $next_start));
+    }
+
+    public function message(){
+        $message_id = I('message_id', 0, 'intval');
+
+        $mMessage = new MessageModel();
+        $message = $mMessage->get_message_for_app($message_id);
+        $this->ajaxReturn(array('errno' => 0, 'result' => $message));
     }
 
     private function get_near_locations($longitude, $latitude){
