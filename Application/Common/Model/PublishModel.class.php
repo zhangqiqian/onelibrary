@@ -129,19 +129,17 @@ class PublishModel extends MongoModel{
      *              ),
      *        ),
      *       'status' => 0,
-     *       'message_id' => array('gt', $last_message_id),
      *       'expire_time' => array('gte', $last_time),
      *       'location_id' => array('in', $location_ids)
      *  );
      * @param $locations
      * @param $user
-     * @param $last_message_id
      * @param $last_time
      * @param $start
      * @param $limit
      * @return array
      */
-    public function get_publishes_by_user_features($locations, $user, $last_message_id = 0, $last_time = 0, $start = 0, $limit = 10){
+    public function get_publishes_by_user_features($locations, $user, $last_time = 0, $start = 0, $limit = 10){
         $location_ids = array(0);
         foreach ($locations as $location) {
             $location_ids[] = $location['location_id'];
@@ -157,7 +155,6 @@ class PublishModel extends MongoModel{
 
         $map['_complex'] = $where;
         $map['status']  = 0;
-        $map['message_id']  = array('gt', $last_message_id);
         $map['expire_time']  = array('gte', $last_time);
         $map['location_id']  = array('in', $location_ids);
         $publishes = $this->where($map)->order('mtime desc')->limit($start.','.$limit)->select();
