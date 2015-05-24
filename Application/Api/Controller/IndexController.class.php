@@ -54,6 +54,9 @@ class IndexController extends ApiController {
         }
 
         $next_start = empty($message) ? 0 : $start + $limit;
+        if(count($message) >= 10){
+            $next_start = $start + $limit;
+        }
         $this->ajaxReturn(array('errno' => 0, 'result' => array_values($messages), 'start' => $next_start));
     }
 
