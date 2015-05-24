@@ -56,7 +56,7 @@ class IndexController extends ApiController {
             }
         }
 
-        $next_start = empty($message) ? 0 : $start + $limit;
+        $next_start = 0;
         if(count($message) >= 10){
             $next_start = $start + $limit;
         }
