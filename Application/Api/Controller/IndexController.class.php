@@ -28,7 +28,6 @@ class IndexController extends ApiController {
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
         $last_time = I('last_time', 0, 'intval');
-        //$last_message_id = I('last_message_id', 0, 'intval');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 10, 'intval');
 
