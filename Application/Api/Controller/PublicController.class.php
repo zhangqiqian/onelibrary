@@ -90,7 +90,7 @@ class PublicController extends Controller {
             $User = new UserApi;
             $uid = $User->register($username, $password, $email);
             if(0 < $uid){ //注册成功
-                $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Success to sign up'));
+                $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to sign up'));
             } else { //注册失败，显示错误信息
                 $this->ajaxReturn(array('errno' => 1, 'errmsg' => $this->showRegError($uid)));
             }
