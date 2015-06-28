@@ -52,8 +52,7 @@ class UserModel extends MongoModel{
         array('ctime', NOW_TIME),
         array('mobile', 0),
         array('role', 'user'),
-        array('group', 2),
-        array('last_login_time', 0, self::MODEL_INSERT),
+        array('group', 2)
 	);
 
 	/**
@@ -147,7 +146,7 @@ class UserModel extends MongoModel{
 		if(is_array($user) && $user['status']){
 			/* 验证用户密码 */
 			if(onelibrary_md5($password, C('DATA_AUTH_KEY')) === $user['password']){
-				$this->updateLogin($user['uid']); //更新用户登录信息
+				//$this->updateLogin($user['uid']); //更新用户登录信息
 				return $user['uid']; //登录成功，返回用户ID
 			} else {
 				return -2; //密码错误
@@ -211,7 +210,6 @@ class UserModel extends MongoModel{
 	protected function updateLogin($uid){
 		$data = array(
 			'uid'              => $uid,
-			'last_login_time' => NOW_TIME,
 		);
 		$this->save($data);
 	}
