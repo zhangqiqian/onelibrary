@@ -13,36 +13,21 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="user_grade" class="col-sm-3 control-label">User Grade</label>
+        <label for="publish_time" class="col-sm-3 control-label">Publish Time</label>
         <div class="col-sm-5">
-            <select id="user_grade" name="user_grade" placeholder="User Grade" class="form-control">
-                <option value="0">All</option>
-                <foreach name="grades" item="grade" >
-                    <option value="{$key}">{$grade}</option>
-                </foreach>
-            </select>
+            <div id="pubtimepicker" class="input-group date">
+                <input type="text" class="form-control" id="publish_time" name="publish_time" value="{$publish.publish_time|date='Y-m-d H:i:s',###}" placeholder="Default is now.">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="user_major" class="col-sm-3 control-label">User Major</label>
-        <div class="col-sm-5">
-            <select id="user_major" name="user_major" placeholder="User Major" class="form-control">
-                <option value="0">All</option>
-                <foreach name="majors" item="major" >
-                    <option value="{$key}">{$major}</option>
-                </foreach>
-            </select>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="user_gender" class="col-sm-3 control-label">User Gender</label>
-        <div class="col-sm-5">
-            <select id="user_gender" name="user_gender" placeholder="User Gender" class="form-control">
-                <option value="2">All</option>
-                <option value="0">Female</option>
-                <option value="1">Male</option>
-            </select>
-        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#pubtimepicker').datetimepicker({
+                    //locale: 'zh-CN',
+                    format: 'YYYY-MM-DD HH:mm'
+                });
+            });
+        </script>
     </div>
     <div class="form-group">
         <label for="expire_time" class="col-sm-3 control-label">Expires</label>
@@ -56,7 +41,7 @@
             $(function () {
                 $('#datetimepicker').datetimepicker({
                     //locale: 'zh-CN',
-                    format: 'YYYY-MM-DD HH:mm:SS'
+                    format: 'YYYY-MM-DD HH:mm'
                 });
             });
         </script>
@@ -95,9 +80,6 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $("#user_uid").val("{$publish.user_uid}");
-        $("#user_grade").val("{$publish.user_grade}");
-        $("#user_major").val("{$publish.user_major}");
-        $("#user_gender").val("{$publish.user_gender}");
         $("#location_id").val("{$publish.location_id}");
         $("#priority").val("{$publish.priority}");
     });
