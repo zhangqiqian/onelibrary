@@ -102,7 +102,7 @@
               <td><eq name="member.gender" value="1">Male<else/>Female</eq></td>
               <td>{$member.major|default='Unknown'}</td>
               <td>{$member.grade|ucwords}</td>
-              <td>{$member.last_login_ip|long2ip}</td>
+              <td>{$member.last_login_ip}</td>
               <td>{$member.login_count}</td>
               <td><eq name="member.status" value="1">Enabled<else/>Disabled</eq></td>
               <td><a href="javascript:open_dialog('edit', '{:U('Settings/user_edit')}/uid/{$member.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
