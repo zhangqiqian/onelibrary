@@ -15,11 +15,12 @@ use Common\Model\MessageModel;
 use Common\Model\LocationModel;
 use Common\Model\CurriculaModel;
 
+/**
+ * 后台-Settings
+ * @author zhangqiqian <43874051@qq.com>
+ */
 class SettingsController extends AdminController {
-    /**
-     * 后台-Settings
-     * @author zhangqiqian <43874051@qq.com>
-     */
+
     public function user(){
         $member = new MemberModel();
         $members = $member->get_member_list();
@@ -82,6 +83,15 @@ class SettingsController extends AdminController {
         $mMember = new MemberModel();
         $ret = $mMember->update_member($uid, $userinfo);
         $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/user'), 'location' => ''));
+    }
+
+    public function user_info(){
+        $uid = I('uid', 0, 'intval');
+
+        $mMember = new MemberModel();
+        $member = $mMember->get_member($uid);
+        $this->assign('member', $member);
+        $this->display();
     }
 
     public function message(){
@@ -221,12 +231,6 @@ class SettingsController extends AdminController {
         $members = $mMember->get_member_list();
         $this->assign('members', $members);
 
-        $grades = C('USER_GRADES');
-        $this->assign('grades', $grades);
-
-        $majors = C('MAJOR_MAPPING');
-        $this->assign('majors', $majors);
-
         $priorities = C('MESSAGE_PRIORITY');
         $this->assign('priorities', $priorities);
 
@@ -239,27 +243,29 @@ class SettingsController extends AdminController {
 
     public function message_publish_submit(){
         $uid = I('user_uid', 0, 'intval');
-        $grade = I('user_grade', 0, 'intval');
-        $major = I('user_major', 0, 'intval');
-        $gender = I('user_gender', 0, 'intval');
         $location_id = I('location_id', 0, 'intval');
-        $datetime = I('expire_time', '', 'trim');
+        $publish_time = I('publish_time', '', 'trim');
+        $expire_time = I('expire_time', '', 'trim');
         $message_id = I('message_id', 0, 'intval');
         $priority = I('priority', 0, 'intval');
         $similarity = I('similarity', 1, 'intval');
 
-        if(empty($datetime)){
+        if(empty($publish_time)){
+            $pub_time = time();
+        }else{
+            $pub_time = strtotime($publish_time);
+        }
+
+        if(empty($expire_time)){
             $date_time = time() + 24 * 3600;
         }else{
-            $date_time = strtotime($datetime);
+            $date_time = strtotime($expire_time);
         }
 
         $publish = array(
             'user_uid' => $uid,
-            'user_grade' => $grade,
-            'user_major' => $major,
-            'user_gender' => $gender,
             'location_id' => $location_id,
+            'publish_time' => $pub_time,
             'expire_time' => $date_time,
             'message_id' => $message_id,
             'status' => 0,
@@ -340,12 +346,6 @@ class SettingsController extends AdminController {
         $members = $mMember->get_member_list();
         $this->assign('members', $members);
 
-        $grades = C('USER_GRADES');
-        $this->assign('grades', $grades);
-
-        $majors = C('MAJOR_MAPPING');
-        $this->assign('majors', $majors);
-
         $priorities = C('MESSAGE_PRIORITY');
         $this->assign('priorities', $priorities);
 
@@ -362,11 +362,9 @@ class SettingsController extends AdminController {
     public function publish_edit_submit(){
         $publish_id = I('publish_id', 0, 'intval');
         $uid = I('user_uid', 0, 'intval');
-        $grade = I('user_grade', 0, 'intval');
-        $major = I('user_major', 0, 'intval');
-        $gender = I('user_gender', 0, 'intval');
         $location_id = I('location_id', 0, 'intval');
-        $datetime = I('expire_time', '', 'trim');
+        $publish_time = I('publish_time', '', 'trim');
+        $expire_time = I('expire_time', '', 'trim');
         $message_id = I('message_id', 0, 'intval');
         $priority = I('priority', 0, 'intval');
         $similarity = I('similarity', 1, 'intval');
@@ -375,18 +373,21 @@ class SettingsController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Publish ID is invalid.', 'location' => ''));
         }
 
-        if(empty($datetime)){
-            $date_time = time();
+        if(empty($publish_time)){
+            $pub_time = time();
         }else{
-            $date_time = strtotime($datetime);
+            $pub_time = strtotime($publish_time);
+        }
+        if(empty($expire_time)){
+            $date_time = time() + 24 * 3600;
+        }else{
+            $date_time = strtotime($expire_time);
         }
 
         $publish = array(
             'user_uid' => $uid,
-            'user_grade' => $grade,
-            'user_major' => $major,
-            'user_gender' => $gender,
             'location_id' => $location_id,
+            'publish_time' => $pub_time,
             'expire_time' => $date_time,
             'message_id' => $message_id,
             'status' => 0,
