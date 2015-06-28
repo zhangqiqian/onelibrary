@@ -23,11 +23,9 @@ class PublishModel extends MongoModel{
     protected $_auto = array(
         array('publish_id', 0, self::MODEL_INSERT),
         array('user_uid', 0, self::MODEL_INSERT),
-        array('user_grade', 0, self::MODEL_INSERT),
-        array('user_major', 0, self::MODEL_INSERT),
-        array('user_gender', 2, self::MODEL_INSERT), //0: female, 1: male, 2: all
         array('location_id', 0, self::MODEL_INSERT),
-        array('expire_time', '', self::MODEL_INSERT),
+        array('publish_time', NOW_TIME, self::MODEL_INSERT),
+        array('expire_time', 0, self::MODEL_INSERT),
         array('message_id', 0, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0, no read; 1, read
         array('priority', 0, self::MODEL_INSERT), //order by priority
@@ -46,8 +44,6 @@ class PublishModel extends MongoModel{
             $publishes = array();
         }
         $ret = array();
-        $grades = C('USER_GRADES');
-        $majors = C('MAJOR_MAPPING');
         $priorities = C('MESSAGE_PRIORITY');
         $mMember = new MemberModel();
         $mLocation = new LocationModel();
@@ -56,16 +52,6 @@ class PublishModel extends MongoModel{
             unset($publish['_id']);
             unset($publish['ctime']);
             unset($publish['mtime']);
-            $publish['user_grade'] = $publish['user_grade'] == 0 ? 'All' : $grades[$publish['user_grade']];
-            $publish['user_major'] = $publish['user_major'] == 0 ? 'All' : $majors[$publish['user_major']];
-
-            if($publish['user_gender'] == 0){
-                $publish['user_gender'] = 'Female';
-            }elseif($publish['user_gender'] == 1){
-                $publish['user_gender'] = 'Male';
-            }else{
-                $publish['user_gender'] = 'All';
-            }
 
             if($publish['user_uid'] == 0){
                 $publish['user_name'] = 'All';
@@ -100,6 +86,7 @@ class PublishModel extends MongoModel{
         $params = array(
             'uid' => $uid, //who
             'location_id' => $location_id, //where
+            'publish_time' => array('$lte', time()), //when
             'expire_time' => array('$gte', time()), //when
             'status' => 0, //no read
         );
@@ -149,16 +136,14 @@ class PublishModel extends MongoModel{
         $last_time = $last_time == 0 ? time() : $last_time;
 
         $where['user_uid']  = array('in', array(0, $user['uid']));
-        $where['user_grade']  = array('in', array(0, $user['grade']));
-        $where['user_major']  = array('in', array(0, $user['major']));
-        $where['user_gender']  = array('in', array(0, $user['gender']));
         $where['_logic'] = 'or';
 
         $map['_complex'] = $where;
         $map['status']  = 0;
+        $map['publish_time']  = array('lte', $last_time);
         $map['expire_time']  = array('gte', $last_time);
         $map['location_id']  = array('in', $location_ids);
-        $publishes = $this->where($map)->order('priority desc, similarity desc, mtime desc')->limit($start.','.$limit)->select();
+        $publishes = $this->where($map)->order('priority desc, similarity desc, publish_time desc')->limit($start.','.$limit)->select();
         if(empty($publishes)){
             $publishes = array();
         }
