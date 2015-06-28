@@ -81,7 +81,7 @@ class MemberModel extends MongoModel{
             'uid'             => $user['uid'],
             'login_count'     => $user['login_count'] + 1, //array('exp', '`login_count`+1'),
             'last_login_time' => NOW_TIME,
-            'last_login_ip'   => get_client_ip(1),
+            'last_login_ip'   => get_client_ip(0, true),
         );
         $this->save($data);
 
