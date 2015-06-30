@@ -151,11 +151,7 @@ class MemberModel extends MongoModel{
             $member = array();
         }
         unset($member['_id']);
-        unset($member['birthday']);
         unset($member['ctime']);
-        unset($member['last_login_ip']);
-        unset($member['last_login_time']);
-        unset($member['login_count']);
         unset($member['mtime']);
         return $member;
     }
