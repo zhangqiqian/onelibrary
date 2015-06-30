@@ -790,8 +790,7 @@ class SettingsController extends AdminController {
         $this->assign('course_week', $course_week);
 
         $mMember = new MemberModel();
-        //TODO get teacher list by user role.
-        $members = $mMember->get_member_list();
+        $members = $mMember->get_teacher_list();
         $teachers = array();
         foreach ($members as $member) {
             $teachers[$member['uid']] = $member['nickname'];
@@ -859,8 +858,7 @@ class SettingsController extends AdminController {
         }
 
         $mMember = new MemberModel();
-        //TODO get teacher list by user role.
-        $members = $mMember->get_member_list();
+        $members = $mMember->get_teacher_list();
         $teachers = array();
         foreach ($members as $member) {
             $teachers[$member['uid']] = $member['nickname'];
