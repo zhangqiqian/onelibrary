@@ -121,6 +121,23 @@ class MemberModel extends MongoModel{
     }
 
     /**
+     * 获取所有用户
+     * @return array
+     */
+    public function get_teacher_list(){
+        $members = $this->where(array('grade' => array('gte' => 3)))->order('uid')->select();
+        if(!$members){
+            $members = array();
+        }
+        $ret = array();
+        foreach ($members as $member) {
+            unset($member['_id']);
+            $ret[] = $member;
+        }
+        return $ret;
+    }
+
+    /**
      * 获取用户信息
      * @param $uid
      * @return array
