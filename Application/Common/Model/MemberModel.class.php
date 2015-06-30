@@ -101,7 +101,8 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function get_member_list(){
-        $members = $this->order('uid')->select();
+        $map['status'] = 1;
+        $members = $this->where($map)->order('uid')->select();
         if(!$members){
             $members = array();
         }
@@ -125,7 +126,9 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function get_teacher_list(){
-        $members = $this->where(array('grade' => array('gte' => 3)))->order('uid')->select();
+        $map['status'] = 1;
+        $map['grade'] = array('$gte' => 3);
+        $members = $this->where($map)->order('uid')->select();
         if(!$members){
             $members = array();
         }
