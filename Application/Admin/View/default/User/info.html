@@ -14,7 +14,7 @@
                 <a href="{:U('Settings/location')}">Location</a>
             </li>
             <li class="active">
-                <a href="{:U('Settings/user')}">User</a>
+                <a href="{:U('User/user_list')}">User</a>
             </li>
             <li>
                 <a href="{:U('Settings/curricula')}">Curricula</a>
@@ -24,7 +24,7 @@
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <ol class="breadcrumb">
         <li><a href="{:U('Settings/publish')}">Settings</a></li>
-        <li><a href="{:U('Settings/user')}">User</a></li>
+        <li><a href="{:U('User/user_list')}">User</a></li>
         <li class="active">{$member.nickname}</li>
         </ol>
         <div>
@@ -116,7 +116,7 @@
     function open_dialog(){
         $("#editFormPage").empty();
         $("#edit-tips").empty();
-        $("#editFormPage").load("{:U('Settings/user_edit')}/uid/{$member.uid}");
+        $("#editFormPage").load("{:U('User/member_edit')}/uid/{$member.uid}");
         $('#editModal').modal('show');
     }
 

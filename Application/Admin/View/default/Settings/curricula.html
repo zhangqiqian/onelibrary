@@ -112,7 +112,7 @@
               <foreach name="curriculas" item="curricula" >
                 <tr>
                   <td>{$curricula.curricula_id}</td>
-                  <td>{$curricula.name}</td>
+                  <td><a href="{:U('Settings/curricula_detail')}/curricula/{$curricula.curricula_id}" title="Detail">{$curricula.name}</a></td>
                   <td>{$curricula.major|ucfirst}</td>
                   <td>{$curricula.grade}</td>
                   <td>{$curricula.class}</td>
