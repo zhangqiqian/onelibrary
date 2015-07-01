@@ -59,8 +59,8 @@
               <td>{$user.mobile}</td>
               <td><eq name="user.status" value="1">Enabled<else/>Disabled</eq></td>
               <td>
-                  <a href="{:U('User/info')}/uid/{$user.uid}" title="Info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a>
-                  <a href="javascript:open_dialog('edit', '{:U('User/user_edit')}/uid/{$user.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                  <a href="{:U('User/info')}/uid/{$user.uid}" title="Info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a>&nbsp;
+                  <a href="javascript:open_dialog('edit', '{:U('User/user_edit')}/uid/{$user.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
                   <neq name="user.uid" value="1">
                   <a href="javascript:open_dialog('del', '{:U('User/user_del')}/uid/{$user.uid}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
                   </neq>
