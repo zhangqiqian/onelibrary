@@ -1,0 +1,7 @@
+<form id="delUserForm" class="form-horizontal" action="{:U('User/user_del_submit')}">
+    <input type="hidden" id="uid" name="uid" value="{$user.uid}">
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        Are you sure to <strong>delete</strong> the user <strong><em>{$user.username}</em></strong>?
+    </div>
+</form>

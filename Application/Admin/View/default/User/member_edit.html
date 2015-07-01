@@ -1,25 +1,26 @@
-<form id="addUserForm" class="form-horizontal" action="{:U('Settings/user_add_submit')}">
+<form id="editUserForm" class="form-horizontal" action="{:U('User/user_edit_submit')}">
     <div class="form-group">
         <label for="nickname" class="col-sm-3 control-label">Nickname</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="nickname" name="nickname" placeholder="Nick name">
+            <input type="hidden" id="uid" name="uid" value="{$member.uid}">
+            <input type="text" class="form-control" id="nickname" name="nickname" value="{$member.nickname}" placeholder="Nick name" disabled>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-3 control-label">Gender</label>
         <div class="col-sm-5">
             <label class="radio-inline">
-                <input type="radio" name="gender" value="1" checked> Male
+                <input type="radio" name="gender" value="1" <eq name="member.gender" value="1">checked</eq>> Male
             </label>
             <label class="radio-inline">
-                <input type="radio" name="gender" value="0"> Female
+                <input type="radio" name="gender" value="0" <eq name="member.gender" value="0">checked</eq>> Female
             </label>
         </div>
     </div>
     <div class="form-group">
         <label for="major" class="col-sm-3 control-label">Major</label>
         <div class="col-sm-5">
-            <select id="major" name="major" placeholder="Major" class="form-control">
+            <select id="major" name="major" class="form-control">
                 <foreach name="majors" item="major" >
                     <option value="{$key}">{$major}</option>
                 </foreach>
@@ -31,7 +32,7 @@
         <div class="col-sm-5">
             <select id="grade" name="grade" placeholder="Grade" class="form-control">
                 <foreach name="grades" item="grade" >
-                    <option data="1" value="{$key}">{$grade}</option>
+                    <option value="{$key}">{$grade}</option>
                 </foreach>
             </select>
         </div>
@@ -39,7 +40,13 @@
     <div class="form-group">
         <label for="desc" class="col-sm-3 control-label">Description</label>
         <div class="col-sm-9">
-            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="4"></textarea>
+            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="4">{$member.desc}</textarea>
         </div>
     </div>
 </form>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#major").val("{$member.major}");
+        $("#grade").val("{$member.grade}");
+    });
+</script>

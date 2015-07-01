@@ -1,0 +1,32 @@
+<form id="editUserForm" class="form-horizontal" action="{:U('User/user_edit_submit')}">
+    <div class="form-group">
+        <label for="username" class="col-sm-4 control-label">User Name</label>
+        <div class="col-sm-5">
+            <input type="hidden" id="uid" name="uid" value="{$user.uid}">
+            <input type="text" class="form-control" id="username" name="username" value="{$user.username}" placeholder="User name" <eq name="user.uid" value="1">disabled</eq>>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 control-label">Status</label>
+        <div class="col-sm-5">
+            <label class="radio-inline">
+                <input type="radio" name="status" value="1" <eq name="user.status" value="1">checked</eq>> Enabled
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="status" value="0" <eq name="user.status" value="0">checked</eq>> Disabled
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="email" class="col-sm-4 control-label">Email</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="email" name="email" value="{$user.email}" placeholder="Email: xxx@xxx.com">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="mobile" class="col-sm-4 control-label">Phone</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="mobile" name="mobile" value="{$user.mobile}" placeholder="Phone">
+        </div>
+    </div>
+</form>

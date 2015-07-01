@@ -14,7 +14,7 @@
               <a href="{:U('Settings/location')}">Location</a>
           </li>
           <li class="active">
-              <a href="{:U('Settings/user')}">User</a>
+              <a href="{:U('User/user_list')}">User</a>
           </li>
           <li>
               <a href="{:U('Settings/curricula')}">Curricula</a>
@@ -27,49 +27,8 @@
         <li class="active">User</li>
       </ol>
       <div>
-        <a href="javascript:open_dialog('add', '{:U('Settings/user_add')}');" class="btn btn-primary btn-sm pull-right" >Add User</a>
+        <a href="javascript:open_dialog('add', '{:U('User/user_add')}');" class="btn btn-primary btn-sm pull-right" >Add User</a>
           <form id="search" class="form-inline" action="" method="post">
-              <div class="btn-group btn-group-sm">
-                  <button type="button" class="btn btn-success">Grade</button>
-                  <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                      <span class="caret"></span>
-                      <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                      <li><a href="#">All</a></li>
-                      <li class="divider"></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
-                      <li><a href="#">Separated link</a></li>
-                  </ul>
-              </div>
-              <div class="btn-group btn-group-sm">
-                  <button type="button" class="btn btn-info">Major</button>
-                  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                      <span class="caret"></span>
-                      <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                      <li><a href="#">All</a></li>
-                      <li class="divider"></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
-                      <li><a href="#">Separated link</a></li>
-                  </ul>
-              </div>
-              <div class="btn-group btn-group-sm">
-                  <button type="button" class="btn btn-warning">Gender</button>
-                  <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                      <span class="caret"></span>
-                      <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                      <li><a href="#">All</a></li>
-                      <li class="divider"></li>
-                      <li><a href="#">Male</a></li>
-                      <li><a href="#">Female</a></li>
-                  </ul>
-              </div>
               <div class="input-group input-group-sm">
                   <input type="text" class="form-control" placeholder="User Name">
                       <span class="input-group-btn">
@@ -85,27 +44,27 @@
             <tr>
               <th width="50">ID</th>
               <th>User Name</th>
-              <th>Gender</th>
-              <th>Major</th>
-              <th>Grade</th>
-              <th>Last Login IP</th>
-              <th>Login Count</th>
+              <th>Email</th>
+              <th>Phone</th>
               <th width="120">Status</th>
               <th width="150">Operation</th>
             </tr>
           </thead>
           <tbody>
-          <foreach name="members" item="member" >
+          <foreach name="users" item="user" >
             <tr>
-              <td>{$member.uid}</td>
-              <td>{$member.nickname}</td>
-              <td><eq name="member.gender" value="1">Male<else/>Female</eq></td>
-              <td>{$member.major|default='Unknown'}</td>
-              <td>{$member.grade|ucwords}</td>
-              <td>{$member.last_login_ip}</td>
-              <td>{$member.login_count}</td>
-              <td><eq name="member.status" value="1">Enabled<else/>Disabled</eq></td>
-              <td><a href="javascript:open_dialog('edit', '{:U('Settings/user_edit')}/uid/{$member.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
+              <td>{$user.uid}</td>
+              <td><a href="{:U('User/info')}/uid/{$user.uid}">{$user.username}</a></td>
+              <td>{$user.email}</td>
+              <td>{$user.mobile}</td>
+              <td><eq name="user.status" value="1">Enabled<else/>Disabled</eq></td>
+              <td>
+                  <a href="{:U('User/info')}/uid/{$user.uid}" title="Info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a>
+                  <a href="javascript:open_dialog('edit', '{:U('User/user_edit')}/uid/{$user.uid}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                  <neq name="user.uid" value="1">
+                  <a href="javascript:open_dialog('del', '{:U('User/user_del')}/uid/{$user.uid}');" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
+                  </neq>
+              </td>
             </tr>
           </foreach>
           </tbody>
@@ -127,7 +86,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- User add Modal -->
   <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -146,7 +105,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- User edit Modal -->
   <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -165,6 +124,25 @@
     </div>
   </div>
 
+    <!-- Del Modal -->
+    <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="delModalLabel">Delete User</h4>
+                </div>
+                <div id="delFormPage" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <div id="del-tips" class="Validform_checktip text-danger pull-left"></div>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" onclick="del_user();">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
   <script>
     $(document).ajaxStart(function(){
       $("button:submit").attr("disabled", true);
@@ -175,7 +153,12 @@
     function open_dialog(tag, url){
       if(tag == 'add'){
         $("#editFormPage").empty();
-      }else{
+        $("#delFormPage").empty();
+      }else if(tag == 'edit'){
+        $("#addFormPage").empty();
+        $("#delFormPage").empty();
+      }else if(tag == 'del'){
+        $("#editFormPage").empty();
         $("#addFormPage").empty();
       }
       $("#"+tag+"-tips").empty();
@@ -190,7 +173,7 @@
           $("#add-tips").addClass('text-success');
           $("#add-tips").removeClass('text-danger');
           $("#add-tips").text(data.errmsg);
-          //window.location.href = data.url;
+          window.location.href = data.url;
         } else {
           var location = data.location;
           if($('#msg'))
@@ -229,6 +212,30 @@
           }
         }
       }, "json");
+    }
+
+    function del_user(){
+        var self = $("#delUserForm");
+        $.post(self.attr("action"), self.serialize(), function(data){
+            if(data.errno == 0){
+                $("#del-tips").addClass('text-success');
+                $("#del-tips").removeClass('text-danger');
+                $("#del-tips").text(data.errmsg);
+                window.location.href = data.url;
+            } else {
+                var location = data.location;
+                if($('#msg'))
+                {
+                    $('#msg').empty();
+                    $('#msg').remove();
+                }
+                if(location){
+                    $('#' + location).after("<span class='text-danger' id='msg'>&nbsp;"+ data.errmsg +" </span>");
+                }else{
+                    $('#del-tips').text(data.errmsg);
+                }
+            }
+        }, "json");
     }
   </script>
 </block>
