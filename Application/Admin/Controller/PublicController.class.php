@@ -19,6 +19,9 @@ class PublicController extends Controller {
 
     /**
      * 后台用户登录
+     * @param string $username
+     * @param string $password
+     * @param string $verify
      * @author zhangqiqian <43874051@qq.com>
      */
     public function login($username = null, $password = null, $verify = null){

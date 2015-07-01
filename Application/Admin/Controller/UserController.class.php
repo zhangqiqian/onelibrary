@@ -9,6 +9,7 @@
 
 namespace Admin\Controller;
 use User\Api\UserApi;
+use Common\Model\MemberModel;
 
 /**
  * 后台用户控制器
@@ -16,70 +17,195 @@ use User\Api\UserApi;
  */
 class UserController extends AdminController {
 
-    /**
-     * 用户管理首页
-     * @author zhangqiqian <43874051@qq.com>
-     */
-    public function index(){
-        $nickname       =   I('nickname');
-        $map['status']  =   array('egt',0);
-        if(is_numeric($nickname)){
-            $map['uid|nickname']=   array(intval($nickname),array('like','%'.$nickname.'%'),'_multi'=>true);
-        }else{
-            $map['nickname']    =   array('like', '%'.(string)$nickname.'%');
-        }
-
-        $list   = $this->lists('Member', $map);
-        int_to_string($list);
-        $this->assign('_list', $list);
-        $this->meta_title = '用户信息';
-        $this->display();
-    }
-
-    /**
-     * 修改昵称初始化
-     * @author zhangqiqian <43874051@qq.com>
-     */
-    public function updateNickname(){
-        $nickname = M('Member')->getFieldByUid(UID, 'nickname');
-        $this->assign('nickname', $nickname);
-        $this->meta_title = '修改昵称';
-        $this->display();
-    }
-
-    /**
-     * 修改昵称提交
-     * @author zhangqiqian <43874051@qq.com>
-     */
-    public function submitNickname(){
-        //获取参数
-        $nickname = I('post.nickname');
-        $password = I('post.password');
-        empty($nickname) && $this->error('请输入昵称');
-        empty($password) && $this->error('请输入密码');
-
-        //密码验证
+    public function user_list(){
         $User   =   new UserApi();
-        $uid    =   $User->login(UID, $password, 4);
-        ($uid == -2) && $this->error('密码不正确');
+        $users    =   $User->user_list();
+        $this->assign('users', $users);
+        $this->display();
+    }
 
-        $Member =   D('Member');
-        $data   =   $Member->create(array('nickname'=>$nickname));
-        if(!$data){
-            $this->error($Member->getError());
+    public function user_add(){
+        $this->display();
+    }
+
+    public function user_add_submit(){
+        $username = I('username', '', 'trim');
+        $password = I('password', '');
+        $repassword = I('repassword', '');
+        $email = I('email', '', 'trim');
+        $mobile = I('mobile', '', 'trim');
+
+        $UserApi = new UserApi();
+        $user = $UserApi->get_user_by_username($username);
+        if($user){
+            $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Username exists.', 'url' => '', 'location' => 'username'));
         }
 
-        $res = $Member->where(array('uid'=>$uid))->save($data);
+        if($password != $repassword){
+            $this->ajaxReturn(array('errno' => 400202, 'errmsg' => 'password is not the same', 'url' => '', 'location' => 'repassword'));
+        }
 
-        if($res){
-            $user               =   session('user_auth');
-            $user['username']   =   $data['nickname'];
-            session('user_auth', $user);
-            session('user_auth_sign', data_auth_sign($user));
-            $this->success('修改昵称成功！');
+        $user = $UserApi->get_user_by_email($email);
+        if($user){
+            $this->ajaxReturn(array('errno' => 400203, 'errmsg' => 'Email has existed.', 'url' => '', 'location' => 'email'));
+        }
+        if($mobile){
+            $user = $UserApi->get_user_by_mobile($mobile);
+            if($user){
+                $this->ajaxReturn(array('errno' => 400204, 'errmsg' => 'Phone has existed.', 'url' => '', 'location' => 'mobile'));
+            }
+        }
+
+        $ret = $UserApi->register($username, $password, $email, $mobile);
+        if($ret > 0){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
         }else{
-            $this->error('修改昵称失败！');
+            $errmsg = $this->showRegError($ret);
+            $this->ajaxReturn(array('errno' => 400205, 'errmsg' => $errmsg, 'url' => '', 'location' => ''));
         }
+    }
+
+    public function user_edit(){
+        $uid = I('uid', 0, 'intval');
+
+        $UserApi = new UserApi();
+        $user = $UserApi->get_user($uid);
+        $this->assign('user', $user);
+        $this->display();
+    }
+
+    public function user_edit_submit(){
+        $uid = I('uid', 0, 'intval');
+        $username = I('username', '', 'trim');
+        $mobile = I('mobile', '');
+        $email = I('email', '', 'trim');
+        $status = I('status', 1, 'intval');
+
+        if(empty($uid)){
+            $this->ajaxReturn(array('errno' => 400200, 'errmsg' => 'User id is invalid.', 'location' => ''));
+        }
+
+        $UserApi = new UserApi();
+        $user = $UserApi->get_user_by_username($username);
+        if($user && $user['uid'] != $uid){
+            $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Username exists.', 'url' => '', 'location' => 'username'));
+        }
+        $user = $UserApi->get_user_by_email($email);
+        if($user && $user['uid'] != $uid){
+            $this->ajaxReturn(array('errno' => 400202, 'errmsg' => 'Email has been existed.', 'url' => '', 'location' => 'email'));
+        }
+        if(!empty($mobile)){
+            $user = $UserApi->get_user_by_mobile($mobile);
+            if($user && $user['uid'] != $uid){
+                $this->ajaxReturn(array('errno' => 400203, 'errmsg' => 'Phone has been existed.', 'url' => '', 'location' => 'mobile'));
+            }
+        }
+
+        $userinfo = array(
+            'username' => $username,
+            'email' => $email,
+            'mobile' => $mobile,
+            'status' => $status,
+        );
+
+        $ret = $UserApi->update($uid, $userinfo);
+        if($ret['ok'] == 1){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Failure to update user.', 'url' => U('User/user_list'), 'location' => ''));
+        }
+    }
+
+    public function user_del(){
+        $uid = I('uid', 0, 'intval');
+
+        $UserApi = new UserApi();
+        $user = $UserApi->get_user($uid);
+        $this->assign('user', $user);
+        $this->display();
+    }
+
+
+    public function user_del_submit(){
+        $uid = I('uid', 0, 'intval');
+        if($uid == 1){
+            $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Admin could not be deleted.', 'location' => ''));
+        }
+        if(empty($uid)){
+            $this->ajaxReturn(array('errno' => 400202, 'errmsg' => 'User id is invalid.', 'location' => ''));
+        }
+
+        $UserApi = new UserApi();
+        $userinfo = array(
+            'status' => 2, //del status
+        );
+
+        $ret = $UserApi->update($uid, $userinfo);
+        if($ret['ok'] == 1){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
+        }else{
+            $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Failure to delete user.', 'url' => U('User/user_list'), 'location' => ''));
+        }
+    }
+
+    public function info(){
+        $uid = I('uid', 0, 'intval');
+
+        $mMember = new MemberModel();
+        $member = $mMember->get_member($uid);
+
+        $grades = C('USER_GRADES');
+        $majors = C('MAJOR_MAPPING');
+        $member['grade_name'] = isset($grades[$member['grade']]) ? $grades[$member['grade']] : 'Unknown';
+        $member['major_name'] = isset($majors[$member['grade']]) ? $majors[$member['grade']] : 'Unknown';
+
+        $this->assign('member', $member);
+
+        $this->display();
+    }
+
+    public function member_edit(){
+        $uid = I('uid', 0, 'intval');
+        $mMember = new MemberModel();
+        $member = $mMember->get_member($uid);
+
+        $grades = C('USER_GRADES');
+        $this->assign('grades', $grades);
+
+        $majors = C('MAJOR_MAPPING');
+        $this->assign('majors', $majors);
+
+        $this->assign('member', $member);
+        $this->display();
+    }
+
+    public function member_edit_submit(){
+        $uid = I('uid', 0, 'intval');
+        $gender = I('gender', 1, 'intval');
+        $major = I('major', '');
+        $grade = I('grade', 1, 'intval');
+        $desc = I('desc', '');
+
+        if(empty($uid)){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
+        }
+        if(!in_array($gender, array(0,1))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Gender value is invalid.', 'location' => 'gender'));
+        }
+        $grades = C('USER_GRADES');
+        if(!in_array($grade, array_keys($grades))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'gender'));
+        }
+
+        $userinfo = array(
+            'gender' => $gender,
+            'major' => $major,
+            'grade' => $grade,
+            'desc' => $desc,
+        );
+        $mMember = new MemberModel();
+        $ret = $mMember->update_member($uid, $userinfo);
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/user'), 'location' => ''));
     }
 
     /**
