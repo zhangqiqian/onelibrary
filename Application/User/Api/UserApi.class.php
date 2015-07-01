@@ -44,6 +44,60 @@ class UserApi extends Api{
     }
 
     /**
+     * 获取用户信息 by uid
+     * @param  int  $uid         用户ID
+     * @return array                用户信息
+     */
+    public function get_user($uid){
+        return $this->model->get_user($uid);
+    }
+
+    /**
+     * 获取用户信息 by username
+     * @param  string  $username    用户名
+     * @return array                用户信息
+     */
+    public function get_user_by_username($username){
+        return $this->model->get_user_by_username($username);
+    }
+
+    /**
+     * 获取用户信息 by email
+     * @param  string  $email         用户email
+     * @return array                用户信息
+     */
+    public function get_user_by_email($email){
+        return $this->model->get_user_by_email($email);
+    }
+
+    /**
+     * 获取用户信息 by mobile
+     * @param  string  $mobile     mobile
+     * @return array                用户信息
+     */
+    public function get_user_by_mobile($mobile){
+        return $this->model->get_user_by_mobile($mobile);
+    }
+
+
+    /**
+     * 获取all用户信息
+     * @return array                all用户信息
+     */
+    public function user_list(){
+        return $this->model->user_list();
+    }
+
+    /**
+     * update用户信息
+     * @param  int  $uid         用户ID
+     * @param  array $data      update fields
+     */
+    public function update($uid, $data){
+        return $this->model->update($uid, $data);
+    }
+
+    /**
      * 检测用户名
      * @param  string  $username  用户名
      * @return integer         错误编号

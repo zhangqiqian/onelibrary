@@ -48,11 +48,10 @@ class UserModel extends MongoModel{
 	protected $_auto = array(
 		array('password', 'onelibrary_md5', self::MODEL_BOTH, 'function', AUTH_KEY),
 		array('status', 'getStatus', self::MODEL_BOTH, 'callback'),
-		array('mtime', NOW_TIME),
-        array('ctime', NOW_TIME),
-        array('mobile', 0),
+		array('mtime', NOW_TIME, self::MODEL_BOTH),
+        array('ctime', NOW_TIME, self::MODEL_INSERT),
         array('role', 'user'),
-        array('group', 2)
+        array('group', 1)
 	);
 
 	/**
@@ -87,7 +86,7 @@ class UserModel extends MongoModel{
 	 * @return integer 用户状态
 	 */
 	protected function getStatus(){
-		return true; //TODO: 暂不限制，下一个版本完善
+		return 1; //TODO: 暂不限制，下一个版本完善
 	}
 
 	/**
@@ -105,9 +104,6 @@ class UserModel extends MongoModel{
 			'email'    => $email,
 			'mobile'   => $mobile,
 		);
-
-		//验证手机
-		//if(empty($data['mobile'])) unset($data['mobile']);
 
 		/* 添加用户 */
 		if($this->create($data)){
@@ -143,10 +139,9 @@ class UserModel extends MongoModel{
 
 		/* 获取用户数据 */
 		$user = $this->where($map)->find();
-		if(is_array($user) && $user['status']){
+		if(is_array($user) && $user['status'] == 1){
 			/* 验证用户密码 */
 			if(onelibrary_md5($password, C('DATA_AUTH_KEY')) === $user['password']){
-				//$this->updateLogin($user['uid']); //更新用户登录信息
 				return $user['uid']; //登录成功，返回用户ID
 			} else {
 				return -2; //密码错误
@@ -155,6 +150,50 @@ class UserModel extends MongoModel{
 			return -1; //用户不存在或被禁用
 		}
 	}
+
+    public function user_list(){
+        $map = array(
+            'status' => array('$lte' => 1)
+        );
+        $users = $this->where($map)->select();
+        $ret = array();
+        if(!empty($users)){
+            $ret = $users;
+        }
+        return $ret;
+    }
+
+    public function get_user($uid){
+        $map = array(
+            'uid' => $uid
+        );
+        $user = $this->where($map)->find();
+        return $user;
+    }
+
+    public function get_user_by_username($username){
+        $map = array(
+            'username' => $username
+        );
+        $user = $this->where($map)->find();
+        return $user;
+    }
+
+    public function get_user_by_email($email){
+        $map = array(
+            'email' => $email
+        );
+        $user = $this->where($map)->find();
+        return $user;
+    }
+
+    public function get_user_by_mobile($mobile){
+        $map = array(
+            'mobile' => $mobile
+        );
+        $user = $this->where($map)->find();
+        return $user;
+    }
 
 	/**
 	 * 获取用户信息
@@ -171,7 +210,7 @@ class UserModel extends MongoModel{
 		}
 
 		$user = $this->where($map)->find();
-		if(is_array($user) && $user['status'] = 1){
+		if(is_array($user) && $user['status'] == 1){
 			return array($user['uid'], $user['username'], $user['email'], $user['mobile']);
 		} else {
 			return -1; //用户不存在或被禁用
@@ -206,12 +245,14 @@ class UserModel extends MongoModel{
 	/**
 	 * 更新用户登录信息
 	 * @param  integer $uid 用户ID
+	 * @param  array $new update fields
+     * @return array
 	 */
-	protected function updateLogin($uid){
-		$data = array(
-			'uid'              => $uid,
+	public function update($uid, $new){
+		$params = array(
+			'uid' => $uid,
 		);
-		$this->save($data);
+		return $this->where($params)->save($new);
 	}
 
 	/**
