@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Admin\Controller;
+use Common\Model\CurriculaModel;
 use User\Api\UserApi;
 use Common\Model\MemberModel;
 
@@ -58,6 +59,10 @@ class UserController extends AdminController {
 
         $ret = $UserApi->register($username, $password, $email, $mobile);
         if($ret > 0){
+            //add member
+            $user = $UserApi->get_user_by_username($username);
+            $mMember = new MemberModel();
+            $mMember->create_member($user['uid']);
             $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
         }else{
             $errmsg = $this->showRegError($ret);
@@ -158,9 +163,30 @@ class UserController extends AdminController {
         $majors = C('MAJOR_MAPPING');
         $member['grade_name'] = isset($grades[$member['grade']]) ? $grades[$member['grade']] : 'Unknown';
         $member['major_name'] = isset($majors[$member['grade']]) ? $majors[$member['grade']] : 'Unknown';
+        $member['interests'] = implode(', ', $member['interests']);
+        $member['research'] = implode(', ', $member['research']);
 
+        $mCurricula = new CurriculaModel();
+        if($member['curricula_id'] > 0){
+            $curricula = $mCurricula->get_curricula($member['curricula_id']);
+            $courses = array();
+            for($i = 1; $i < 8; $i += 2){
+                $courses[$i] = array();
+                for($j = 1; $j < 8; $j++){
+                    $courses[$i][$j] = array();
+                }
+            }
+            foreach ($curricula['courses'] as $course) {
+                $teacher = $mMember->get_member($course['teacher']);
+                $course['teacher'] = $teacher['nickname'];
+                $courses[$course['section']][$course['week']] = $course;
+            }
+            $curricula['courses'] = $courses;
+        }else{
+            $curricula = array();
+        }
+        $member['curricula'] = $curricula;
         $this->assign('member', $member);
-
         $this->display();
     }
 
