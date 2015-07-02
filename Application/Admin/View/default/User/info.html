@@ -33,55 +33,105 @@
           <h3>{$member.nickname}</h3>
         </div>
         <hr class="featurette-divider" style="margin-top: 30px">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">Basic Information</h3>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Basic Information</h3>
+                    </div>
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            <dt>Name</dt>
+                            <dd>{$member.nickname}</dd>
+                            <dt>Gender</dt>
+                            <dd><eq name="member.gender" value="1">Male<else/>Female</eq></dd>
+                            <dt>Grade</dt>
+                            <dd>{$member.grade_name}</dd>
+                            <dt>Major</dt>
+                            <dd>{$member.major_name}</dd>
+                            <dt>Research</dt>
+                            <dd>{$member.research|default="-"}</dd>
+                            <dt>Interests</dt>
+                            <dd>{$member.interests|default="-"}</dd>
+                        </dl>
+                    </div>
+                </div>
             </div>
-            <div class="panel-body">
-                <dl class="dl-horizontal">
-                    <dt>Name</dt>
-                    <dd>{$member.nickname}</dd>
-                    <dt>Gender</dt>
-                    <dd><eq name="member.gender" value="1">Male<else/>Female</eq></dd>
-                    <dt>Phone</dt>
-                    <dd>{$member.mobile|default='-'}</dd>
-                    <dt>Birthday</dt>
-                    <dd>{$member.birthday|date="F j, Y",###}</dd>
-                </dl>
+            <div class="col-sm-6">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Login Stat</h3>
+                    </div>
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            <dt>Last login ip</dt>
+                            <dd>{$member.last_login_ip}</dd>
+                            <dt>Login count</dt>
+                            <dd>{$member.login_count}</dd>
+                            <dt>Last login time</dt>
+                            <dd>{$member.last_login_time|date="Y-m-d H:i:s",###}</dd>
+                        </dl>
+                        <br/>
+                        <br/>
+                        <br/>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <h3 class="panel-title">Personal Info</h3>
-            </div>
-            <div class="panel-body">
-                <dl class="dl-horizontal">
-                    <dt>Grade</dt>
-                    <dd>{$member.grade_name}</dd>
-                    <dt>Major</dt>
-                    <dd>{$member.major_name}</dd>
-                    <dt>Research</dt>
-                    <dd>{$member.research|default="-"}</dd>
-                    <dt>Interests</dt>
-                    <dd>{$member.interests|default="-"}</dd>
-                    <dt>Preference</dt>
-                    <dd>{$member.preference|default="-"}</dd>
-                </dl>
-            </div>
-        </div>
+
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Login Stat</h3>
+                <h3 class="panel-title">Curricula</h3>
             </div>
             <div class="panel-body">
-                <dl class="dl-horizontal">
-                    <dt>Last login ip</dt>
-                    <dd>{$member.last_login_ip}</dd>
-                    <dt>Login count</dt>
-                    <dd>{$member.login_count}</dd>
-                    <dt>Last login time</dt>
-                    <dd>{$member.last_login_time|date="Y-m-d H:i:s",###}</dd>
-                </dl>
+                <empty name="member.curricula">
+                    <div class="text-center" style="margin-bottom: 5px;">
+                        <span class="text-info"><strong>No curricula.</strong></span>
+                    </div>
+                <else />
+                <div style="margin-bottom: 5px;">
+                    <span class="text-primary pull-right">{$member.curricula.term_start|date="Y年",###} 第{$member.curricula.term}学期 (第{$member.curricula.term_start|date="W",###}周 ~ 第{$member.curricula.term_end|date="W",###}周)</span>
+                    <span class="text-primary">班级: {$member.curricula.name}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped responsive-utilities">
+                        <thead>
+                        <tr>
+                            <th width="180">#</th>
+                            <th>周一</th>
+                            <th>周二</th>
+                            <th>周三</th>
+                            <th>周四</th>
+                            <th>周五</th>
+                            <th width="100">周六</th>
+                            <th width="100">周日</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <foreach name="member.curricula.courses" item="row">
+                            <tr>
+                                <th scope="row">第 {$key}/{$key+1} 节</th>
+                                <foreach name="row" item="course" key="k">
+                                    <empty name="course">
+                                        <in name="k" value="6,7">
+                                            <td class="bg-warning"></td>
+                                            <else/>
+                                            <td></td>
+                                        </in>
+                                        <else />
+                                        <td class="bg-success">
+                                            <div>
+                                                <span class="text-success">{$course.name} | {$course.teacher} | {$course.classroom} | {$course.period}周</span>
+                                            </div>
+                                        </td>
+                                    </empty>
+                                </foreach>
+                            </tr>
+                        </foreach>
+                        </tbody>
+                    </table>
+                </div>
+                </empty>
             </div>
         </div>
     </div>
