@@ -24,21 +24,17 @@ class MemberModel extends MongoModel{
     protected $_auto = array(
         array('login_count', 0, self::MODEL_INSERT),
         array('last_login_time', 0, self::MODEL_INSERT),
-        array('last_login_ip', '', self::MODEL_INSERT),
+        array('last_login_ip', '127.0.0.1', self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
         array('status', 1, self::MODEL_INSERT),
         array('gender', 1, self::MODEL_INSERT),
-        array('name', '', self::MODEL_INSERT),
-        array('email', '', self::MODEL_INSERT),
-        array('phone', 0, self::MODEL_INSERT),
         array('birthday', NOW_TIME, self::MODEL_INSERT),
-        array('major', "", self::MODEL_INSERT),
+        array('major', 0, self::MODEL_INSERT),
         array('grade', 1, self::MODEL_INSERT),
         array('interests', array(), self::MODEL_INSERT),
         array('research', array(), self::MODEL_INSERT),
-        array('preference', array(), self::MODEL_INSERT),
-        array('desc', "", self::MODEL_INSERT),
+        array('curricula_id', 0, self::MODEL_INSERT),
     );
 
     /**
@@ -161,6 +157,24 @@ class MemberModel extends MongoModel{
         unset($member['ctime']);
         unset($member['mtime']);
         return $member;
+    }
+
+    public function create_member($uid){
+        $user = $this->where(array('uid' => intval($uid)))->find();
+        if(!$user){ //未注册
+            /* 在当前应用中注册用户 */
+            $Api = new UserApi();
+            $info = $Api->info($uid);
+            $user = $this->create(array('nickname' => $info[1], 'status' => 1));
+            $user['uid'] = $uid;
+            if(!$this->add($user)){
+                $this->error = '前台用户信息注册失败，请重试！';
+                return false;
+            }
+        } elseif(1 != $user['status']) {
+            $this->error = '用户未激活或已禁用！'; //应用级别禁用
+            return false;
+        }
     }
 
     /**
