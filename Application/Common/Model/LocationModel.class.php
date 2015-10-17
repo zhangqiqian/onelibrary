@@ -75,10 +75,10 @@ class LocationModel extends MongoModel{
      * @return array
      */
     public function get_locations_by_location($longitude, $latitude){
-        $longitude_start = $longitude - 0.002;
-        $longitude_end = $longitude + 0.002;
-        $latitude_start = $latitude - 0.002;
-        $latitude_end = $latitude + 0.002;
+        $longitude_start = $longitude - 0.005;
+        $longitude_end = $longitude + 0.005;
+        $latitude_start = $latitude - 0.005;
+        $latitude_end = $latitude + 0.005;
 
         $map = array(
             'longitude' => array('$gt' => $longitude_start, '$lt' => $longitude_end),
