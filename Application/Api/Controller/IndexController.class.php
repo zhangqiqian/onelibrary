@@ -85,4 +85,14 @@ class IndexController extends ApiController {
         }
         return $near_locations;
     }
+
+    public function get_distance(){
+        $latitude1 = I('latitude1', 0.0, 'floatval');
+        $longitude1 = I('longitude1', 0.0, 'floatval');
+        $latitude2 = I('latitude2', 0.0, 'floatval');
+        $longitude2 = I('longitude2', 0.0, 'floatval');
+
+        $distance = get_distance($latitude1, $longitude1, $latitude2, $longitude2);
+        $this->ajaxReturn(array('errno' => 0, 'distance' => $distance));
+    }
 }
