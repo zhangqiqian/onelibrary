@@ -122,26 +122,29 @@ class PublishModel extends MongoModel{
      *  );
      * @param $locations
      * @param $user
-     * @param $publish_id
+     * @param $last_time
      * @param $priority
      * @param $start
      * @param $limit
      * @return array
      */
-    public function get_publishes_by_user_features($locations, $user, $publish_id = 0, $priority = 1, $start = 0, $limit = 10){
+    public function get_publishes_by_user_features($locations, $user, $last_time = 0, $priority = 1, $start = 0, $limit = 10){
         $location_ids = array(0);
         foreach ($locations as $location) {
             $location_ids[] = $location['location_id'];
         }
         $now = time();
+        if($last_time == 0) $last_time = $now;
 
         $map['user_uid']  = array('in', array(0, $user['uid']));
+        $map['location_id']  = array('in', $location_ids);
         $map['status']  = 0;
-        $map['publish_id']  = array('gte', $publish_id);
         $map['priority']  = array('gte', $priority);
+        if($last_time > 0 && $last_time < $now ){
+            $map['publish_time']  = array('gte', $last_time);
+        }
         $map['publish_time']  = array('lte', $now);
         $map['expire_time']  = array('gte', $now);
-        $map['location_id']  = array('in', $location_ids);
         $publishes = $this->where($map)->order('priority desc, similarity desc, publish_time desc')->limit($start.','.$limit)->select();
         if(empty($publishes)){
             $publishes = array();
