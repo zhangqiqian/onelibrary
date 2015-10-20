@@ -29,7 +29,6 @@ class PublishModel extends MongoModel{
         array('message_id', 0, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0, no read; 1, read
         array('priority', 0, self::MODEL_INSERT), //order by priority
-        array('similarity', 1, self::MODEL_INSERT), //order by similarity, 1-100
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
     );
@@ -140,7 +139,7 @@ class PublishModel extends MongoModel{
         $map['priority']  = array('$gte', $priority);
         $map['publish_time']  = array('$lte', $now);
         $map['expire_time']  = array('$gte', $now);
-        $publishes = $this->where($map)->order('priority desc, similarity desc, publish_time desc')->limit($start.','.$limit)->select();
+        $publishes = $this->where($map)->order('priority desc, publish_time desc')->limit($start.','.$limit)->select();
         if(empty($publishes)){
             $publishes = array();
         }
