@@ -1,13 +1,13 @@
-<form id="editUserForm" class="form-horizontal" action="{:U('User/user_edit_submit')}">
+<form id="editMemberForm" class="form-horizontal" action="{:U('User/member_edit_submit')}">
     <div class="form-group">
-        <label for="nickname" class="col-sm-3 control-label">Nickname</label>
+        <label for="nickname" class="col-sm-3 control-label">姓名</label>
         <div class="col-sm-5">
             <input type="hidden" id="uid" name="uid" value="{$member.uid}">
-            <input type="text" class="form-control" id="nickname" name="nickname" value="{$member.nickname}" placeholder="Nick name" disabled>
+            <input type="text" class="form-control" id="nickname" name="nickname" value="{$member.nickname}" placeholder="姓名">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">Gender</label>
+        <label class="col-sm-3 control-label">性别</label>
         <div class="col-sm-5">
             <label class="radio-inline">
                 <input type="radio" name="gender" value="1" <eq name="member.gender" value="1">checked</eq>> Male
@@ -18,7 +18,17 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="major" class="col-sm-3 control-label">Major</label>
+        <label for="grade" class="col-sm-3 control-label">角色</label>
+        <div class="col-sm-5">
+            <select id="grade" name="grade" class="form-control">
+                <foreach name="grades" item="grade" >
+                    <option value="{$key}">{$grade}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="major" class="col-sm-3 control-label">专业</label>
         <div class="col-sm-5">
             <select id="major" name="major" class="form-control">
                 <foreach name="majors" item="major" >
@@ -28,19 +38,25 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="grade" class="col-sm-3 control-label">Grade</label>
-        <div class="col-sm-5">
-            <select id="grade" name="grade" placeholder="Grade" class="form-control">
-                <foreach name="grades" item="grade" >
-                    <option value="{$key}">{$grade}</option>
-                </foreach>
-            </select>
+        <label for="research" class="col-sm-3 control-label">研究方向</label>
+        <div class="col-sm-9">
+            <textarea id="research" name="research" placeholder="研究方向，以英文逗号分割关键词" class="form-control" rows="2">{$member.research}</textarea>
         </div>
     </div>
     <div class="form-group">
-        <label for="desc" class="col-sm-3 control-label">Description</label>
+        <label for="interests" class="col-sm-3 control-label">兴趣</label>
         <div class="col-sm-9">
-            <textarea id="desc" name="desc" placeholder="Description" class="form-control" rows="4">{$member.desc}</textarea>
+            <textarea id="interests" name="interests" placeholder="兴趣，以英文逗号分割关键词" class="form-control" rows="2">{$member.interests}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="major" class="col-sm-3 control-label">课程表</label>
+        <div class="col-sm-9">
+            <select id="curricula" name="curricula" class="form-control">
+                <foreach name="curriculas" item="curricula" >
+                    <option value="{$key}">{$curricula}</option>
+                </foreach>
+            </select>
         </div>
     </div>
 </form>
@@ -48,5 +64,6 @@
     $(document).ready(function(){
         $("#major").val("{$member.major}");
         $("#grade").val("{$member.grade}");
+        $("#curricula").val("{$member.curricula_id}");
     });
 </script>

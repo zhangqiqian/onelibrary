@@ -162,7 +162,7 @@ class UserController extends AdminController {
         $grades = C('USER_GRADES');
         $majors = C('MAJOR_MAPPING');
         $member['grade_name'] = isset($grades[$member['grade']]) ? $grades[$member['grade']] : 'Unknown';
-        $member['major_name'] = isset($majors[$member['grade']]) ? $majors[$member['grade']] : 'Unknown';
+        $member['major_name'] = isset($majors[$member['major']]) ? $majors[$member['major']] : 'Unknown';
         $member['interests'] = implode(', ', $member['interests']);
         $member['research'] = implode(', ', $member['research']);
 
@@ -195,11 +195,23 @@ class UserController extends AdminController {
         $mMember = new MemberModel();
         $member = $mMember->get_member($uid);
 
+        $member['interests'] = implode(', ', $member['interests']);
+        $member['research'] = implode(', ', $member['research']);
+
         $grades = C('USER_GRADES');
         $this->assign('grades', $grades);
 
         $majors = C('MAJOR_MAPPING');
         $this->assign('majors', $majors);
+
+        $mCurricula = new CurriculaModel();
+        $result = $mCurricula->get_curriculas_by_info($member['major']);
+
+        $curriculas = array();
+        foreach ($result as $curricula) {
+            $curriculas[$curricula['curricula_id']] = $curricula['name'];
+        }
+        $this->assign('curriculas', $curriculas);
 
         $this->assign('member', $member);
         $this->display();
@@ -207,10 +219,13 @@ class UserController extends AdminController {
 
     public function member_edit_submit(){
         $uid = I('uid', 0, 'intval');
+        $nickname = I('nickname', '');
         $gender = I('gender', 1, 'intval');
-        $major = I('major', '');
+        $major = I('major', '', 'intval');
         $grade = I('grade', 1, 'intval');
-        $desc = I('desc', '');
+        $interests = I('interests', '');
+        $research = I('research', '');
+        $curricula_id = I('curricula', 0, 'intval');
 
         if(empty($uid)){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'User id is invalid.', 'location' => ''));
@@ -224,14 +239,17 @@ class UserController extends AdminController {
         }
 
         $userinfo = array(
+            'nickname' => $nickname,
             'gender' => $gender,
             'major' => $major,
             'grade' => $grade,
-            'desc' => $desc,
+            'interests' => empty($interests) ? array() : explode(',', $interests),
+            'research' => empty($research) ? array() : explode(',', $research),
+            'curricula_id' => $curricula_id,
         );
         $mMember = new MemberModel();
         $ret = $mMember->update_member($uid, $userinfo);
-        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/user'), 'location' => ''));
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/info').'/uid/'.$uid, 'location' => ''));
     }
 
     /**

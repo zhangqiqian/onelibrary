@@ -37,21 +37,21 @@
             <div class="col-sm-6">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Basic Information</h3>
+                        <h3 class="panel-title">基本信息</h3>
                     </div>
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            <dt>Name</dt>
+                            <dt>姓名</dt>
                             <dd>{$member.nickname}</dd>
-                            <dt>Gender</dt>
+                            <dt>性别</dt>
                             <dd><eq name="member.gender" value="1">Male<else/>Female</eq></dd>
-                            <dt>Grade</dt>
+                            <dt>角色</dt>
                             <dd>{$member.grade_name}</dd>
-                            <dt>Major</dt>
+                            <dt>专业</dt>
                             <dd>{$member.major_name}</dd>
-                            <dt>Research</dt>
+                            <dt>研究方向</dt>
                             <dd>{$member.research|default="-"}</dd>
-                            <dt>Interests</dt>
+                            <dt>兴趣</dt>
                             <dd>{$member.interests|default="-"}</dd>
                         </dl>
                     </div>
@@ -60,15 +60,15 @@
             <div class="col-sm-6">
                 <div class="panel panel-danger">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Login Stat</h3>
+                        <h3 class="panel-title">登录统计</h3>
                     </div>
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            <dt>Last login ip</dt>
+                            <dt>最后登录IP</dt>
                             <dd>{$member.last_login_ip}</dd>
-                            <dt>Login count</dt>
+                            <dt>登录次数</dt>
                             <dd>{$member.login_count}</dd>
-                            <dt>Last login time</dt>
+                            <dt>最后登录时间</dt>
                             <dd>{$member.last_login_time|date="Y-m-d H:i:s",###}</dd>
                         </dl>
                         <br/>
@@ -81,7 +81,7 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Curricula</h3>
+                <h3 class="panel-title">课程表</h3>
             </div>
             <div class="panel-body">
                 <empty name="member.curricula">
@@ -150,7 +150,7 @@
             <div class="modal-footer">
                 <div id="edit-tips" class="Validform_checktip text-danger pull-left"></div>
                 <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary btn-sm" onclick="edit_user();">Save</button>
+                <button type="submit" class="btn btn-primary btn-sm" onclick="edit_member();">Save</button>
             </div>
         </div>
     </div>
@@ -170,8 +170,8 @@
         $('#editModal').modal('show');
     }
 
-    function edit_user(){
-        var self = $("#editUserForm");
+    function edit_member(){
+        var self = $("#editMemberForm");
         $.post(self.attr("action"), self.serialize(), function(data){
             if(data.errno == 0){
                 $("#edit-tips").addClass('text-success');
