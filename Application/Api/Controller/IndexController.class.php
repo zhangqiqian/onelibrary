@@ -28,7 +28,6 @@ class IndexController extends ApiController {
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
         $priority = I('priority', 1, 'intval');
-        $last_time = I('last_time', 0, 'intval');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 10, 'intval');
 
@@ -37,7 +36,7 @@ class IndexController extends ApiController {
 
         $locations = $this->get_near_locations($longitude, $latitude);
         $mPublish = new PublishModel();
-        $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $last_time, $priority, $start, $limit);
+        $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $priority, $start, $limit);
         $messages = array();
         $mMessage = new MessageModel();
         foreach ($publishes as $publish) {
