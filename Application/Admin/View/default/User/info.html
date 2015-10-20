@@ -91,7 +91,7 @@
                 <else />
                 <div style="margin-bottom: 5px;">
                     <span class="text-primary pull-right">{$member.curricula.term_start|date="Y年",###} 第{$member.curricula.term}学期 (第{$member.curricula.term_start|date="W",###}周 ~ 第{$member.curricula.term_end|date="W",###}周)</span>
-                    <span class="text-primary">班级: {$member.curricula.name}</span>
+                    <span class="text-primary"><a href="{:U('Settings/curricula_detail')}/curricula/{$member.curricula_id}">{$member.curricula.name} ({$member.curricula.class}班)</a></span>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped responsive-utilities">
