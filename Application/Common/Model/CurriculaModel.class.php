@@ -52,6 +52,33 @@ class CurriculaModel extends MongoModel{
     }
 
     /**
+     * 根据信息获取相关Curricula
+     * @return array
+     */
+    public function get_curriculas_by_info($major){
+        if(empty($major)){
+            return array();
+        }
+
+        $where = array(
+            'major' => intval($major),
+            'status' => 1,
+        );
+
+        $curriculas = $this->where($where)->order('curricula_id desc')->select();
+        if(!$curriculas){
+            $curriculas = array();
+        }
+        $ret = array();
+        foreach ($curriculas as $curricula) {
+            unset($curricula['_id']);
+            unset($curricula['mtime']);
+            $ret[] = $curricula;
+        }
+        return $ret;
+    }
+
+    /**
      * 获取Curricula信息
      * @param $curricula_id
      * @return array
