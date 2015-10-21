@@ -57,7 +57,7 @@ class IndexController extends ApiController {
 
         //save user location to log
         $mUserLocation = new UserLocationModel();
-        $mUserLocation->add_location($longitude, $latitude);
+        $mUserLocation->add_location(UID, $longitude, $latitude);
 
         $next_start = 0;
         if(count($message) >= $limit){
