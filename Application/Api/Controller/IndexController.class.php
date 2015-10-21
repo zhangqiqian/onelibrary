@@ -13,6 +13,7 @@ use Common\Model\MemberModel;
 use Common\Model\PublishModel;
 use Common\Model\MessageModel;
 
+use Common\Model\UserLocationModel;
 use Think\Controller;
 
 class IndexController extends ApiController {
@@ -54,8 +55,12 @@ class IndexController extends ApiController {
             }
         }
 
+        //save user location to log
+        $mUserLocation = new UserLocationModel();
+        $mUserLocation->add_location($longitude, $latitude);
+
         $next_start = 0;
-        if(count($message) >= 10){
+        if(count($message) >= $limit){
             $next_start = $start + $limit;
         }
         $this->ajaxReturn(array('errno' => 0, 'result' => array_values($messages), 'start' => $next_start));
