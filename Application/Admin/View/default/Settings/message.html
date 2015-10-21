@@ -61,7 +61,6 @@
                 <th>Author</th>
                 <th>Category</th>
                 <th>Tag</th>
-                <th width="180">DateTime</th>
                 <th width="150">Operation</th>
               </tr>
               </thead>
@@ -73,7 +72,6 @@
                   <td>{$message.author|ucwords}</td>
                   <td>{$message.category|ucfirst}</td>
                   <td>{$message.tags}</td>
-                  <td>{$message.pubdate|date="Y-m-d H:i:s",###}</td>
                   <td>
                     <a href="javascript:open_dialog('edit', '{:U('Settings/message_edit')}/message_id/{$message.message_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
                     <a href="javascript:open_dialog('publish', '{:U('Settings/message_publish')}/message_id/{$message.message_id}');" title="Publish"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a>&nbsp;
