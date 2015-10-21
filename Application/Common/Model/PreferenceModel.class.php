@@ -38,14 +38,14 @@ class PreferenceModel extends MongoModel{
 
     /**
      * @param int $uid
-     * @param string $keywork
+     * @param string $keyword
      * @param int $weight
      * @return bool
      */
-    public function add_preference($uid, $keywork, $weight){
+    public function add_preference($uid, $keyword, $weight){
         $preference = array(
             'uid' => $uid,
-            'keywork' => $keywork,
+            'keyword' => $keyword,
             'weight' => $weight
         );
         if(!$this->add($preference)){
