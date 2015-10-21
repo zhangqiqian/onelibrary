@@ -136,9 +136,9 @@ class PublishModel extends MongoModel{
         $map['user_uid']  = array('in', array(0, $user['uid']));
         $map['location_id']  = array('in', $location_ids);
         $map['status']  = 0;
-        $map['priority']  = array('$gte', $priority);
-        $map['publish_time']  = array('$lte', $now);
-        $map['expire_time']  = array('$gte', $now);
+        $map['priority']  = array('$gte' => $priority);
+        $map['publish_time']  = array('$lte' => $now);
+        $map['expire_time']  = array('$gte' => $now);
         $publishes = $this->where($map)->order('priority desc, publish_time desc')->limit($start.','.$limit)->select();
         if(empty($publishes)){
             $publishes = array();
