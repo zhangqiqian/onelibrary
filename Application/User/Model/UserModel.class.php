@@ -155,7 +155,7 @@ class UserModel extends MongoModel{
         $map = array(
             'status' => array('$lte' => 1)
         );
-        $users = $this->where($map)->select();
+        $users = $this->where($map)->order("uid asc")->select();
         $ret = array();
         if(!empty($users)){
             $ret = $users;
