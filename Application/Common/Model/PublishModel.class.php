@@ -143,7 +143,7 @@ class PublishModel extends MongoModel{
         }
         $map['publish_time']  = array('$lte' => $now);
         $map['expire_time']  = array('$gte' => $now);
-        $publishes = $this->where($map)->order('priority desc, publish_time desc')->limit($start.','.$limit)->select();
+        $publishes = $this->where($map)->order('priority desc, similarity desc, publish_time desc')->limit($start.','.$limit)->select();
         if(empty($publishes)){
             $publishes = array();
         }
