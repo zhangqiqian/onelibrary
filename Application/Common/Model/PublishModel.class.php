@@ -29,6 +29,7 @@ class PublishModel extends MongoModel{
         array('message_id', 0, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0, no read; 1, read
         array('priority', 0, self::MODEL_INSERT), //order by priority
+        array('similarity', 0, self::MODEL_INSERT), //0-100
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
     );
@@ -126,7 +127,7 @@ class PublishModel extends MongoModel{
      * @param $limit
      * @return array
      */
-    public function get_publishes_by_user_features($locations, $user, $priority = 1, $start = 0, $limit = 10){
+    public function get_publishes_by_user_features($locations, $user, $priority = 1, $notification = 0, $start = 0, $limit = 10){
         $location_ids = array(0);
         foreach ($locations as $location) {
             $location_ids[] = $location['location_id'];
@@ -137,6 +138,9 @@ class PublishModel extends MongoModel{
         $map['location_id']  = array('in', $location_ids);
         $map['status']  = 0;
         $map['priority']  = array('$gte' => $priority);
+        if($notification == 1){
+            $map['similarity']  = array('$gte' => 80);
+        }
         $map['publish_time']  = array('$lte' => $now);
         $map['expire_time']  = array('$gte' => $now);
         $publishes = $this->where($map)->order('priority desc, publish_time desc')->limit($start.','.$limit)->select();
