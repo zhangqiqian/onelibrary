@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Home\Controller;
+use Common\Model\PublishModel;
 use User\Api\UserApi;
 
 /**
@@ -41,6 +42,18 @@ class UserController extends HomeController {
 			$uid = $User->register($username, $password, $email);
 			if(0 < $uid){ //注册成功
 				//TODO: 发送验证邮件
+                $publish = array(
+                    'user_uid' => $uid,
+                    'location_id' => 0,
+                    'publish_time' => time(),
+                    'expire_time' => time() + 24 * 3600,
+                    'message_id' => 1,
+                    'status' => 0,
+                    'priority' => 3,
+                    'similarity' => 100
+                );
+                $mPublish = new PublishModel();
+                $mPublish->insert_publish($publish);
 				$this->success('Success to sign up!',U('login'));
 			} else { //注册失败，显示错误信息
 				$this->error($this->showRegError($uid));
