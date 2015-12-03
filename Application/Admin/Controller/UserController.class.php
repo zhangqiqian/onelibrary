@@ -221,7 +221,7 @@ class UserController extends AdminController {
         $uid = I('uid', 0, 'intval');
         $nickname = I('nickname', '');
         $gender = I('gender', 1, 'intval');
-        $major = I('major', '', 'intval');
+        $major = I('major', 0, 'intval');
         $grade = I('grade', 1, 'intval');
         $interests = I('interests', '');
         $research = I('research', '');
