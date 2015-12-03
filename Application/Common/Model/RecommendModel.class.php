@@ -23,6 +23,7 @@ class RecommendModel extends MongoModel{
     protected $_auto = array(
         array('recommend_id', 0, self::MODEL_INSERT),
         array('uid', '', self::MODEL_INSERT),
+        array('location_id', 0, self::MODEL_INSERT),
         array('resource_id', '', self::MODEL_INSERT),
         array('source', 'book', self::MODEL_INSERT),
         array('similarity', 0, self::MODEL_INSERT), //0-100
@@ -31,12 +32,17 @@ class RecommendModel extends MongoModel{
     );
 
     /**
-     * 获取所有recommend
+     * 获取recommend列表
      * @return array
      */
-    public function get_recommend_list($uid, $similarity = 80, $start = 0, $limit = 10){
+    public function get_recommend_list($uid, $locations, $similarity = 80, $start = 0, $limit = 10){
+        if(!isset($locations)){
+            $locations = array();
+        }
+        $locations[] = 0;
         $params = array(
             'uid' => $uid,
+            'location_id' => array('in' => $locations),
             'similarity' => array('$gte' => $similarity)
         );
         $recommends = $this->where($params)->order('similarity desc')->limit($start, $limit)->select();
