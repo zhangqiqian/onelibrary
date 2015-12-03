@@ -74,6 +74,7 @@
                   <th>Title</th>
                   <th>User</th>
                   <th>Priority</th>
+                  <th>Similarity</th>
                   <th>Location</th>
                   <th width="150">Publish</th>
                   <th width="80">Status</th>
@@ -87,6 +88,7 @@
                   <td><a href="{:U('Settings/message_detail')}/message/{$publish.message_id}">{$publish.title}</a></td>
                   <td>{$publish.user_name}</td>
                   <td>{$publish.priority|ucfirst}</td>
+                  <td>{$publish.similarity|default='1'} %</td>
                   <td>{$publish.location_name|default='All'}</td>
                   <td>{$publish.publish_time|date="Y-m-d H:i",###}</td>
                   <td><eq name="publish.status" value="0">No Read<else/>Read</eq></td>
