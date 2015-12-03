@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Api\Controller;
+use Common\Model\PublishModel;
 use User\Api\UserApi;
 use Think\Controller;
 
@@ -90,6 +91,18 @@ class PublicController extends Controller {
             $User = new UserApi;
             $uid = $User->register($username, $password, $email);
             if(0 < $uid){ //注册成功
+                $publish = array(
+                    'user_uid' => $uid,
+                    'location_id' => 0,
+                    'publish_time' => time(),
+                    'expire_time' => time() + 24 * 3600,
+                    'message_id' => 1,
+                    'status' => 0,
+                    'priority' => 3,
+                    'similarity' => 100
+                );
+                $mPublish = new PublishModel();
+                $mPublish->insert_publish($publish);
                 $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to sign up'));
             } else { //注册失败，显示错误信息
                 $this->ajaxReturn(array('errno' => 1, 'errmsg' => $this->showRegError($uid)));
