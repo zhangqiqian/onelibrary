@@ -195,8 +195,8 @@ class UserController extends AdminController {
         $mMember = new MemberModel();
         $member = $mMember->get_member($uid);
 
-        $member['interests'] = implode(', ', $member['interests']);
-        $member['research'] = implode(', ', $member['research']);
+        $member['interests'] = implode(',', $member['interests']);
+        $member['research'] = implode(',', $member['research']);
 
         $grades = C('USER_GRADES');
         $this->assign('grades', $grades);
@@ -223,8 +223,8 @@ class UserController extends AdminController {
         $gender = I('gender', 1, 'intval');
         $major = I('major', 0, 'intval');
         $grade = I('grade', 1, 'intval');
-        $interests = I('interests', '');
-        $research = I('research', '');
+        $interests = I('interests', '', '');
+        $research = I('research', '', '');
         $curricula_id = I('curricula', 0, 'intval');
 
         if(empty($uid)){
@@ -238,6 +238,15 @@ class UserController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'gender'));
         }
 
+        $interests = explode(',', $interests);
+        foreach ($interests as $key => $interest) {
+            $interests[$key] = trim($interest);
+        }
+
+        $researches = explode(',', $research);
+        foreach ($researches as $key => $research) {
+            $researches[$key] = trim($research);
+        }
         $userinfo = array(
             'nickname' => $nickname,
             'gender' => $gender,
