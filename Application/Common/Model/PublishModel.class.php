@@ -139,7 +139,7 @@ class PublishModel extends MongoModel{
         $map['status']  = 0;
         $map['priority']  = array('$gte' => $priority);
         if($notification == 1){
-            $map['similarity']  = array('$gte' => 1);
+            $map['similarity']  = array('$gte' => 10);
         }
         $map['publish_time']  = array('$lte' => $now);
         $map['expire_time']  = array('$gte' => $now);
