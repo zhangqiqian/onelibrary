@@ -393,6 +393,7 @@ class SettingsController extends AdminController {
     }
 
     public function location_add(){
+        $this->assign('location_types', C('LOCATION_TYPE_MAPPING'));
         $this->display();
     }
 
@@ -400,6 +401,7 @@ class SettingsController extends AdminController {
         $name = I('name', '', 'trim');
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
+        $location_type = I('location_type', 0, 'intval');
         $status = I('status', 0, 'intval');
         $radius = I('radius', 0, 'intval');
         $address = I('address', '', 'trim');
@@ -409,6 +411,7 @@ class SettingsController extends AdminController {
             'name' => $name,
             'longitude' => $longitude,
             'latitude' => $latitude,
+            'location_type' => $location_type,
             'status' => $status,
             'radius' => $radius,
             'address' => $address,
@@ -429,6 +432,7 @@ class SettingsController extends AdminController {
         $mLocation = new LocationModel();
         $location = $mLocation->get_location($location_id);
         $this->assign('location', $location);
+        $this->assign('location_types', C('LOCATION_TYPE_MAPPING'));
         $this->display();
     }
 
@@ -437,6 +441,7 @@ class SettingsController extends AdminController {
         $name = I('name', '', 'trim');
         $longitude = I('longitude', 0.0, 'floatval');
         $latitude = I('latitude', 0.0, 'floatval');
+        $location_type = I('location_type', 0, 'intval');
         $status = I('status', 0, 'intval');
         $radius = I('radius', 0, 'intval');
         $address = I('address', '', 'trim');
@@ -453,6 +458,7 @@ class SettingsController extends AdminController {
             'name' => $name,
             'longitude' => $longitude,
             'latitude' => $latitude,
+            'location_type' => $location_type,
             'status' => $status,
             'radius' => $radius,
             'address' => $address,
