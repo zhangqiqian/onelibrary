@@ -13,6 +13,7 @@ use Common\Model\MemberModel;
 use Common\Model\PublishModel;
 use Common\Model\MessageModel;
 
+use Common\Model\UserLocationLogModel;
 use Common\Model\UserLocationModel;
 use Think\Controller;
 
@@ -56,12 +57,25 @@ class IndexController extends ApiController {
             }
         }
 
-        //save user location to log
-        $mUserLocation = new UserLocationModel();
-        $mUserLocation->add_location(UID, $longitude, $latitude);
+        if(!empty($locations)){
+            //save user location to log
+            $mUserLocation = new UserLocationLogModel();
+            $location_ids = array();
+            foreach ($locations as $location) {
+                $location_ids[] = $location['location_id'];
+            }
+
+            $log = array(
+                'uid' => UID,
+                'longitude' => $longitude,
+                'latitude' => $latitude,
+                'locations' => $location_ids,
+            );
+            $mUserLocation->insert_user_location_log($log);
+        }
 
         $next_start = 0;
-        if(count($message) >= $limit){
+        if(count($messages) >= $limit){
             $next_start = $start + $limit;
         }
         $this->ajaxReturn(array('errno' => 0, 'result' => array_values($messages), 'start' => $next_start));
