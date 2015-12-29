@@ -39,6 +39,16 @@
         </div>
     </div>
     <div class="form-group">
+        <label for="location_type" class="col-sm-3 control-label">Type</label>
+        <div class="col-sm-5">
+            <select id="location_type" name="location_type" class="form-control">
+                <foreach name="location_types" item="location_type" >
+                    <option value="{$key}">{$location_type}</option>
+                </foreach>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
         <label for="address" class="col-sm-3 control-label">Address</label>
         <div class="col-sm-5">
             <input type="text" class="form-control" id="address" name="address" value="{$location.address}" placeholder="Address">
@@ -54,5 +64,6 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $("#country_code").val("{$location.country_code}");
+        $("#location_type").val("{$location.location_type}");
     });
 </script>

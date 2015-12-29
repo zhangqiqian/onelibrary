@@ -48,8 +48,8 @@
                 <th>Longitude</th>
                 <th>Latitude</th>
                 <th>Radius</th>
+                <th>Type</th>
                 <th>Address</th>
-                <th width="150">Status</th>
                 <th width="150">Operation</th>
               </tr>
               </thead>
@@ -61,8 +61,8 @@
                   <td>{$location.longitude|default='0'}</td>
                   <td>{$location.latitude|default='0'}</td>
                   <td>{$location.radius|default='0'} m</td>
+                  <td>{$location.location_type_name|default=''}</td>
                   <td>{$location.address|ucfirst}</td>
-                  <td><eq name="location.status" value="1">Enabled<else/>Disabled</eq></td>
                   <td>
                       <a href="javascript:open_dialog('edit', '{:U('Settings/location_edit')}/location_id/{$location.location_id}');" title="Edit"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
                       <a href="javascript:open_dialog('locate', '{:U('Settings/location_locate')}/location_id/{$location.location_id}');" title="Locate in map"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a>&nbsp;
