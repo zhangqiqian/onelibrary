@@ -37,6 +37,17 @@ return array(
         0 => '其他',
     ),
 
+    /* Location Type Mapping */
+    'LOCATION_TYPE_MAPPING' => array(
+        1 => '院系楼',
+        2 => '教学楼',
+        3 => '图书馆',
+        4 => '实验楼',
+        5 => '宿舍楼',
+        6 => '行政楼',
+        0 => '其他',
+    ),
+
     /* 1 -> section 1/2: 08:00~09:40; 2 -> section 3/4: 10:00~11:40; 3 -> section 5/6: 14:10~15:50; 4 -> section 7/8: 16:10~17:50 */
     'COURSE_SECTION_TIME_MAPPING' => array(
         1 => array(
