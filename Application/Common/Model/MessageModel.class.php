@@ -24,7 +24,7 @@ class MessageModel extends MongoModel{
         array('message_id', 0, self::MODEL_INSERT),
         array('title', '', self::MODEL_INSERT),
         array('content', '', self::MODEL_INSERT),
-        array('author', '', self::MODEL_INSERT),
+        array('author', array(), self::MODEL_INSERT),
         array('category', 0, self::MODEL_INSERT),
         array('link', '', self::MODEL_INSERT),
         array('pubdate', NOW_TIME, self::MODEL_INSERT),
