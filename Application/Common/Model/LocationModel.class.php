@@ -24,6 +24,7 @@ class LocationModel extends MongoModel{
         array('location_id', 0, self::MODEL_INSERT),
         array('name', '', self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT),
+        array('location_type', 0, self::MODEL_INSERT),
         array('longitude', 0.0, self::MODEL_INSERT),
         array('latitude', 0.0, self::MODEL_INSERT),
         array('radius', 0, self::MODEL_INSERT),
@@ -42,11 +43,17 @@ class LocationModel extends MongoModel{
         if(!$locations){
             $locations = array();
         }
+        $location_types = C('LOCATION_TYPE_MAPPING');
         $ret = array();
         foreach ($locations as $location) {
             unset($location['_id']);
             unset($location['ctime']);
             unset($location['mtime']);
+            $location_type = isset($location['location_type']) ? $location['location_type'] : 0;
+            if(!isset($location['location_type'])){
+                $location['location_type'] = $location_type;
+            }
+            $location['location_type_name'] = $location_types[$location_type];
             $ret[] = $location;
         }
         return $ret;
@@ -62,6 +69,12 @@ class LocationModel extends MongoModel{
         if(empty($location)){
             $location = array();
         }
+        $location_types = C('LOCATION_TYPE_MAPPING');
+        $location_type = isset($location['location_type']) ? $location['location_type'] : 0;
+        if(!isset($location['location_type'])){
+            $location['location_type'] = $location_type;
+        }
+        $location['location_type_name'] = $location_types[$location_type];
         unset($location['_id']);
         unset($location['mtime']);
         unset($location['ctime']);
