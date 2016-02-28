@@ -26,8 +26,6 @@ class CrontabController extends Controller {
         $mUser = new MemberModel();
         $mUserBook = new UserBookModel();
         $mBook = new BookModel();
-        $mPublish = new PublishModel();
-        $mMessage = new MessageModel();
         $mLocation = new LocationModel();
 
         //获取所有的用户
@@ -55,6 +53,7 @@ class CrontabController extends Controller {
                     'desc' => '',
                 );
                 //插入到message中
+                $mMessage = new MessageModel();
                 $message_id = $mMessage->insert_message($message);
                 echo "-------- insert message: ".$message_id."\n";
 
@@ -70,15 +69,16 @@ class CrontabController extends Controller {
                         'priority' => 1,
                         'similarity' => $user_book['similarity']
                     );
+                    $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
                     echo "-------- publish message: ".$publish_id."\n";
                 }
 
                 //更新user book的状态为1
-                /*$data = array(
+                $data = array(
                     'status' => 1
                 );
-                $mUserBook->update_user_book($user['uid'], $book['book_id'], $data);*/
+                $mUserBook->update_user_book($user['uid'], $book['book_id'], $data);
             }
         }
     }
