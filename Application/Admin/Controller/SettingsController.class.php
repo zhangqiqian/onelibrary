@@ -390,17 +390,25 @@ class SettingsController extends AdminController {
         $start = I('start', 0, 'intval');
         $limit = I('limit', 20, 'intval');
 
+
         $mLocation = new LocationModel();
         $ret = $mLocation->get_location_list($search, $start, $limit);
 
         $count = $ret['count'];
         $pages = intval($count / $limit) + 1;
         $page = intval($start / $limit) + 1;
+
+        $prev_start = $start - $limit >= 0 ? $start - $limit : 0;
+        $next_start = $start + $limit >= $count ? $start : $start + $limit;
+        $last_start = ($pages - 1) * $limit;
+
         $this->assign('locations', $ret['locations']);
         $this->assign('pages', $pages);
         $this->assign('page', $page);
         $this->assign('search', $search);
-        $this->assign('start', $start);
+        $this->assign('prev_start', $prev_start);
+        $this->assign('next_start', $next_start);
+        $this->assign('last_start', $last_start);
         $this->assign('limit', $limit);
         $this->display();
     }
