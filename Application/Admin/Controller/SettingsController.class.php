@@ -386,9 +386,22 @@ class SettingsController extends AdminController {
     }
 
     public function location(){
+        $search = I('search', '', 'trim');
+        $start = I('start', 0, 'intval');
+        $limit = I('limit', 20, 'intval');
+
         $mLocation = new LocationModel();
-        $locations = $mLocation->get_location_list();
-        $this->assign('locations', $locations);
+        $ret = $mLocation->get_location_list($search, $start, $limit);
+
+        $count = $ret['count'];
+        $pages = intval($count / $limit) + 1;
+        $page = intval($start / $limit) + 1;
+        $this->assign('locations', $ret['locations']);
+        $this->assign('pages', $pages);
+        $this->assign('page', $page);
+        $this->assign('search', $search);
+        $this->assign('start', $start);
+        $this->assign('limit', $limit);
         $this->display();
     }
 
