@@ -22,6 +22,10 @@ use Common\Model\CurriculaModel;
 class SettingsController extends AdminController {
 
     public function message(){
+        $search = I('search', '', 'trim');
+        $start = I('start', 0, 'intval');
+        $limit = I('limit', 20, 'intval');
+
         $mMessage = new MessageModel();
         $messages = $mMessage->get_message_list();
         $this->assign('messages', $messages);
@@ -261,6 +265,10 @@ class SettingsController extends AdminController {
     }
 
     public function publish(){
+        $search = I('search', '', 'trim');
+        $start = I('start', 0, 'intval');
+        $limit = I('limit', 20, 'intval');
+
         $mPublish = new PublishModel();
         $publishes = $mPublish->get_publish_list();
         $this->assign('publishes', $publishes);
@@ -389,7 +397,6 @@ class SettingsController extends AdminController {
         $search = I('search', '', 'trim');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 20, 'intval');
-
 
         $mLocation = new LocationModel();
         $ret = $mLocation->get_location_list($search, $start, $limit);
