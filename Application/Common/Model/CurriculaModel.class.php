@@ -35,19 +35,35 @@ class CurriculaModel extends MongoModel{
 
     /**
      * 获取所有Curricula
+     * @param string $search
+     * @param int $start
+     * @param int $limit
      * @return array
      */
-    public function get_curricula_list(){
-        $curriculas = $this->order('curricula_id desc')->select();
+    public function get_curricula_list($search = '', $start = 0, $limit = 20){
+        if($search){
+            $like = array('like', $search);
+            $curriculas = $this->where(array('name' => $like))->order('curricula_id desc')->limit($start.','.$limit)->select();
+            $count = $this->where(array('name' => $like))->count();
+        }else{
+            $curriculas = $this->order('curricula_id desc')->limit($start.','.$limit)->select();
+            $count = $this->count();
+        }
+
         if(!$curriculas){
             $curriculas = array();
         }
-        $ret = array();
+        $data = array();
         foreach ($curriculas as $curricula) {
             unset($curricula['_id']);
             unset($curricula['mtime']);
-            $ret[] = $curricula;
+            $data[] = $curricula;
         }
+
+        $ret = array(
+            'curriculas' => $data,
+            'count' => $count
+        );
         return $ret;
     }
 

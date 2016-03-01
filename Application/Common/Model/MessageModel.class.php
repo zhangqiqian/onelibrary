@@ -38,15 +38,26 @@ class MessageModel extends MongoModel{
 
     /**
      * 获取所有Message
+     * @param string $search
+     * @param int $start
+     * @param int $limit
      * @return array
      */
-    public function get_message_list(){
-        $messages = $this->order('message_id desc')->select();
+    public function get_message_list($search = '', $start = 0, $limit = 20){
+        if($search){
+            $like = array('like', $search);
+            $messages = $this->where(array('name' => $like))->order('message_id desc')->limit($start.','.$limit)->select();
+            $count = $this->where(array('name' => $like))->count();
+        }else{
+            $messages = $this->order('message_id desc')->limit($start.','.$limit)->select();
+            $count = $this->count();
+        }
+
         if(!$messages){
             $messages = array();
         }
         $categories = C('MESSAGE_CATEGORIES');
-        $ret = array();
+        $data = array();
         foreach ($messages as $message) {
             unset($message['_id']);
             unset($message['ctime']);
@@ -54,8 +65,12 @@ class MessageModel extends MongoModel{
             $message['tags'] = implode(', ', $message['tags']);
             $message['author'] = implode(', ', $message['author']);
             $message['category'] = $categories[$message['category']];
-            $ret[] = $message;
+            $data[] = $message;
         }
+        $ret = array(
+            'messages' => $data,
+            'count' => $count
+        );
         return $ret;
     }
 

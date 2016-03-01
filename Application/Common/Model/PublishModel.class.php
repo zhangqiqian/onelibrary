@@ -36,14 +36,18 @@ class PublishModel extends MongoModel{
 
     /**
      * 获取所有publish
+     * @param int $start
+     * @param int $limit
      * @return array
      */
-    public function get_publish_list(){
-        $publishes = $this->order('publish_id desc')->select();
+    public function get_publish_list($start = 0, $limit = 20){
+        $publishes = $this->order('publish_id desc')->limit($start.','.$limit)->select();
+        $count = $this->count();
+
         if(!$publishes){
             $publishes = array();
         }
-        $ret = array();
+        $data = array();
         $priorities = C('MESSAGE_PRIORITY');
         $mMember = new MemberModel();
         $mLocation = new LocationModel();
@@ -71,8 +75,12 @@ class PublishModel extends MongoModel{
 
             $message = $mMessage->get_message($publish['message_id']);
             $publish['title'] = $message['title'];
-            $ret[] = $publish;
+            $data[] = $publish;
         }
+        $ret = array(
+            'publishes' => $data,
+            'count' => $count
+        );
         return $ret;
     }
 
