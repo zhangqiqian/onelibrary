@@ -28,7 +28,7 @@
           </ol>
           <div>
             <a href="javascript:open_dialog('add', '{:U('Settings/curricula_add')}');" class="btn btn-primary btn-sm pull-right" >Add Curricula</a>
-              <form id="search" class="form-inline" action="" method="post">
+              <form id="searchForm" class="form-inline" action="{:U('Settings/curricula')}" method="post">
                   <div class="btn-group btn-group-sm">
                       <button type="button" class="btn btn-success">Major</button>
                       <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -84,9 +84,9 @@
                       </ul>
                   </div>
                   <div class="input-group input-group-sm">
-                      <input type="text" class="form-control" placeholder="Curricula Name">
+                      <input type="text" id="search" name="search" class="form-control" value="{$search}" placeholder="Curricula Name">
                       <span class="input-group-btn">
-                        <button class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                       </span>
                   </div>
               </form>
@@ -131,17 +131,15 @@
             </table>
           </div>
           <div class="text-center">
-            <nav>
-                <ul class="pagination pagination-sm">
-                    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-                </ul>
-            </nav>
+              <nav>
+                  <ul class="pager">
+                      <li><a href="{:U('Settings/curricula')}/start/0/limit/{$limit}/search/{$search}">首页</a></li>
+                      <li <eq name="page" value="1">class="disabled"</eq>><a href="{:U('Settings/curricula')}/start/{$prev_start}/limit/20/search/{$search}">上一页</a></li>
+                      <span class="label" style="color: #337ab7"> {$page}/{$pages} </span>
+                      <li <if condition="$page == $pages">class="disabled"</if>><a href="{:U('Settings/curricula')}/start/{$next_start}/limit/20/search/{$search}">下一页</a></li>
+                      <li><a href="{:U('Settings/curricula')}/start/{$last_start}/limit/{$limit}/search/{$search}">末页</a></li>
+                  </ul>
+              </nav>
           </div>
         </div>
       </div>
