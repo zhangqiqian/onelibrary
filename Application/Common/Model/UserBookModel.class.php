@@ -54,6 +54,7 @@ class UserBookModel extends MongoModel{
     public function get_user_books($uid, $similarity = 0, $limit = 5){
         $param = array(
             'uid' => $uid,
+            'status' => 0,
             'similarity' => array(
                 '$gt' => $similarity
             )
