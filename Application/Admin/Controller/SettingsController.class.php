@@ -27,8 +27,23 @@ class SettingsController extends AdminController {
         $limit = I('limit', 20, 'intval');
 
         $mMessage = new MessageModel();
-        $messages = $mMessage->get_message_list();
-        $this->assign('messages', $messages);
+        $ret = $mMessage->get_message_list($search, $start, $limit);
+
+        $count = $ret['count'];
+        $pages = intval($count / $limit) + 1;
+        $page = intval($start / $limit) + 1;
+
+        $prev_start = $start - $limit >= 0 ? $start - $limit : 0;
+        $next_start = $start + $limit >= $count ? $start : $start + $limit;
+        $last_start = ($pages - 1) * $limit;
+
+        $this->assign('messages', $ret['messages']);
+        $this->assign('pages', $pages);
+        $this->assign('page', $page);
+        $this->assign('prev_start', $prev_start);
+        $this->assign('next_start', $next_start);
+        $this->assign('last_start', $last_start);
+        $this->assign('limit', $limit);
         $this->display();
     }
 
@@ -265,13 +280,27 @@ class SettingsController extends AdminController {
     }
 
     public function publish(){
-        $search = I('search', '', 'trim');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 20, 'intval');
 
         $mPublish = new PublishModel();
-        $publishes = $mPublish->get_publish_list();
-        $this->assign('publishes', $publishes);
+        $ret = $mPublish->get_publish_list($start, $limit);
+
+        $count = $ret['count'];
+        $pages = intval($count / $limit) + 1;
+        $page = intval($start / $limit) + 1;
+
+        $prev_start = $start - $limit >= 0 ? $start - $limit : 0;
+        $next_start = $start + $limit >= $count ? $start : $start + $limit;
+        $last_start = ($pages - 1) * $limit;
+
+        $this->assign('publishes', $ret['publishes']);
+        $this->assign('pages', $pages);
+        $this->assign('page', $page);
+        $this->assign('prev_start', $prev_start);
+        $this->assign('next_start', $next_start);
+        $this->assign('last_start', $last_start);
+        $this->assign('limit', $limit);
         $this->display();
     }
 
@@ -551,14 +580,33 @@ class SettingsController extends AdminController {
     }
 
     public function curricula(){
+        $search = I('search', '', 'trim');
+        $start = I('start', 0, 'intval');
+        $limit = I('limit', 20, 'intval');
+
         $mCurricula = new CurriculaModel();
-        $curriculas = $mCurricula->get_curricula_list();
+        $ret = $mCurricula->get_curricula_list($search, $start, $limit);
+
+        $count = $ret['count'];
+        $pages = intval($count / $limit) + 1;
+        $page = intval($start / $limit) + 1;
+
+        $prev_start = $start - $limit >= 0 ? $start - $limit : 0;
+        $next_start = $start + $limit >= $count ? $start : $start + $limit;
+        $last_start = ($pages - 1) * $limit;
 
         $majors = C('MAJOR_MAPPING');
-        foreach ($curriculas as $key => $curricula) {
-            $curriculas[$key]['major'] = isset($majors[$curricula['major']]) ? $majors[$curricula['major']] : '其他';
+        foreach ($ret['curriculas'] as $key => $curricula) {
+            $ret['curriculas'][$key]['major'] = isset($majors[$curricula['major']]) ? $majors[$curricula['major']] : '其他';
         }
-        $this->assign('curriculas', $curriculas);
+        $this->assign('curriculas', $ret['curriculas']);
+        $this->assign('pages', $pages);
+        $this->assign('page', $page);
+        $this->assign('search', $search);
+        $this->assign('prev_start', $prev_start);
+        $this->assign('next_start', $next_start);
+        $this->assign('last_start', $last_start);
+        $this->assign('limit', $limit);
         $this->display();
     }
 

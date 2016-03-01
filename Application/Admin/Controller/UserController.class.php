@@ -19,9 +19,29 @@ use Common\Model\MemberModel;
 class UserController extends AdminController {
 
     public function user_list(){
-        $User   =   new UserApi();
-        $users    =   $User->user_list();
-        $this->assign('users', $users);
+        $search = I('search', '', 'trim');
+        $start = I('start', 0, 'intval');
+        $limit = I('limit', 20, 'intval');
+
+        $User = new UserApi();
+        $ret = $User->user_list($search, $start, $limit);
+
+        $count = $ret['count'];
+        $pages = intval($count / $limit) + 1;
+        $page = intval($start / $limit) + 1;
+
+        $prev_start = $start - $limit >= 0 ? $start - $limit : 0;
+        $next_start = $start + $limit >= $count ? $start : $start + $limit;
+        $last_start = ($pages - 1) * $limit;
+
+        $this->assign('users', $ret['users']);
+        $this->assign('pages', $pages);
+        $this->assign('page', $page);
+        $this->assign('search', $search);
+        $this->assign('prev_start', $prev_start);
+        $this->assign('next_start', $next_start);
+        $this->assign('last_start', $last_start);
+        $this->assign('limit', $limit);
         $this->display();
     }
 
