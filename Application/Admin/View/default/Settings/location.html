@@ -75,15 +75,13 @@
           </div>
           <div class="text-center">
             <nav>
-                <ul class="pagination pagination-sm">
-                    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-                </ul>
+              <ul class="pager">
+                <li><a href="{:U('Settings/location')}/start/0/limit/{$limit}/search/{$search}">首页</a></li>
+                <li <eq name="page" value="1">class="disabled"</eq>><a href="{:U('Settings/location')}/start/{$prev_start}/limit/20/search/{$search}">上一页</a></li>
+                <span class="label" style="color: #337ab7"> {$page}/{$pages} </span>
+                <li <if condition="$page == $pages">class="disabled"</if>><a href="{:U('Settings/location')}/start/{$next_start}/limit/20/search/{$search}">下一页</a></li>
+                <li><a href="{:U('Settings/location')}/start/{$last_start}/limit/{$limit}/search/{$search}">末页</a></li>
+              </ul>
             </nav>
           </div>
         </div>
