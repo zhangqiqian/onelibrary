@@ -151,15 +151,39 @@ class UserModel extends MongoModel{
 		}
 	}
 
-    public function user_list(){
-        $map = array(
-            'status' => array('$lte' => 1)
-        );
-        $users = $this->where($map)->order("uid asc")->select();
-        $ret = array();
-        if(!empty($users)){
-            $ret = $users;
-        }
+    /**
+     * 获取all用户信息
+     * @param string $search
+     * @param int $start
+     * @param int $limit
+     * @return array all用户信息
+     */
+    public function user_list($search = '', $start = 0, $limit = 20){
+		if($search){
+			$like = array('like', $search);
+			$users = $this->where(array('username' => $like, 'status' => array('$lte' => 1)))->order('uid asc')->limit($start.','.$limit)->select();
+			$count = $this->where(array('username' => $like, 'status' => array('$lte' => 1)))->count();
+		}else{
+			$users = $this->where(array('status' => array('$lte' => 1)))->order('uid asc')->limit($start.','.$limit)->select();
+			$count = $this->where(array('status' => array('$lte' => 1)))->count();
+		}
+
+		if(!$users){
+			$users = array();
+		}
+
+		$data = array();
+		foreach ($users as $user) {
+			unset($user['_id']);
+			unset($user['ctime']);
+			unset($user['mtime']);
+			$data[] = $user;
+		}
+
+		$ret = array(
+			'users' => $data,
+			'count' => $count
+		);
         return $ret;
     }
 

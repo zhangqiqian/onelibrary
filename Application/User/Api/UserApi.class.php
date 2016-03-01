@@ -82,10 +82,13 @@ class UserApi extends Api{
 
     /**
      * 获取all用户信息
-     * @return array                all用户信息
+     * @param string $search
+     * @param int $start
+     * @param int $limit
+     * @return array all用户信息
      */
-    public function user_list(){
-        return $this->model->user_list();
+    public function user_list($search = '', $start = 0, $limit = 20){
+        return $this->model->user_list($search, $start, $limit);
     }
 
     /**
