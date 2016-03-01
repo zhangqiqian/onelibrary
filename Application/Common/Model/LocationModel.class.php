@@ -36,15 +36,27 @@ class LocationModel extends MongoModel{
 
     /**
      * 获取所有Location
+     * @param string $search
+     * @param int $start
+     * @param int $limit
      * @return array
      */
-    public function get_location_list(){
-        $locations = $this->order('location_id')->select();
+    public function get_location_list($search = '', $start = 0, $limit = 20){
+
+        if($search){
+            $like = array('like', $search);
+            $locations = $this->where(array('name' => $like))->order('location_id asc')->limit($start.','.$limit)->select();
+            $total = $this->where(array('name' => $like))->count();
+        }else{
+            $locations = $this->order('location_id asc')->limit($start.','.$limit)->select();
+            $total = $this->count();
+        }
+
         if(!$locations){
             $locations = array();
         }
         $location_types = C('LOCATION_TYPE_MAPPING');
-        $ret = array();
+        $data = array();
         foreach ($locations as $location) {
             unset($location['_id']);
             unset($location['ctime']);
@@ -54,8 +66,13 @@ class LocationModel extends MongoModel{
                 $location['location_type'] = $location_type;
             }
             $location['location_type_name'] = $location_types[$location_type];
-            $ret[] = $location;
+            $data[] = $location;
         }
+
+        $ret = array(
+            'locations' => $data,
+            'count' => $total
+        );
         return $ret;
     }
 
