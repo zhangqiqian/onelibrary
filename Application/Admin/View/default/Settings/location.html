@@ -29,11 +29,11 @@
 
           <div>
             <a href="javascript:open_dialog('add', '{:U('Settings/location_add')}');" class="btn btn-primary btn-sm pull-right" >Add Location</a>
-              <form id="search" class="form-inline" action="" method="post">
+              <form id="searchForm" class="form-inline" action="{:U('Settings/location')}" method="post">
                   <div class="input-group input-group-sm">
-                      <input type="text" class="form-control" placeholder="Location Name">
+                      <input type="text" id="search" name="search" class="form-control" value="{$search}" placeholder="Location Name">
                       <span class="input-group-btn">
-                        <button class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                       </span>
                   </div>
               </form>
