@@ -84,7 +84,7 @@ class PublishModel extends MongoModel{
      */
     public function get_publishes_by_uid($location_id, $uid){
         $params = array(
-            'uid' => $uid, //who
+            'user_uid' => $uid, //who
             'location_id' => $location_id, //where
             'publish_time' => array('$lte', time()), //when
             'expire_time' => array('$gte', time()), //when
