@@ -14,7 +14,6 @@ use Common\Model\PublishModel;
 use Common\Model\MessageModel;
 
 use Common\Model\UserLocationLogModel;
-use Common\Model\UserLocationModel;
 use Think\Controller;
 
 class IndexController extends ApiController {
@@ -42,6 +41,8 @@ class IndexController extends ApiController {
         $publishes = $mPublish->get_publishes_by_user_features($locations, $member, $priority, $notification, $start, $limit);
         $messages = array();
         $mMessage = new MessageModel();
+        $publish_ids = array();
+        $message_ids = array();
         foreach ($publishes as $publish) {
             $message = $mMessage->get_message_for_app($publish['message_id']);
             if(!isset($messages[$publish['publish_id']])){
@@ -50,6 +51,8 @@ class IndexController extends ApiController {
                     'message_id' => $publish['message_id'],
                     'title' => $message['title'],
                 );
+                $publish_ids[] = $publish['publish_id'];
+                $message_ids[] = $publish['message_id'];
             }
             if($message && $publish['user_uid'] > 0 ){
                 $params = array('status' => 1); //switch to read
@@ -69,7 +72,9 @@ class IndexController extends ApiController {
                 'uid' => UID,
                 'longitude' => $longitude,
                 'latitude' => $latitude,
-                'locations' => $location_ids,
+                'location_ids' => $location_ids,
+                'publish_ids' => array_unique($publish_ids),
+                'message_ids' => array_unique($message_ids),
             );
             $mUserLocation->insert_user_location_log($log);
         }
