@@ -25,7 +25,9 @@ class UserLocationLogModel extends MongoModel{
         array('uid', 0, self::MODEL_INSERT),
         array('longitude', 0.0, self::MODEL_INSERT),
         array('latitude', 0.0, self::MODEL_INSERT),
-        array('locations', array(), self::MODEL_INSERT),
+        array('location_ids', array(), self::MODEL_INSERT),
+        array('publish_ids', array(), self::MODEL_INSERT),
+        array('message_ids', array(), self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
     );
 
@@ -47,7 +49,7 @@ class UserLocationLogModel extends MongoModel{
     }
 
     /**
-     * 获取User的Locations
+     * 获取User的Locations log
      * @param $uid
      * @param $start_time
      * @param $end_time

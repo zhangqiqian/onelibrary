@@ -18,6 +18,23 @@ class UserLocationModel extends MongoModel{
     protected $trueTableName = 't_user_location';
 
     /* Location模型自动完成 */
+    /**
+     * locations = {
+     *    'location_id1': {
+     *         'type': 0,
+     *         'count': 0,
+     *         'tags': [
+     *             {
+     *                'tag': 'xxx',
+     *                'weight': 33.4,
+     *             },
+     *             ...
+     *         ]
+     *    }
+     *    ...
+     * }
+     * @var array
+     */
     protected $_auto = array(
         array('uid', 0, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0/1
@@ -91,6 +108,7 @@ class UserLocationModel extends MongoModel{
      * @return array
      */
     public function update_user_location($uid, $user_location){
+        $user_location['mtime'] = time();
         $ret = $this->where(array('uid' => $uid))->save($user_location);
         return $ret;
     }
