@@ -131,6 +131,7 @@ class PublishModel extends MongoModel{
      * @param $locations
      * @param $user
      * @param $priority
+     * @param $notification
      * @param $start
      * @param $limit
      * @return array
