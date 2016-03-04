@@ -9,6 +9,7 @@
 
 namespace Admin\Controller;
 use Common\Model\CurriculaModel;
+use Common\Model\PublishModel;
 use User\Api\UserApi;
 use Common\Model\MemberModel;
 
@@ -83,6 +84,19 @@ class UserController extends AdminController {
             $user = $UserApi->get_user_by_username($username);
             $mMember = new MemberModel();
             $mMember->create_member($user['uid']);
+            //添加欢迎词
+            $publish = array(
+                'user_uid' => $user['uid'],
+                'location_id' => 0,
+                'publish_time' => time(),
+                'expire_time' => time() + 7 * 24 * 3600,
+                'message_id' => 1,
+                'status' => 0,
+                'priority' => 3,
+                'similarity' => 100
+            );
+            $mPublish = new PublishModel();
+            $mPublish->insert_publish($publish);
             $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
         }else{
             $errmsg = $this->showRegError($ret);
@@ -153,6 +167,9 @@ class UserController extends AdminController {
 
     public function user_del_submit(){
         $uid = I('uid', 0, 'intval');
+        //TODO
+        $this->ajaxReturn(array('errno' => 400200, 'errmsg' => 'You can not delete user now.', 'location' => ''));
+
         if($uid == 1){
             $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Admin could not be deleted.', 'location' => ''));
         }
@@ -167,10 +184,13 @@ class UserController extends AdminController {
 
         $ret = $UserApi->update($uid, $userinfo);
         if($ret['ok'] == 1){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
-        }else{
-            $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Failure to delete user.', 'url' => U('User/user_list'), 'location' => ''));
+            $mMember = new MemberModel();
+            $retval = $mMember->update_member($uid, $userinfo);
+            if($retval['ok'] == 1){
+                $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('User/user_list'), 'location' => ''));
+            }
         }
+        $this->ajaxReturn(array('errno' => 400201, 'errmsg' => 'Failure to delete user.', 'url' => U('User/user_list'), 'location' => ''));
     }
 
     public function info(){
