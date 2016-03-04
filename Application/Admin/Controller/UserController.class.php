@@ -235,8 +235,8 @@ class UserController extends AdminController {
         $mMember = new MemberModel();
         $member = $mMember->get_member($uid);
 
-        $member['interests'] = implode(',', $member['interests']);
-        $member['research'] = implode(',', $member['research']);
+        $member['interests'] = implode("\n", $member['interests']);
+        $member['research'] = implode("\n", $member['research']);
 
         $grades = C('USER_GRADES');
         $this->assign('grades', $grades);
@@ -278,22 +278,31 @@ class UserController extends AdminController {
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'gender'));
         }
 
-        $interests = explode(',', $interests);
-        foreach ($interests as $key => $interest) {
-            $interests[$key] = trim($interest);
+        $interests_arr = array();
+        $interests = explode("\n", $interests);
+        foreach ($interests as $interest) {
+            $interest = trim($interest);
+            if($interest){
+                $interests_arr[] = $interest;
+            }
         }
 
-        $researches = explode(',', $research);
-        foreach ($researches as $key => $research) {
-            $researches[$key] = trim($research);
+        $researches_arr = array();
+        $researches = explode("\n", $research);
+        foreach ($researches as $research) {
+            $research = trim($research);
+            if($research){
+                $researches_arr[] = $research;
+            }
         }
+
         $userinfo = array(
             'nickname' => $nickname,
             'gender' => $gender,
             'major' => $major,
             'grade' => $grade,
-            'interests' => empty($interests) ? array() : explode(',', $interests),
-            'research' => empty($research) ? array() : explode(',', $research),
+            'interests' => $interests_arr,
+            'research' => $researches_arr,
             'curricula_id' => $curricula_id,
         );
         $mMember = new MemberModel();
