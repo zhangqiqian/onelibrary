@@ -56,6 +56,13 @@ class CrontabController extends Controller {
                 $location_id = $this->get_user_location($user['uid'], $book['tags']);
                 //发布新的信息
                 if($message_id > 0){
+                    if($user_book['similarity'] > 60){
+                        $priority = 3;
+                    }elseif($user_book['similarity'] > 30){
+                        $priority = 2;
+                    }else{
+                        $priority = 1;
+                    }
                     $publish_message = array(
                         'user_uid' => $user['uid'],
                         'location_id' => $location_id,
@@ -63,7 +70,7 @@ class CrontabController extends Controller {
                         'expire_time' => time() + 30 * 24 * 3600,
                         'message_id' => $message_id,
                         'status' => 0,
-                        'priority' => 1,
+                        'priority' => $priority,
                         'similarity' => $user_book['similarity']
                     );
                     $mPublish = new PublishModel();
