@@ -24,6 +24,11 @@ class IndexController extends HomeController {
 
         $mMessage = new MessageModel();
         $messages = $mMessage->get_messages_by_category($category_id);
+        foreach ($messages as $i => $message) {
+            if(strlen($message['title']) > 69){
+                $messages[$i]['title'] = substr($message['title'], 0, 66)."...";
+            }
+        }
         $this->ajaxReturn(array('errno' => 0, 'result' => $messages));
     }
 
