@@ -23,7 +23,7 @@ class MemberModel extends MongoModel{
     /* 用户模型自动完成 */
     protected $_auto = array(
         array('login_count', 0, self::MODEL_INSERT),
-        array('last_login_time', 0, self::MODEL_INSERT),
+        array('last_login_time', NOW_TIME, self::MODEL_INSERT),
         array('last_login_ip', '127.0.0.1', self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
