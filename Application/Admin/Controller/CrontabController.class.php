@@ -41,7 +41,7 @@ class CrontabController extends Controller {
                     'title' => $book['title'],
                     'content' => $book['summary'],
                     'author' => array($book['author']),
-                    'category' => 0,
+                    'category' => 1,//图书
                     'link' => 'http://www.onelibrary.cn',
                     'pubdate' => time(),
                     'status' => 0,  //0, no handle; 1, handled.
