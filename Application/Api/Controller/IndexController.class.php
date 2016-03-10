@@ -60,7 +60,7 @@ class IndexController extends ApiController {
             }
         }
 
-        if(!empty($locations)){
+        if(!empty($locations) && !empty($publishes)){
             //save user location to log
             $mUserLocation = new UserLocationLogModel();
             $location_ids = array();
