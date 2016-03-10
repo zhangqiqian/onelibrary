@@ -39,9 +39,9 @@ class UserModel extends MongoModel{
 		array('email', '', -8, self::EXISTS_VALIDATE, 'unique'), //邮箱被占用
 
 		/* 验证手机号码 */
-		array('mobile', '//', -9, self::EXISTS_VALIDATE), //手机格式不正确 TODO:
-		array('mobile', 'checkDenyMobile', -10, self::EXISTS_VALIDATE, 'callback'), //手机禁止注册
-		array('mobile', '', -11, self::EXISTS_VALIDATE, 'unique'), //手机号被占用
+		array('mobile', '//', -9, self::VALUE_VALIDATE), //手机格式不正确 TODO:
+		array('mobile', 'checkDenyMobile', -10, self::VALUE_VALIDATE, 'callback'), //手机禁止注册
+		array('mobile', '', -11, self::VALUE_VALIDATE, 'unique'), //手机号被占用
 	);
 
 	/* 用户模型自动完成 */
