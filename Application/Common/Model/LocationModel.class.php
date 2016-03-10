@@ -98,6 +98,14 @@ class LocationModel extends MongoModel{
         return $location;
     }
 
+    public function get_all_locations(){
+        $locations = $this->select();
+        if(empty($locations)){
+            $locations = array();
+        }
+        return $locations;
+    }
+
     /**
      * 根据经纬度获取Location信息
      * @param $longitude
