@@ -314,7 +314,7 @@ class SettingsController extends AdminController {
         $this->assign('priorities', $priorities);
 
         $mLocation = new LocationModel();
-        $locations = $mLocation->get_location_list();
+        $locations = $mLocation->get_all_locations();
         $this->assign('locations', $locations);
 
         $mPublish = new PublishModel();
