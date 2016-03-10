@@ -103,7 +103,7 @@ class UserLocationLogModel extends MongoModel{
      * @return array
      */
     public function insert_user_location_log($location_log){
-        $location['mtime'] = time();
+        $location_log['mtime'] = time();
         $ret = $this->add($location_log);
         return $ret;
     }
