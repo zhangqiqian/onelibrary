@@ -204,4 +204,49 @@ class CrontabController extends Controller {
             $mUserLocation->update_user_location($user['uid'], $user_location);
         }
     }
+
+    public function publish_lcaotion_test_message(){
+        $mUser = new MemberModel();
+        $mLocation = new LocationModel();
+
+        //获取所有的用户
+        $users = $mUser->get_members();
+        foreach ($users as $user) {
+            $locations = $mLocation->get_all_locations();
+            //插入新的book信息
+            foreach ($locations as $location) {
+                $message = array(
+                    'title' => "位置测试：".$location['name'],
+                    'content' => "您目前所在的位置是：".$location['name'].", 如果位置不符，请记录下来当前所在位置的详细信息: 经纬度和范围。",
+                    'author' => array('Niko'),
+                    'category' => 2,//图书
+                    'link' => 'http://www.onelibrary.cn',
+                    'pubdate' => time(),
+                    'status' => 0,  //0, no handle; 1, handled.
+                    'level' => 0,  //0, no level; 1...9
+                    'tags' => array('address'),
+                    'desc' => '',
+                );
+                //插入到message中
+                $mMessage = new MessageModel();
+                $message_id = $mMessage->insert_message($message);
+
+                //发布新的信息
+                if($message_id > 0){
+                    $publish_message = array(
+                        'user_uid' => $user['uid'],
+                        'location_id' => $location['location_id'],
+                        'publish_time' => time(),
+                        'expire_time' => time() + 24 * 3600,
+                        'message_id' => $message_id,
+                        'status' => 0,
+                        'priority' => 3,
+                        'similarity' => 100
+                    );
+                    $mPublish = new PublishModel();
+                    $publish_id = $mPublish->insert_publish($publish_message);
+                }
+            }
+        }
+    }
 }
