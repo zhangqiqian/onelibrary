@@ -52,11 +52,15 @@ class UserBookModel extends MongoModel{
      * @return array
      */
     public function get_user_books($uid, $similarity = 0, $limit = 5){
+        $start_time = time() - 30 * 24 * 3600;
         $param = array(
             'uid' => $uid,
             'status' => 0,
             'similarity' => array(
                 '$gt' => $similarity
+            ),
+            'mtime' => array(
+                '$gt' => $start_time
             )
         );
         $user_books = $this->where($param)->order('similarity desc')->limit($limit)->select();
