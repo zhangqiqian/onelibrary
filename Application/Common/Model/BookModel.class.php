@@ -68,7 +68,6 @@ class BookModel extends MongoModel{
         unset($book['_id']);
         unset($book['ctime']);
         unset($book['mtime']);
-        $book['subject'] = implode(' ', $book['subject']);
         return $book;
     }
 

@@ -46,7 +46,7 @@ class CrontabController extends Controller {
                     'pubdate' => time(),
                     'status' => 0,  //0, no handle; 1, handled.
                     'level' => 0,  //0, no level; 1...9
-                    'tags' => implode(' ', $book['subject']),
+                    'tags' => $book['subject'],
                     'desc' => '',
                 );
                 //插入到message中
