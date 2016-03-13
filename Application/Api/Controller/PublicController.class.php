@@ -35,7 +35,7 @@ class PublicController extends Controller {
                 /* 登录用户 */
                 $Member = D('Member');
                 if($Member->login($uid)){ //登录用户
-                    $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to login!'));
+                    $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to login!', 'uid' => $uid));
                 } else {
                     $this->ajaxReturn(array('errno' => 1, 'errmsg' => $Member->getError()));
                 }
@@ -49,8 +49,9 @@ class PublicController extends Controller {
                 $this->ajaxReturn(array('errno' => 1, 'errmsg' => $error));
             }
         } else {
-            if(is_login()){
-                $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to login!'));
+            $uid = is_login();
+            if($uid > 0){
+                $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to login!', 'uid' => $uid));
             }else{
                 $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Please sign in.'));
             }
