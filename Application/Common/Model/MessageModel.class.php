@@ -30,6 +30,7 @@ class MessageModel extends MongoModel{
         array('pubdate', NOW_TIME, self::MODEL_INSERT),
         array('status', 0, self::MODEL_INSERT), //0, no handle; 1, handled.
         array('level', 0, self::MODEL_INSERT), //0, no level; 1...9
+        array('tag_weight', array(), self::MODEL_INSERT),
         array('tags', array(), self::MODEL_INSERT),
         array('desc', '', self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
@@ -62,6 +63,7 @@ class MessageModel extends MongoModel{
             unset($message['_id']);
             unset($message['ctime']);
             unset($message['mtime']);
+            unset($message['tag_weight']);
             $message['tags'] = implode(', ', $message['tags']);
             $message['author'] = implode(', ', $message['author']);
             $message['category'] = $categories[$message['category']];
@@ -87,6 +89,7 @@ class MessageModel extends MongoModel{
         unset($message['_id']);
         unset($message['ctime']);
         unset($message['mtime']);
+        unset($message['tag_weight']);
         $message['tags'] = implode(' ', $message['tags']);
         $message['author'] = implode(', ', $message['author']);
         $link = parse_url($message['link']);
@@ -115,6 +118,7 @@ class MessageModel extends MongoModel{
         unset($message['desc']);
         unset($message['status']);
         unset($message['level']);
+        unset($message['tag_weight']);
         $categories = C('MESSAGE_CATEGORIES');
         $message['category'] = $categories[$message['category']];
         $message['tags'] = implode(', ', $message['tags']);
