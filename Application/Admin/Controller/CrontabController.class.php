@@ -47,6 +47,7 @@ class CrontabController extends Controller {
                     'status' => 0,  //0, no handle; 1, handled.
                     'level' => 0,  //0, no level; 1...9
                     'tags' => $book['subject'],
+                    'tag_weight' => $book['tags'],
                     'desc' => '',
                 );
                 //插入到message中
@@ -131,7 +132,7 @@ class CrontabController extends Controller {
         $mMessage = new MessageModel();
 
         $end_time = time();
-        $start_time = $end_time - 3600;
+        $start_time = $end_time - 24 * 3600;
         
         $mMember = new MemberModel();
         $users = $mMember->get_members();
@@ -168,7 +169,7 @@ class CrontabController extends Controller {
                 foreach ($log['message_ids'] as $message_id) {
                     $message = $mMessage->get_message($message_id);
                     foreach ($locations as $key => $val) {
-                        $message_tags = isset($message['tags']) ? $message['tags'] : array();
+                        $message_tags = isset($message['tag_weight']) ? $message['tag_weight'] : array();
                         if(empty($val['tags'])){
                             $locations[$key]['tags'] = $message_tags;
                         }else{
@@ -225,6 +226,7 @@ class CrontabController extends Controller {
                     'status' => 0,  //0, no handle; 1, handled.
                     'level' => 0,  //0, no level; 1...9
                     'tags' => array('address'),
+                    'tag_weight' => array(),
                     'desc' => '',
                 );
                 //插入到message中

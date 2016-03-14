@@ -92,7 +92,8 @@ class SettingsController extends AdminController {
             'pubdate' => time(),
             'status' => 0,
             'level' => 0,
-            'tags' => $tags
+            'tags' => $tags,
+            'tag_weight' => array()
         );
         $mMessage = new MessageModel();
         $ret = $mMessage->insert_message($message);
