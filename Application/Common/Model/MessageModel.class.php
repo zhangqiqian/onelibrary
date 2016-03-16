@@ -89,7 +89,6 @@ class MessageModel extends MongoModel{
         unset($message['_id']);
         unset($message['ctime']);
         unset($message['mtime']);
-        unset($message['tag_weight']);
         $message['tags'] = implode(' ', $message['tags']);
         $message['author'] = implode(', ', $message['author']);
         $link = parse_url($message['link']);
