@@ -29,6 +29,11 @@ class CrontabController extends Controller {
         $mUserBook = new UserBookModel();
         $mBook = new BookModel();
 
+        $now = date("H", time());
+        $hour = intval($now);
+        if($hour > 22 || $hour < 6){
+            return ;
+        }
         //获取所有的用户
         $users = $mUser->get_members();
         foreach ($users as $user) {
@@ -39,7 +44,7 @@ class CrontabController extends Controller {
                 $book = $mBook->get_book($user_book['book_id']);
                 $message = array(
                     'title' => $book['title'],
-                    'content' => $book['summary'],
+                    'content' => $book['summary']."\n\n——《".$book['title']."》,".$book['author'].", ".$book['publisher'].", ".$book['pubdate'],
                     'author' => array($book['author']),
                     'category' => 1,//图书
                     'link' => 'http://www.onelibrary.cn',
