@@ -140,7 +140,6 @@ class CrontabController extends Controller {
         foreach ($users as $user) {
             $logs = $mUserLocationLog->get_location_logs_by_user($user['uid'], $start_time, $end_time);
             $user_location = $mUserLocation->get_user_location($user['uid']);
-
             if(empty($user_location)){
                 $user_location = array(
                     'uid' => $user['uid'],
@@ -168,8 +167,8 @@ class CrontabController extends Controller {
 
                 foreach ($log['message_ids'] as $message_id) {
                     $message = $mMessage->get_message($message_id);
+                    $message_tags = isset($message['tag_weight']) ? $message['tag_weight'] : array();
                     foreach ($locations as $key => $val) {
-                        $message_tags = isset($message['tag_weight']) ? $message['tag_weight'] : array();
                         if(empty($val['tags'])){
                             $locations[$key]['tags'] = $message_tags;
                         }else{
@@ -178,7 +177,6 @@ class CrontabController extends Controller {
                     }
                 }
             }
-
             //tags 去重
             foreach ($locations as $location_key => $location) {
                 $new_tags = array();
