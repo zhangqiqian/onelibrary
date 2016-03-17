@@ -38,7 +38,7 @@ class CrontabController extends Controller {
         $users = $mUser->get_members();
         foreach ($users as $user) {
             //查找新的user book信息
-            $user_books = $mUserBook->get_user_books($user['uid']);
+            $user_books = $mUserBook->get_user_books($user['uid'], 0, 1);
             //插入新的book信息
             foreach ($user_books as $user_book) {
                 $book = $mBook->get_book($user_book['book_id']);
