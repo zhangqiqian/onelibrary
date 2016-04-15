@@ -260,22 +260,37 @@ class CrontabController extends Controller {
         $mPref = new PreferenceModel();
         $mMember = new MemberModel();
         $members = $mMember->get_members();
+        $tags = array();
         foreach ($members as $member) {
             if(isset($member['tags'])){
                 foreach ($member['tags'] as $tag) {
-                    $pref = $mPref->get_preference_by_keyword($tag['tag']);
-                    if($pref){
-                        $params = array(
-                            'weight' => $tag['weight'] > $pref['weight'] ? $tag['weight'] : $pref['weight'],
-                        );
-                        $mPref->update_preference($pref['pref_id'], $params);
+                    if(isset($tags[$tag['tag']])){
+                        $tags[$tag['tag']]['weight'] += $tag['weight'];
+                        $tags[$tag['tag']]['count'] += 1;
                     }else{
-                        $end_time = time();
-                        $start_time = $end_time - 5 * 365 * 24 * 3600;
-                        $mPref->add_preference($tag['tag'], $tag['weight'], $start_time, $end_time);
+                        $tags[$tag['tag']] = array(
+                            'weight' => $tag['weight'],
+                            'count' => 1
+                        );
                     }
                 }
             }
         }
+
+        foreach ($tags as $key => $tag) {
+            $pref = $mPref->get_preference_by_keyword($key);
+            $weight = round($tag['weight']/$tag['count'], 3);
+            if($pref){
+                $params = array(
+                    'weight' => $weight,
+                );
+                $mPref->update_preference($pref['pref_id'], $params);
+            }else{
+                $end_time = time();
+                $start_time = $end_time - 5 * 365 * 24 * 3600;
+                $mPref->add_preference($key, $weight, $start_time, $end_time);
+            }
+        }
+
     }
 }
