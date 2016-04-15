@@ -18,13 +18,26 @@ class PreferenceModel extends MongoModel{
     protected $_idType       = self::TYPE_INT;
     protected $pk            = 'pref_id';
 
+    /* Message模型自动完成 */
+    protected $_auto = array(
+        array('pref_id', 0, self::MODEL_INSERT),
+        array('keyword', '', self::MODEL_INSERT),
+        array('weight', 0.0, self::MODEL_INSERT),
+        array('start_time', 0, self::MODEL_INSERT),
+        array('end_time', 0, self::MODEL_INSERT),
+        array('count', 0, self::MODEL_INSERT),
+        array('mtime', NOW_TIME, self::MODEL_BOTH),
+        array('ctime', NOW_TIME, self::MODEL_INSERT),
+    );
+
     /**
      * 获取user所有preferences
+     * @param int $start
+     * @param int $limit
      * @return array
      */
-    public function get_preferences($uid, $limit = 10){
-        $map['uid'] = $uid;
-        $preferences = $this->where($map)->order('weight desc')->limit($limit)->select();
+    public function get_preferences($start = 0, $limit = 10){
+        $preferences = $this->order('weight desc')->limit($start.','.$limit)->select();
         if(!$preferences){
             $preferences = array();
         }
@@ -37,16 +50,21 @@ class PreferenceModel extends MongoModel{
     }
 
     /**
-     * @param int $uid
      * @param string $keyword
      * @param int $weight
+     * @param int $start_time
+     * @param int $end_time
      * @return bool
      */
-    public function add_preference($uid, $keyword, $weight){
+    public function add_preference($keyword, $weight, $start_time, $end_time){
         $preference = array(
-            'uid' => $uid,
             'keyword' => $keyword,
-            'weight' => $weight
+            'weight' => $weight,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'count' => 0,
+            'mtime' => time(),
+            'ctime' => time(),
         );
         if(!$this->add($preference)){
             $this->error = 'Failed to add preference.';
@@ -56,12 +74,11 @@ class PreferenceModel extends MongoModel{
 
     /**
      * get by keyword
-     * @param $uid
      * @param $keyword
      * @return array
      */
-    public function get_preference_by_keyword($uid, $keyword){
-        $ret = $this->where(array('uid' => $uid, 'keyword' => $keyword))->find();
+    public function get_preference_by_keyword($keyword){
+        $ret = $this->where(array('keyword' => $keyword))->find();
         return $ret;
     }
 
@@ -72,19 +89,20 @@ class PreferenceModel extends MongoModel{
      * @return array
      */
     public function update_preference($pref_id, $preference){
+        $preference['mtime'] = time();
         $ret = $this->where(array('pref_id' => $pref_id))->save($preference);
         return $ret;
     }
 
     /**
      * 更新
-     * @param $uid
      * @param $keyword
-     * @param $weight
+     * @param $preference
      * @return array
      */
-    public function update_preference_by_keyword($uid, $keyword, $weight){
-        $ret = $this->where(array('uid' => $uid, 'keyword' => $keyword))->save(array('weight' => $weight));
+    public function update_preference_by_keyword($keyword, $preference){
+        $preference['mtime'] = time();
+        $ret = $this->where(array('keyword' => $keyword))->save($preference);
         return $ret;
     }
 
@@ -101,12 +119,11 @@ class PreferenceModel extends MongoModel{
 
     /**
      * delete by keyword
-     * @param $uid
      * @param $keyword
      * @return array
      */
-    public function delete_preference_by_keyword($uid, $keyword){
-        $ret = $this->where(array('uid' => $uid, 'keyword' => $keyword))->delete();
+    public function delete_preference_by_keyword($keyword){
+        $ret = $this->where(array('keyword' => $keyword))->delete();
         return $ret;
     }
 }
