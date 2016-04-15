@@ -12,6 +12,7 @@ use Common\Model\BookModel;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
+use Common\Model\PreferenceModel;
 use Common\Model\PublishModel;
 use Common\Model\UserBookModel;
 use Common\Model\UserLocationLogModel;
@@ -250,6 +251,29 @@ class CrontabController extends Controller {
                     );
                     $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
+                }
+            }
+        }
+    }
+
+    public function analyze_preference(){
+        $mPref = new PreferenceModel();
+        $mMember = new MemberModel();
+        $members = $mMember->get_members();
+        foreach ($members as $member) {
+            if(isset($member['tags'])){
+                foreach ($member['tags'] as $tag) {
+                    $pref = $mPref->get_preference_by_keyword($tag['tag']);
+                    if($pref){
+                        $params = array(
+                            'weight' => $tag['weight'] > $pref['weight'] ? $tag['weight'] : $pref['weight'],
+                        );
+                        $mPref->update_preference($pref['pref_id'], $params);
+                    }else{
+                        $end_time = time();
+                        $start_time = $end_time - 5 * 365 * 24 * 3600;
+                        $mPref->add_preference($tag['tag'], $tag['weight'], $start_time, $end_time);
+                    }
                 }
             }
         }
