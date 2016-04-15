@@ -390,3 +390,91 @@ function get_distance($latitude1, $longitude1, $latitude2, $longitude2)
     $s = round($s * 10000) / 10000;
     return $s * 1000;
 }
+
+/**
+ * 获取本周期的标准时间
+ * 例如:
+ *      hour    -> 2014-05-12 21:00:00 ~ 2014-05-12 22:00:00
+ *      day     -> 2014-05-12 00:00:00 ~ 2014-05-13 00:00:00
+ *      week    -> 2014-11-09 00:00:00 ~ 2014-11-16 00:00:00 以周一为周开始的第一天
+ *      month   -> 2014-05-01 00:00:00 ~ 2014-06-01 00:00:00
+ *      year    -> 2013-01-01 00:00:00 ~ 2014-01-01 00:00:00
+ * @param number 	$date_time		timestamp
+ * @param string 	$period		hour/day/week/month
+ * @return number 	start time
+ * @author zhangqiqian
+ */
+function get_period_time($date_time, $period) {
+    switch ($period) {
+        case 'hour' :
+            $start_time = intval($date_time / 3600) * 3600;
+            $end_time = $start_time +  3600;
+            break;
+        case 'day' :
+            $start_time = intval($date_time / 86400) * 86400;
+            $end_time = $start_time + 24 * 60 * 60;
+            break;
+        case 'week' :
+            $start_time = strtotime("last sunday", $date_time);
+            $end_time = strtotime("this sunday", $date_time);
+            break;
+        case 'month' :
+            $start_time = strtotime("first day of this month", $date_time);
+            $start_time = intval($start_time / 86400) * 86400;
+            $end_time = strtotime("first day of next month", $date_time);
+            $end_time = intval($end_time / 86400) * 86400;
+            break;
+        case 'year' :
+            $year = intval(date('Y', $date_time));
+            $year_firstday = date('Y-m-d', mktime(0, 0 ,0 , 1, 1, $year));
+            $next_year_firstday = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year + 1));
+            $start_time = strtotime($year_firstday.' UTC');
+            $end_time = strtotime($next_year_firstday.' UTC');
+            break;
+    }
+    return array('start_time' => $start_time, 'end_time' => $end_time);
+}
+
+/**
+ * 获取上一个周期的标准时间
+ * 例如:
+ *      hour    -> 2014-05-12 21:00:00 ~ 2014-05-12 22:00:00
+ *      day     -> 2014-05-12 00:00:00 ~ 2014-05-13 00:00:00
+ *      week    -> 2014-11-09 00:00:00 ~ 2014-11-16 00:00:00 以周一为周开始的第一天
+ *      month   -> 2014-05-01 00:00:00 ~ 2014-06-01 00:00:00
+ *      year    -> 2013-01-01 00:00:00 ~ 2014-01-01 00:00:00
+ * @param number 	$date_time		timestamp
+ * @param string 	$period		    hour/day/week/month
+ * @return number 	start time
+ * @author zhangqiqian
+ */
+function get_last_period_time($date_time, $period){
+    switch ($period) {
+        case 'hour' :
+            $end_time = intval($date_time / 3600) * 3600;
+            $start_time = $end_time - 3600;
+            break;
+        case 'day' :
+            $end_time = intval($date_time / 86400) * 86400;
+            $start_time = $end_time - 24 * 3600;
+            break;
+        case 'week' :
+            $end_time = strtotime("last sunday", $date_time);
+            $start_time = $end_time - 7 * 24 * 3600;
+            break;
+        case 'month' :
+            $start_time = strtotime("first day of last month", $date_time);
+            $start_time = intval($start_time / 86400) * 86400;
+            $end_time = strtotime("first day of this month", $date_time);
+            $end_time = intval($end_time / 86400) * 86400;
+            break;
+        case 'year' :
+            $year = intval(date('Y', $date_time));
+            $year_firstday = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year));
+            $last_year_firstday = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year - 1));
+            $start_time = strtotime($last_year_firstday.' UTC');
+            $end_time = strtotime($year_firstday.' UTC');
+            break;
+    }
+    return array('start_time' => $start_time, 'end_time' => $end_time);
+}
