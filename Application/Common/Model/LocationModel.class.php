@@ -106,6 +106,20 @@ class LocationModel extends MongoModel{
         return $locations;
     }
 
+    public function get_locations_by_type($types = array()){
+        if(empty($types)){
+            $locations = $this->select();
+        }else{
+            $locations = $this->where(array('location_type' => array('$in' => $types)))->select();
+        }
+        if(empty($locations)){
+            $locations = array();
+        }
+        return $locations;
+    }
+
+
+
     /**
      * 根据经纬度获取Location信息
      * @param $longitude

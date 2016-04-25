@@ -627,9 +627,17 @@ class SettingsController extends AdminController {
             }
         }
         $mMember = new MemberModel();
+        $mLocation = new LocationModel();
         foreach ($curricula['courses'] as $course) {
             $member = $mMember->get_member($course['teacher']);
             $course['teacher'] = $member['nickname'];
+            if (is_string($course['classroom'])) {
+                $classroom = $course['classroom'];
+            }else{
+                $location = $mLocation->get_location(intval($course['classroom']));
+                $classroom = $location['name'];
+            }
+            $course['classroom'] = $classroom;
             $courses[$course['section']][$course['week']] = $course;
         }
         $curricula['courses'] = $courses;
@@ -806,6 +814,14 @@ class SettingsController extends AdminController {
             $teachers[$member['uid']] = $member['nickname'];
         }
         $this->assign('teachers', $teachers);
+
+        $mLocation = new LocationModel();
+        $locations = $mLocation->get_locations_by_type(array(1,2,4));
+        $calssrooms = array();
+        foreach ($locations as $location) {
+            $calssrooms[$location['location_id']] = $location['name'];
+        }
+        $this->assign('locations', $calssrooms);
         $this->display();
     }
 
@@ -813,7 +829,7 @@ class SettingsController extends AdminController {
         $curricula_id = I('curricula_id', 0, 'intval');
         $course_name = I('course_name', '', 'trim');
         $teacher = I('teacher', 0, 'intval');
-        $classroom = I('classroom', '', 'trim');
+        $classroom = I('classroom', '', 'intval');
         $course_week = I('course_week', 0, 'intval');
         $course_section = I('course_section', 0, 'intval');
         $course_period = I('course_period', 1, 'intval');
@@ -874,6 +890,15 @@ class SettingsController extends AdminController {
             $teachers[$member['uid']] = $member['nickname'];
         }
         $this->assign('teachers', $teachers);
+
+        $mLocation = new LocationModel();
+        $locations = $mLocation->get_locations_by_type(array(1,2,4));
+        $calssrooms = array();
+        foreach ($locations as $location) {
+            $calssrooms[$location['location_id']] = $location['name'];
+        }
+        $this->assign('locations', $calssrooms);
+
         $this->display();
     }
 
@@ -881,7 +906,7 @@ class SettingsController extends AdminController {
         $curricula_id = I('curricula_id', 0, 'intval');
         $course_name = I('course_name', '', 'trim');
         $teacher = I('teacher', 0, 'intval');
-        $classroom = I('classroom', '', 'trim');
+        $classroom = I('classroom', '', 'intval');
         $old_week = I('old_week', 0, 'intval');
         $old_section = I('old_section', 0, 'intval');
         $course_week = I('course_week', 0, 'intval');
