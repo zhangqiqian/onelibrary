@@ -19,7 +19,11 @@
     <div class="form-group">
         <label for="classroom" class="col-sm-4 control-label">Classroom</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="classroom" name="classroom" placeholder="Classroom">
+            <select id="classroom" name="classroom" placeholder="Classroom" class="form-control">
+                <foreach name="locations" item="location" >
+                    <option value="{$key}">{$location}</option>
+                </foreach>
+            </select>
         </div>
     </div>
     <div class="form-group">
