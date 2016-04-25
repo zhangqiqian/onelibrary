@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Api\Controller;
+use Common\Model\MemberModel;
 use User\Api\UserApi;
 
 /**
@@ -54,7 +55,7 @@ class UserController extends ApiController {
      * 修改昵称提交
      * @author zhangqiqian <43874051@qq.com>
      */
-    public function submitNickname(){
+    public function update_nickname(){
         //获取参数
         $nickname = I('post.nickname');
         $password = I('post.password');
@@ -89,10 +90,14 @@ class UserController extends ApiController {
      * 修改密码提交
      * @author zhangqiqian <43874051@qq.com>
      */
-    public function submitPassword($oldpassword = '', $password = '', $repassword = ''){
+    public function update_password(){
         if(!is_login()){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => '您还没有登录'));
         }
+        $oldpassword = I('oldpassword', '', '');
+        $password = I('password', '', '');
+        $repassword = I('repassword', '', '');
+
         if(IS_POST){
             //获取参数
             $uid = is_login();
@@ -137,6 +142,59 @@ class UserController extends ApiController {
             default:  $error = '未知错误';
         }
         return $error;
+    }
+
+    /**
+     * 修改用户信息
+     * @author zhangqiqian <43874051@qq.com>
+     */
+    public function update_profile(){
+        $grade = I('grade', 0, 'intval');
+        $major = I('major', 0, 'intval');
+        $research = I('research', '', 'trim');
+        $interest = I('interest', '', 'trim');
+        $project = I('project', '', 'trim');
+        $curricula_id = I('curricula', 0, 'intval');
+
+        $uid = is_login();
+        empty($grade) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请选择角色'));
+        empty($major) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请选择专业'));
+
+        $grades = C('USER_GRADES');
+        if(!in_array($grade, array_keys($grades))){
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'gender'));
+        }
+
+        $interests = array();
+        if (!empty($interest)){
+            $interests[] = $interest;
+        }
+
+        $researches = array();
+        if (!empty($research)){
+            $researches[] = $research;
+        }
+
+        $projects = array();
+        if (!empty($project)){
+            $projects[] = $project;
+        }
+
+        $userinfo = array(
+            'major' => $major,
+            'grade' => $grade,
+            'interests' => $interests,
+            'research' => $researches,
+            'projects' => $project,
+            'curricula_id' => $curricula_id,
+        );
+        $mMember = new MemberModel();
+        $ret = $mMember->update_member($uid, $userinfo);
+        if ($ret['ok'] == 1){
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.'));
+        }else{
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.'));
+        }
     }
 
 }

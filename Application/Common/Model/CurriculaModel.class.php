@@ -22,6 +22,7 @@ class CurriculaModel extends MongoModel{
     /* Curricula模型自动完成 */
     protected $_auto = array(
         array('curricula_id', 0, self::MODEL_INSERT),
+        array('name', '', self::MODEL_INSERT),
         array('major', 0, self::MODEL_INSERT),
         array('class', 0, self::MODEL_INSERT),
         array('curricula', array(), self::MODEL_INSERT),
@@ -72,14 +73,12 @@ class CurriculaModel extends MongoModel{
      * @return array
      */
     public function get_curriculas_by_info($major){
-        if(empty($major)){
-            return array();
-        }
-
         $where = array(
-            'major' => intval($major),
             'status' => 1,
         );
+        if(!empty($major)){
+            $where['major'] = intval($major);
+        }
 
         $curriculas = $this->where($where)->order('curricula_id desc')->select();
         if(!$curriculas){

@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Api\Controller;
+use Common\Model\CurriculaModel;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
 use Common\Model\PublishModel;
@@ -117,5 +118,29 @@ class IndexController extends ApiController {
 
         $distance = get_distance($latitude1, $longitude1, $latitude2, $longitude2);
         $this->ajaxReturn(array('errno' => 0, 'distance' => $distance));
+    }
+
+    public function get_curricula_list(){
+        $major = I('major', 0, 'intval');
+
+        $mCurricula = new CurriculaModel();
+        $curriculas_ret = $mCurricula->get_curriculas_by_info($major);
+        $curriculas = array();
+        foreach ($curriculas_ret as $curricula) {
+            $curriculas[$curricula['curricula_id']] = $curricula['name'];
+        }
+        $this->ajaxReturn(array('errno' => 0, 'result' => $curriculas));
+    }
+
+    public function get_member_options(){
+        $this->ajaxReturn(
+            array(
+                'errno' => 0,
+                'result' => array(
+                    'grades' => C('USER_GRADES'),
+                    'majors' => C('MAJOR_MAPPING'),
+                )
+            )
+        );
     }
 }
