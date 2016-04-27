@@ -816,7 +816,7 @@ class SettingsController extends AdminController {
         $this->assign('teachers', $teachers);
 
         $mLocation = new LocationModel();
-        $locations = $mLocation->get_locations_by_type(array(1,2,4));
+        $locations = $mLocation->get_locations_by_type(array(1,2,3,4,7));
         $calssrooms = array();
         foreach ($locations as $location) {
             $calssrooms[$location['location_id']] = $location['name'];
@@ -892,7 +892,7 @@ class SettingsController extends AdminController {
         $this->assign('teachers', $teachers);
 
         $mLocation = new LocationModel();
-        $locations = $mLocation->get_locations_by_type(array(1,2,4));
+        $locations = $mLocation->get_locations_by_type(array(1,2,3,4,7));
         $calssrooms = array();
         foreach ($locations as $location) {
             $calssrooms[$location['location_id']] = $location['name'];
