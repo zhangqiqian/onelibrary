@@ -145,7 +145,7 @@ class IndexController extends ApiController {
     }
 
     public function get_update_info(){
-        $filename = DOWNLOAD_PATH.'version.txt';
+        $filename = DOWNLOAD_PATH.'version.json';
         $content = file_get_contents($filename);
         $result = json_decode($content, true);
         $this->ajaxReturn(array('errno' => 0, 'result' => $result));
