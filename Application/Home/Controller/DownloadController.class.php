@@ -21,7 +21,12 @@ class DownloadController extends HomeController {
 
     public function android(){
         $filename = DOWNLOAD_PATH.'onelibrary-android.apk';
-        $showname = 'onelibrary-1.0-release.apk';
+
+        $version_file = DOWNLOAD_PATH.'version.json';
+        $content = file_get_contents($version_file);
+        $version_info = json_decode($content, true);
+        $version = $version_info['version'];
+        $showname = 'onelibrary-'.$version.'-release.apk';
         Http::download($filename, $showname);
     }
 
