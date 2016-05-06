@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Api\Controller;
+use Common\Model\CurriculaModel;
 use Common\Model\MemberModel;
 use User\Api\UserApi;
 
@@ -157,9 +158,6 @@ class UserController extends ApiController {
         $curricula_id = I('curricula', 0, 'intval');
 
         $uid = is_login();
-        empty($grade) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请选择角色'));
-        empty($major) && $this->ajaxReturn(array('errno' => 1, 'errmsg' => '请选择专业'));
-
         $grades = C('USER_GRADES');
         if(!in_array($grade, array_keys($grades))){
             $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Grade value is invalid.', 'location' => 'gender'));
@@ -167,17 +165,26 @@ class UserController extends ApiController {
 
         $interests = array();
         if (!empty($interest)){
-            $interests[] = $interest;
+            $interest_arr = explode(',', $interest);
+            foreach ($interest_arr as $interest_str) {
+                $interests[] = trim($interest_str);
+            }
         }
 
         $researches = array();
         if (!empty($research)){
-            $researches[] = $research;
+            $research_arr = explode(',', $research);
+            foreach ($research_arr as $research_str) {
+                $researches[] = trim($research_str);
+            }
         }
 
         $projects = array();
         if (!empty($project)){
-            $projects[] = $project;
+            $project_arr = explode(',', $project);
+            foreach ($project_arr as $project_str) {
+                $projects[] = trim($project_str);
+            }
         }
 
         $userinfo = array(
@@ -185,7 +192,7 @@ class UserController extends ApiController {
             'grade' => $grade,
             'interests' => $interests,
             'research' => $researches,
-            'projects' => $project,
+            'projects' => $projects,
             'curricula_id' => $curricula_id,
         );
         $mMember = new MemberModel();
@@ -197,4 +204,26 @@ class UserController extends ApiController {
         }
     }
 
+    public function get_curricula_list(){
+        $mCurricula = new CurriculaModel();
+        $curriculas = $mCurricula->get_all_curriculas();
+
+        $data = array();
+        $majors = C('MAJOR_MAPPING');
+        foreach ($majors as $key => $major) {
+            $data[$key] = array();
+        }
+        foreach ($curriculas as $curricula) {
+            if($curricula['courses']){
+                if(isset($data[$curricula['major']])){
+                    $data[$curricula['major']][$curricula['curricula_id']] = $curricula['name'];
+                }else{
+                    $data[$curricula['major']] = array(
+                        $curricula['curricula_id'] => $curricula['name']
+                    );
+                }
+            }
+        }
+        $this->ajaxReturn(array('errno' => 0, 'result' => $data));
+    }
 }
