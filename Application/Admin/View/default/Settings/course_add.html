@@ -10,6 +10,7 @@
         <label for="teacher" class="col-sm-4 control-label">Teacher</label>
         <div class="col-sm-5">
             <select id="teacher" name="teacher" placeholder="Teacher" class="form-control">
+                <option value="0">Anonymous</option>
                 <foreach name="teachers" item="teacher" >
                     <option value="{$key}">{$teacher}</option>
                 </foreach>
