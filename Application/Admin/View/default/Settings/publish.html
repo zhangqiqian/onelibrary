@@ -89,7 +89,7 @@
                   <td>{$publish.user_name}</td>
                   <td>{$publish.priority|ucfirst}</td>
                   <td>{$publish.similarity|default='1'} %</td>
-                  <td>{$publish.location_name|default='All'}</td>
+                  <td>{$publish.location_name|default='Any'}</td>
                   <td>{$publish.publish_time|date="Y-m-d H:i",###}</td>
                   <td><eq name="publish.status" value="0">No Read<else/>Read</eq></td>
                   <td>

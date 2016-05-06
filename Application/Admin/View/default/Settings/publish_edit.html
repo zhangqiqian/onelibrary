@@ -50,7 +50,7 @@
         <label for="location_id" class="col-sm-3 control-label">Location</label>
         <div class="col-sm-5">
             <select id="location_id" name="location_id" class="form-control">
-                <option value="0">All</option>
+                <option value="0">Any</option>
                 <foreach name="locations" item="location" >
                     <option value="{$location.location_id}">{$location.name}</option>
                 </foreach>

@@ -67,7 +67,7 @@ class PublishModel extends MongoModel{
             $publish['priority'] = $priorities[$publish['priority']];
 
             if($publish['location_id'] == 0){
-                $publish['location_name'] = 'All';
+                $publish['location_name'] = 'Any';
             }else{
                 $location = $mLocation->get_location($publish['location_id']);
                 $publish['location_name'] = $location['name'];
