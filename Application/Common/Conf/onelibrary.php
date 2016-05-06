@@ -8,6 +8,7 @@ return array(
         4 => '讲师',
         5 => '副教授',
         6 => '教授',
+        0 => '其他',
     ),
 
     /* Message Category Mapping */
