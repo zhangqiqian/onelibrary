@@ -251,12 +251,16 @@ class UserController extends ApiController {
                 }
             }
         }
-        foreach ($data as $key => $curricula_list) {
+        $major_curricula_list = array();
+        foreach ($data as $major_id => $curricula_list) {
             $curricula_list[0] = array(
                 'id' => 0,
                 'name' => '无课程'
             );
-            $data[$key] = array_values($curricula_list);
+            $major_curricula_list[] = array(
+                'major_id' => $major_id,
+                'curriculas' => array_values($curricula_list)
+            );
         }
 
         $grades = C('USER_GRADES');
@@ -285,7 +289,7 @@ class UserController extends ApiController {
                 'result' => array(
                     'grades' => $new_grades,
                     'majors' => $new_majors,
-                    'curriculas' => $data,
+                    'curriculas' => $major_curricula_list,
                 )
             )
         );

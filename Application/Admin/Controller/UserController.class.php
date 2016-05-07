@@ -205,6 +205,7 @@ class UserController extends AdminController {
         $member['major_name'] = isset($majors[$member['major']]) ? $majors[$member['major']] : 'Unknown';
         $member['interests'] = implode(', ', $member['interests']);
         $member['research'] = implode(', ', $member['research']);
+        $member['projects'] = implode('<br/>', $member['projects']);
 
         $mCurricula = new CurriculaModel();
         if($member['curricula_id'] > 0){
@@ -237,6 +238,7 @@ class UserController extends AdminController {
 
         $member['interests'] = implode("\n", $member['interests']);
         $member['research'] = implode("\n", $member['research']);
+        $member['projects'] = implode("\n", $member['projects']);
 
         $grades = C('USER_GRADES');
         $this->assign('grades', $grades);
@@ -265,6 +267,7 @@ class UserController extends AdminController {
         $grade = I('grade', 1, 'intval');
         $interests = I('interests', '', '');
         $research = I('research', '', '');
+        $project = I('projects', '', '');
         $curricula_id = I('curricula', 0, 'intval');
 
         if(empty($uid)){
@@ -296,6 +299,15 @@ class UserController extends AdminController {
             }
         }
 
+        $projects_arr = array();
+        $projects = explode("\n", $project);
+        foreach ($projects as $project_str) {
+            $project_str = trim($project_str);
+            if($project_str){
+                $projects_arr[] = $project_str;
+            }
+        }
+
         $userinfo = array(
             'nickname' => $nickname,
             'gender' => $gender,
@@ -303,6 +315,7 @@ class UserController extends AdminController {
             'grade' => $grade,
             'interests' => $interests_arr,
             'research' => $researches_arr,
+            'projects' => $projects_arr,
             'curricula_id' => $curricula_id,
         );
         $mMember = new MemberModel();

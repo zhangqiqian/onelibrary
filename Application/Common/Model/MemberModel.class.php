@@ -34,6 +34,7 @@ class MemberModel extends MongoModel{
         array('grade', 1, self::MODEL_INSERT),
         array('interests', array(), self::MODEL_INSERT),
         array('research', array(), self::MODEL_INSERT),
+        array('projects', array(), self::MODEL_INSERT),
         array('curricula_id', 0, self::MODEL_INSERT),
     );
 
