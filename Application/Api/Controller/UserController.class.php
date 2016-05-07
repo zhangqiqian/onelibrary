@@ -245,12 +245,22 @@ class UserController extends ApiController {
                 }
             }
         }
+        foreach ($data as $key => $curricula_list) {
+            $curricula_list[0] = '无课程';
+            $data[$key] = $curricula_list;
+        }
+
+        $grades = C('USER_GRADES');
+        unset($grades[0]);
+        unset($grades[3]);
+        unset($grades[4]);
+        unset($grades[5]);
 
         $this->ajaxReturn(
             array(
                 'errno' => 0,
                 'result' => array(
-                    'grades' => C('USER_GRADES'),
+                    'grades' => $grades,
                     'majors' => C('MAJOR_MAPPING'),
                     'curriculas' => $data,
                 )
