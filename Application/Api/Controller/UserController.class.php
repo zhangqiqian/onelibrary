@@ -225,7 +225,7 @@ class UserController extends ApiController {
         }
     }
 
-    public function get_curricula_list(){
+    public function get_profile_options(){
         $mCurricula = new CurriculaModel();
         $curriculas = $mCurricula->get_all_curriculas();
 
@@ -245,6 +245,16 @@ class UserController extends ApiController {
                 }
             }
         }
-        $this->ajaxReturn(array('errno' => 0, 'result' => $data));
+
+        $this->ajaxReturn(
+            array(
+                'errno' => 0,
+                'result' => array(
+                    'grades' => C('USER_GRADES'),
+                    'majors' => C('MAJOR_MAPPING'),
+                    'curriculas' => $data,
+                )
+            )
+        );
     }
 }

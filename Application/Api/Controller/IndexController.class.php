@@ -132,18 +132,6 @@ class IndexController extends ApiController {
         $this->ajaxReturn(array('errno' => 0, 'result' => $curriculas));
     }
 
-    public function get_member_options(){
-        $this->ajaxReturn(
-            array(
-                'errno' => 0,
-                'result' => array(
-                    'grades' => C('USER_GRADES'),
-                    'majors' => C('MAJOR_MAPPING'),
-                )
-            )
-        );
-    }
-
     public function get_update_info(){
         $filename = DOWNLOAD_PATH.'version.json';
         $content = file_get_contents($filename);
