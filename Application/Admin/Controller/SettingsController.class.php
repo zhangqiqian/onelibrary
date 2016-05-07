@@ -792,9 +792,9 @@ class SettingsController extends AdminController {
         }
 
         if($remove_result){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/Curricula'), 'location' => ''));
+            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success.', 'url' => U('Settings/curricula'), 'location' => ''));
         }else{
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/Curricula'), 'location' => ''));
+            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure.', 'url' => U('Settings/curricula'), 'location' => ''));
         }
     }
 
