@@ -146,6 +146,27 @@ class UserController extends ApiController {
     }
 
     /**
+     * 获取用户信息
+     * @author zhangqiqian <43874051@qq.com>
+     */
+    public function get_profile(){
+        $uid = is_login();
+
+        $mMember = new MemberModel();
+        $ret = $mMember->get_member($uid);
+        $profile_info = array();
+        if($ret){
+            $profile_info['grade'] = $ret['grade'];
+            $profile_info['major'] = $ret['major'];
+            $profile_info['research'] = implode(',', $ret['research']);
+            $profile_info['interest'] = implode(',', $ret['interests']);
+            $profile_info['project'] = implode(',', $ret['projects']);
+            $profile_info['curricula_id'] = $ret['curricula_id'];
+        }
+        $this->ajaxReturn(array('errno' => 0, 'result' => $profile_info));
+    }
+
+    /**
      * 修改用户信息
      * @author zhangqiqian <43874051@qq.com>
      */
