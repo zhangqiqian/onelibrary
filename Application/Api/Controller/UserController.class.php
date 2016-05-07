@@ -237,31 +237,54 @@ class UserController extends ApiController {
         foreach ($curriculas as $curricula) {
             if($curricula['courses']){
                 if(isset($data[$curricula['major']])){
-                    $data[$curricula['major']][$curricula['curricula_id']] = $curricula['name'];
+                    $data[$curricula['major']][$curricula['curricula_id']] = array(
+                        'id' => $curricula['curricula_id'],
+                        'name' => $curricula['name']
+                    );
                 }else{
                     $data[$curricula['major']] = array(
-                        $curricula['curricula_id'] => $curricula['name']
+                        $curricula['curricula_id'] => array(
+                            'id' => $curricula['curricula_id'],
+                            'name' => $curricula['name']
+                        )
                     );
                 }
             }
         }
         foreach ($data as $key => $curricula_list) {
-            $curricula_list[0] = '无课程';
-            $data[$key] = $curricula_list;
+            $curricula_list[0] = array(
+                'id' => 0,
+                'name' => '无课程'
+            );
+            $data[$key] = array_values($curricula_list);
         }
 
         $grades = C('USER_GRADES');
-        unset($grades[0]);
-        unset($grades[3]);
-        unset($grades[4]);
-        unset($grades[5]);
+        $new_grades = array();
+        foreach ($grades as $id => $grade) {
+            if(in_array($id, array(1, 2, 6))){
+                $new_grades[] = array(
+                    'id' => $id,
+                    'name' => $grade,
+                );
+            }
+        }
+
+        $majors = C('MAJOR_MAPPING');
+        $new_majors = array();
+        foreach ($majors as $id => $major) {
+            $new_majors[] = array(
+                'id' => $id,
+                'name' => $major,
+            );
+        }
 
         $this->ajaxReturn(
             array(
                 'errno' => 0,
                 'result' => array(
-                    'grades' => $grades,
-                    'majors' => C('MAJOR_MAPPING'),
+                    'grades' => $new_grades,
+                    'majors' => $new_majors,
                     'curriculas' => $data,
                 )
             )
