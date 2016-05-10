@@ -1,6 +1,6 @@
 {
     "name": "onelibrary-1.0.apk",
     "version": 1.1,
-    "description": "Features: \n(1) fixed crashing bug as destroy;\n(2) add check-update function.",
+    "description": "修复Bug: \n(1) 切换角色为教师时表单动画错误",
     "url": "http://115.28.223.203:8080/Download/android"
 }
