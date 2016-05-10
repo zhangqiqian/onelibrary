@@ -91,7 +91,7 @@
                   <td>{$publish.similarity|default='1'} %</td>
                   <td>{$publish.location_name|default='Any'}</td>
                   <td>{$publish.publish_time|date="Y-m-d H:i",###}</td>
-                  <td><eq name="publish.status" value="0">No Read<else/>Read</eq></td>
+                  <td>{$publish.status}</td>
                   <td>
                     <a href="javascript:open_dialog('edit', '{:U('Settings/publish_edit')}/publish_id/{$publish.publish_id}');" title="Read"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
                     <a href="javascript:open_dialog('read', '{:U('Settings/publish_read')}/publish_id/{$publish.publish_id}');" title="Read"><span class="glyphicon glyphicon-registration-mark" aria-hidden="true"></span></a>&nbsp;

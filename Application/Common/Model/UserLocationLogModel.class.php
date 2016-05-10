@@ -25,6 +25,7 @@ class UserLocationLogModel extends MongoModel{
         array('uid', 0, self::MODEL_INSERT),
         array('longitude', 0.0, self::MODEL_INSERT),
         array('latitude', 0.0, self::MODEL_INSERT),
+        array('is_notified', 1, self::MODEL_INSERT),
         array('location_ids', array(), self::MODEL_INSERT),
         array('publish_ids', array(), self::MODEL_INSERT),
         array('message_ids', array(), self::MODEL_INSERT),

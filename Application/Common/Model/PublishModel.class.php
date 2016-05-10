@@ -27,7 +27,7 @@ class PublishModel extends MongoModel{
         array('publish_time', NOW_TIME, self::MODEL_INSERT),
         array('expire_time', 0, self::MODEL_INSERT),
         array('message_id', 0, self::MODEL_INSERT),
-        array('status', 0, self::MODEL_INSERT), //0, no read; 1, read
+        array('status', 0, self::MODEL_INSERT), //0:send; 1:receive 2:read
         array('priority', 0, self::MODEL_INSERT), //order by priority
         array('similarity', 0, self::MODEL_INSERT), //0-100
         array('mtime', NOW_TIME, self::MODEL_BOTH),
@@ -71,6 +71,14 @@ class PublishModel extends MongoModel{
             }else{
                 $location = $mLocation->get_location($publish['location_id']);
                 $publish['location_name'] = $location['name'];
+            }
+
+            if($publish['status'] == 0){
+                $publish['status'] = 'Pushed';
+            }elseif($publish['status'] == 1){
+                $publish['status'] = 'Received';
+            }else{
+                $publish['status'] = 'Opened';
             }
 
             $message = $mMessage->get_message($publish['message_id']);
