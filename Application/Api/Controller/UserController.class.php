@@ -266,7 +266,7 @@ class UserController extends ApiController {
         $grades = C('USER_GRADES');
         $new_grades = array();
         foreach ($grades as $id => $grade) {
-            if(in_array($id, array(1, 2, 6))){
+            if(in_array($id, array(1, 2, 7))){
                 $new_grades[] = array(
                     'id' => $id,
                     'name' => $grade,
