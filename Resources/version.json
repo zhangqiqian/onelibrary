@@ -1,6 +1,6 @@
 {
     "name": "onelibrary-1.2.apk",
     "version": 1.2,
-    "description": "修复Bug: \n(1) 切换专业时课程表不能随之切换。",
+    "description": "修复Bug: \n(1) 切换专业时课程表不能随之切换。\n(2) 添加参数Publish的ID，以便于记录log。",
     "url": "http://115.28.223.203:8080/Download/android"
 }
