@@ -1,6 +1,6 @@
 {
-    "name": "onelibrary-1.0.apk",
-    "version": 1.1,
-    "description": "修复Bug: \n(1) 切换角色为教师时表单动画错误",
+    "name": "onelibrary-1.2.apk",
+    "version": 1.2,
+    "description": "修复Bug: \n(1) 切换角色专业时课程表不能随之切换。",
     "url": "http://115.28.223.203:8080/Download/android"
 }
