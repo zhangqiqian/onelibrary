@@ -11,6 +11,7 @@ namespace Api\Controller;
 use Common\Model\CurriculaModel;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
+use Common\Model\PublishLogModel;
 use Common\Model\PublishModel;
 use Common\Model\MessageModel;
 
@@ -56,7 +57,7 @@ class IndexController extends ApiController {
                 $message_ids[] = $publish['message_id'];
             }
             if($message && $publish['user_uid'] > 0 ){
-                $params = array('status' => 1); //switch to read
+                $params = array('status' => 1); //switch to receive status
                 $mPublish->update_publish($publish['publish_id'], $params);
             }
         }
@@ -73,6 +74,7 @@ class IndexController extends ApiController {
                 'uid' => UID,
                 'longitude' => $longitude,
                 'latitude' => $latitude,
+                'is_notified' => $notification,
                 'location_ids' => $location_ids,
                 'publish_ids' => array_unique($publish_ids),
                 'message_ids' => array_unique($message_ids),
@@ -89,9 +91,23 @@ class IndexController extends ApiController {
 
     public function message(){
         $message_id = I('message_id', 0, 'intval');
+        $publish_id = I('publish_id', 0, 'intval');
 
         $mMessage = new MessageModel();
         $message = $mMessage->get_message_for_app($message_id);
+
+        $mPublish = new PublishModel();
+        $publish = $mPublish->get_publish($publish_id);
+        $mPublishLog = new PublishLogModel();
+        $log = array(
+            'uid' => isset($publish['user_uid']) ? $publish['user_uid'] : 0,
+            'publish_id' => $publish_id,
+            'message_id' => $message_id,
+            'location_id' => isset($publish['location_id']) ? $publish['location_id'] : 0,
+            'status' => 2
+        );
+        $mPublishLog->insert_publish_log($log);
+
         $this->ajaxReturn(array('errno' => 0, 'result' => $message));
     }
 

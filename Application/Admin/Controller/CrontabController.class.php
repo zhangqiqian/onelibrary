@@ -76,7 +76,7 @@ class CrontabController extends Controller {
                         'publish_time' => time(),
                         'expire_time' => time() + 30 * 24 * 3600,
                         'message_id' => $message_id,
-                        'status' => 0,
+                        'status' => 0, //0:send
                         'priority' => $priority,
                         'similarity' => $user_book['similarity']
                     );
