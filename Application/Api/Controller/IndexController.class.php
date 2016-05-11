@@ -57,7 +57,7 @@ class IndexController extends ApiController {
                 $message_ids[] = $publish['message_id'];
             }
             if($message && $publish['user_uid'] > 0 ){
-                $params = array('status' => 1); //switch to receive status
+                $params = array('status' => 1); //switch to received status
                 $mPublish->update_publish($publish['publish_id'], $params);
             }
         }
@@ -107,6 +107,9 @@ class IndexController extends ApiController {
             'status' => 2
         );
         $mPublishLog->insert_publish_log($log);
+
+        $params = array('status' => 2); //switch to opened status
+        $mPublish->update_publish($publish['publish_id'], $params);
 
         $this->ajaxReturn(array('errno' => 0, 'result' => $message));
     }
