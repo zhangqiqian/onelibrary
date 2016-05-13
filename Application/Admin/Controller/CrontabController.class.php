@@ -9,6 +9,8 @@
 
 namespace Admin\Controller;
 use Common\Model\BookModel;
+use Common\Model\CourseBookModel;
+use Common\Model\CurriculaModel;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
@@ -292,5 +294,108 @@ class CrontabController extends Controller {
             }
         }
 
+    }
+
+    public function push_book_message_by_course(){
+        $mUser = new MemberModel();
+        $mCurricula = new CurriculaModel();
+        $mCourseBook = new CourseBookModel();
+        $mBook = new BookModel();
+
+        $now = time();
+        $today = $now / 87600 * 87600;
+        $week = intval(date('w', $now));
+        if($week > 5){
+            return;
+        }
+
+        $courses = array();
+        $curriculas = $mCurricula->get_all_curriculas();
+        foreach ($curriculas as $curricula) {
+            foreach ($curricula['courses'] as $course) {
+                if($week == $course['week']){
+                    $course_key = substr(md5($course['course_id']."_".$course['start_time']."_".$course['classroom']), 0, 8);
+                    $courses[$course_key] = array(
+                        'name' => $course['name'],
+                        'course_id' => $course['course_id'],
+                        'start_time' => $today + $course['start_time'],
+                        'end_time' => $today + $course['end_time'],
+                        'location_id' => $course['classroom'],
+                        'curricula_id' => $curricula['curricula_id']
+                    );
+                }
+            }
+        }
+
+        foreach ($courses as $course) {
+            $course_books = $mCourseBook->get_course_books($course['course_id'], 0, 1);
+            $content = "提醒: 你的<".$course['name'].">课程将在".date('H:i', $course['start_time'])."开始。\n\n";
+            if(!empty($course_books)){
+                $content = $content."猜你喜欢下面的图书: \n";
+            }
+            foreach ($course_books as $course_book) {
+                $book = $mBook->get_book($course_book['book_id']);
+                $content = $content."《".$book['title']."》: ".$book['summary']." \n —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate'];
+            }
+
+            $message = array(
+                'title' => "课程提醒: ".$course['name'],
+                'content' => $content,
+                'author' => "Onelibrary",
+                'category' => 0,//其他
+                'link' => 'http://www.onelibrary.cn',
+                'pubdate' => time(),
+                'status' => 0,  //0, no handle; 1, handled.
+                'level' => 0,  //0, no level; 1...9
+                'tags' => array('课程提醒', $course['name']),
+                'tag_weight' => array(),
+                'desc' => '',
+            );
+            //插入到message中
+            $mMessage = new MessageModel();
+            $message_id = $mMessage->insert_message($message);
+
+            //找到与此相关的用户
+            $users = $mUser->get_members_by_curricula($course['curricula_id']);
+            foreach ($users as $user) {
+                //发布新的信息
+                if($message_id > 0){
+                    $publish_message = array(
+                        'user_uid' => $user['uid'],
+                        'location_id' => $course['location_id'],
+                        'publish_time' => $course['start_time'] - 3600,
+                        'expire_time' => $course['end_time'],
+                        'message_id' => $message_id,
+                        'status' => 0, //0:send
+                        'priority' => 3,
+                        'similarity' => 1
+                    );
+                    $mPublish = new PublishModel();
+                    $publish_id = $mPublish->insert_publish($publish_message);
+                }
+
+                //更新user book的状态为1
+                $data = array(
+                    'status' => 1
+                );
+                foreach ($course_books as $course_book) {
+                    $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
+                }
+            }
+        }
+    }
+
+    public function repair_course(){
+        $mCurricula = new CurriculaModel();
+        $curriculas = $mCurricula->get_all_curriculas();
+        foreach ($curriculas as $curricula) {
+            if(!empty($curricula['courses'])){
+                foreach ($curricula['courses'] as $key => $course) {
+                    $curricula['courses'][$key]['course_id'] = substr(md5($course['name']), 0, 8);
+                }
+                echo json_encode($curricula)."\n\n";
+                $mCurricula->update_curricula($curricula['curricula_id'], $curricula);
+            }
+        }
     }
 }
