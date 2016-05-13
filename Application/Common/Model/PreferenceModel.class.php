@@ -33,12 +33,48 @@ class PreferenceModel extends MongoModel{
 
     /**
      * 获取user所有preferences
+     * @param int $type
      * @param int $start
      * @param int $limit
      * @return array
      */
-    public function get_preferences($start = 0, $limit = 10){
-        $preferences = $this->order('weight desc')->limit($start.','.$limit)->select();
+    public function get_preferences($type = 1, $start = 0, $limit = 10){
+        $preferences = $this->where(array('type' => $type))->order('weight desc')->limit($start.','.$limit)->select();
+        if(!$preferences){
+            $preferences = array();
+        }
+        $ret = array();
+        foreach ($preferences as $preference) {
+            unset($preference['_id']);
+            $ret[] = $preference;
+        }
+        return $ret;
+    }
+
+    /**
+     * 获取所有preferences
+     * @return array
+     */
+    public function get_all_preferences(){
+        $preferences = $this->select();
+        if(!$preferences){
+            $preferences = array();
+        }
+        $ret = array();
+        foreach ($preferences as $preference) {
+            unset($preference['_id']);
+            $ret[] = $preference;
+        }
+        return $ret;
+    }
+
+    /**
+     * 获取所有preferences
+     * @param int $type
+     * @return array
+     */
+    public function get_preferences_by_type($type = 1){
+        $preferences = $this->where(array('type' => $type))->select();
         if(!$preferences){
             $preferences = array();
         }
