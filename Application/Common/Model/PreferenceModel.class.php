@@ -18,10 +18,11 @@ class PreferenceModel extends MongoModel{
     protected $_idType       = self::TYPE_INT;
     protected $pk            = 'pref_id';
 
-    /* Message模型自动完成 */
+    /* Preference模型自动完成 */
     protected $_auto = array(
         array('pref_id', 0, self::MODEL_INSERT),
         array('keyword', '', self::MODEL_INSERT),
+        array('type', 1, self::MODEL_INSERT), //1: user / 2: course
         array('weight', 0.0, self::MODEL_INSERT),
         array('start_time', 0, self::MODEL_INSERT),
         array('end_time', 0, self::MODEL_INSERT),
@@ -52,20 +53,33 @@ class PreferenceModel extends MongoModel{
     /**
      * @param string $keyword
      * @param int $weight
+     * @param int $type
      * @param int $start_time
      * @param int $end_time
      * @return bool
      */
-    public function add_preference($keyword, $weight, $start_time, $end_time){
+    public function add_keyword($keyword, $weight, $type, $start_time, $end_time){
         $preference = array(
             'keyword' => $keyword,
             'weight' => $weight,
+            'type' => $type,
             'start_time' => $start_time,
             'end_time' => $end_time,
             'count' => 0,
             'mtime' => time(),
             'ctime' => time(),
         );
+        if(!$this->add($preference)){
+            $this->error = 'Failed to add preference.';
+            return false;
+        }
+    }
+
+    /**
+     * @param array $preference
+     * @return bool
+     */
+    public function add_preference($preference){
         if(!$this->add($preference)){
             $this->error = 'Failed to add preference.';
             return false;

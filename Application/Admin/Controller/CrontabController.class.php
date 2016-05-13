@@ -290,10 +290,22 @@ class CrontabController extends Controller {
             }else{
                 $end_time = time();
                 $start_time = $end_time - 5 * 365 * 24 * 3600;
-                $mPref->add_preference($key, $weight, $start_time, $end_time);
+                $mPref->add_keyword($key, $weight, 1, $start_time, $end_time);
             }
         }
 
+        $mCurricula = new CurriculaModel();
+        $curriculas = $mCurricula->get_all_curriculas();
+        foreach ($curriculas as $curricula) {
+            foreach ($curricula['courses'] as $course) {
+                $pref = $mPref->get_preference_by_keyword($course['name']);
+                if(empty($pref)){
+                    $end_time = time();
+                    $start_time = $end_time - 4 * 365 * 24 * 3600;
+                    $mPref->add_keyword($course['name'], 1, 2, $start_time, $end_time);
+                }
+            }
+        }
     }
 
     public function push_book_message_by_course(){
