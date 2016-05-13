@@ -667,15 +667,15 @@ class SettingsController extends AdminController {
                 $term_start = date('Y', time()).'-09-01';
             }else{
                 $next_year = intval(date('Y', time())) + 1;
-                $term_start = $next_year.'-01-01';
+                $term_start = $next_year.'-01-12';
             }
         }
         if(empty($term_end)){
             $next_year = intval(date('Y', time())) + 1;
             if($term == 1){
-                $term_end = $next_year.'-01-01';
+                $term_end = $next_year.'-02-22';
             }else{
-                $term_end = $next_year.'-07-01';
+                $term_end = $next_year.'-07-10';
             }
         }
         $term_start_time = strtotime($term_start);
@@ -688,8 +688,8 @@ class SettingsController extends AdminController {
             'grade' => $grade,
             'courses' => array(),
             'term' => $term,
-            'term_start' => $term_start_time,
-            'term_end' => $term_end_time,
+            'term_start' => intval($term_start_time),
+            'term_end' => intval($term_end_time),
             'status' => $status,
             'desc' => $desc,
         );
@@ -731,15 +731,15 @@ class SettingsController extends AdminController {
                 $term_start = date('Y', time()).'-09-01';
             }else{
                 $next_year = intval(date('Y', time())) + 1;
-                $term_start = $next_year.'-01-01';
+                $term_start = $next_year.'-01-12';
             }
         }
         if(empty($term_end)){
             $next_year = intval(date('Y', time())) + 1;
             if($term == 1){
-                $term_end = $next_year.'-01-01';
+                $term_end = $next_year.'-02-22';
             }else{
-                $term_end = $next_year.'-07-01';
+                $term_end = $next_year.'-07-10';
             }
         }
         $term_start_time = strtotime($term_start);
@@ -755,8 +755,8 @@ class SettingsController extends AdminController {
             'class' => $class,
             'grade' => $grade,
             'term' => $term,
-            'term_start' => $term_start_time,
-            'term_end' => $term_end_time,
+            'term_start' => intval($term_start_time),
+            'term_end' => intval($term_end_time),
             'status' => $status,
             'desc' => $desc,
         );
@@ -844,6 +844,7 @@ class SettingsController extends AdminController {
 
         $section_times = C('COURSE_SECTION_TIME_MAPPING');
         $course = array(
+            'course_id' => substr(md5($course_name), 0, 8),
             'name' => $course_name,
             'teacher' => $teacher,
             'classroom' => $classroom,
@@ -923,6 +924,7 @@ class SettingsController extends AdminController {
 
         $section_times = C('COURSE_SECTION_TIME_MAPPING');
         $course = array(
+            'course_id' => substr(md5($course_name), 0, 8),
             'name' => $course_name,
             'teacher' => $teacher,
             'classroom' => $classroom,
