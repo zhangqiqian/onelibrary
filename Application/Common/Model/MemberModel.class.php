@@ -148,6 +148,30 @@ class MemberModel extends MongoModel{
     }
 
     /**
+     * 获取普通用户
+     * @param $curricula_id
+     * @return array
+     */
+    public function get_members_by_curricula($curricula_id){
+        $map = array(
+            'uid' => array('$ne' => 1),
+            'curricula_id' => $curricula_id,
+            'status' => 1,
+        );
+        $members = $this->where($map)->select();
+        if(!$members){
+            $members = array();
+        }
+        $ret = array();
+        foreach ($members as $member) {
+            unset($member['_id']);
+            unset($member['ctime']);
+            $ret[] = $member;
+        }
+        return $ret;
+    }
+
+    /**
      * 获取所有用户
      * @return array
      */
