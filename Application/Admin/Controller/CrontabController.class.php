@@ -288,8 +288,8 @@ class CrontabController extends Controller {
                 );
                 $mPref->update_preference($pref['pref_id'], $params);
             }else{
-                $end_time = time();
-                $start_time = $end_time - 5 * 365 * 24 * 3600;
+                $start_time = time();
+                $end_time = $start_time + 30 * 24 * 3600;
                 $mPref->add_keyword($key, $weight, 1, $start_time, $end_time);
             }
         }
@@ -300,8 +300,8 @@ class CrontabController extends Controller {
             foreach ($curricula['courses'] as $course) {
                 $pref = $mPref->get_preference_by_keyword($course['name']);
                 if(empty($pref)){
-                    $end_time = time();
-                    $start_time = $end_time - 4 * 365 * 24 * 3600;
+                    $start_time = time();
+                    $end_time = $start_time + 30 * 24 * 3600;
                     $mPref->add_keyword($course['name'], 1, 2, $start_time, $end_time);
                 }
             }
@@ -315,8 +315,9 @@ class CrontabController extends Controller {
         $mBook = new BookModel();
 
         $now = time();
-        $today = $now / 87600 * 87600;
+        $today = intval($now / 86400) * 86400;
         $week = intval(date('w', $now));
+        echo "today: ".date('Y-m-d H:i:s', $today).", week: ".$week."\n";
         if($week > 5){
             return;
         }
@@ -324,9 +325,11 @@ class CrontabController extends Controller {
         $courses = array();
         $curriculas = $mCurricula->get_all_curriculas();
         foreach ($curriculas as $curricula) {
+            echo "curricula: ".$curricula['name']."\n";
             foreach ($curricula['courses'] as $course) {
                 if($week == $course['week']){
                     $course_key = substr(md5($course['course_id']."_".$course['start_time']."_".$course['classroom']), 0, 8);
+                    echo "course: ".$course['name'].", time: ".date('Y-m-d H:i:s',$today + $course['start_time'])." -> ".date('Y-m-d H:i:s',$today + $course['end_time'])."\n";
                     $courses[$course_key] = array(
                         'name' => $course['name'],
                         'course_id' => $course['course_id'],
@@ -339,15 +342,18 @@ class CrontabController extends Controller {
             }
         }
 
+        echo "courses: ".json_encode($courses)."\n";
         foreach ($courses as $course) {
-            $course_books = $mCourseBook->get_course_books($course['course_id'], 0, 1);
-            $content = "提醒: 你的<".$course['name'].">课程将在".date('H:i', $course['start_time'])."开始。\n\n";
+            $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
+            $content = "提醒: 课程<".$course['name'].">将在 ".date('H:i', $course['start_time'] - 8*3600)." 开始。\n\n";
             if(!empty($course_books)){
                 $content = $content."猜你喜欢下面的图书: \n";
             }
+            $i = 1;
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
-                $content = $content."《".$book['title']."》: ".$book['summary']." \n —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate'];
+                $content = $content.$i.".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
+                $i += 1;
             }
 
             $message = array(
@@ -364,6 +370,7 @@ class CrontabController extends Controller {
                 'desc' => '',
             );
             //插入到message中
+            echo json_encode($message)."\n";
             $mMessage = new MessageModel();
             $message_id = $mMessage->insert_message($message);
 

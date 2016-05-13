@@ -26,7 +26,6 @@ class PreferenceModel extends MongoModel{
         array('weight', 0.0, self::MODEL_INSERT),
         array('start_time', 0, self::MODEL_INSERT),
         array('end_time', 0, self::MODEL_INSERT),
-        array('count', 0, self::MODEL_INSERT),
         array('mtime', NOW_TIME, self::MODEL_BOTH),
         array('ctime', NOW_TIME, self::MODEL_INSERT),
     );
@@ -101,7 +100,6 @@ class PreferenceModel extends MongoModel{
             'type' => $type,
             'start_time' => $start_time,
             'end_time' => $end_time,
-            'count' => 0,
             'mtime' => time(),
             'ctime' => time(),
         );

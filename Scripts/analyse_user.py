@@ -66,9 +66,6 @@ def main(topn=10, withweight=True):
         major = MAJOR_LIST[member['major']] if member['major'] > 0 else ''
         interests = member['interests'] if 'interests' in member.keys() else []
         research = member['research'] if 'research' in member.keys() else []
-        words = [major] + research
-        content = ','.join(words)
-        tags = analyse(content, topn, withweight)
         courses = []
         if 'curricula_id' in member.keys() and member['curricula_id'] > 0:
             curricula_collection = client[DB_NAME][CURRICULA_COLLECTION]
@@ -80,11 +77,6 @@ def main(topn=10, withweight=True):
         all_tags = analyse(content, topn, withweight)
 
         new_tags = {}
-        for tag in tags:
-            if tag[0] in new_tags.keys():
-                new_tags[tag[0]] += tag[1]
-            else:
-                new_tags[tag[0]] = tag[1]
         for tag in all_tags:
             if tag[0] in new_tags.keys():
                 new_tags[tag[0]] += tag[1]
