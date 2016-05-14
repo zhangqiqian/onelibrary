@@ -325,11 +325,9 @@ class CrontabController extends Controller {
         $courses = array();
         $curriculas = $mCurricula->get_all_curriculas();
         foreach ($curriculas as $curricula) {
-            echo "curricula: ".$curricula['name']."\n";
             foreach ($curricula['courses'] as $course) {
                 if($week == $course['week']){
-                    $course_key = substr(md5($course['course_id']."_".$course['start_time']."_".$course['classroom']), 0, 8);
-                    echo "course: ".$course['name'].", time: ".date('Y-m-d H:i:s',$today + $course['start_time'])." -> ".date('Y-m-d H:i:s',$today + $course['end_time'])."\n";
+                    $course_key = substr(md5($curricula['curricula_id']."_".$course['course_id']."_".$course['start_time']."_".$course['classroom']), 0, 8);
                     $courses[$course_key] = array(
                         'name' => $course['name'],
                         'course_id' => $course['course_id'],
@@ -342,8 +340,10 @@ class CrontabController extends Controller {
             }
         }
 
-        echo "courses: ".json_encode($courses)."\n";
         foreach ($courses as $course) {
+            //找到与此相关的用户
+            $users = $mUser->get_members_by_curricula($course['curricula_id']);
+            if(empty($users)) continue;
             $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
             $content = "提醒: 课程<".$course['name'].">将在 ".date('H:i', $course['start_time'] - 8*3600)." 开始。\n\n";
             if(!empty($course_books)){
@@ -359,7 +359,7 @@ class CrontabController extends Controller {
             $message = array(
                 'title' => "课程提醒: ".$course['name'],
                 'content' => $content,
-                'author' => "Onelibrary",
+                'author' => array("Onelibrary"),
                 'category' => 0,//其他
                 'link' => 'http://www.onelibrary.cn',
                 'pubdate' => time(),
@@ -370,12 +370,11 @@ class CrontabController extends Controller {
                 'desc' => '',
             );
             //插入到message中
-            echo json_encode($message)."\n";
             $mMessage = new MessageModel();
             $message_id = $mMessage->insert_message($message);
+            echo "insert new message: ".$message["title"].", and message id is ".$message_id."\n";
 
             //找到与此相关的用户
-            $users = $mUser->get_members_by_curricula($course['curricula_id']);
             foreach ($users as $user) {
                 //发布新的信息
                 if($message_id > 0){
@@ -392,7 +391,7 @@ class CrontabController extends Controller {
                     $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
                 }
-
+                
                 //更新user book的状态为1
                 $data = array(
                     'status' => 1

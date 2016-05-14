@@ -269,7 +269,7 @@ class SettingsController extends AdminController {
         $message = $mMessage->get_message($message_id);
 
         $new_contents = array();
-        $contents = explode("\r\n", $message['content']);
+        $contents = explode("\n", $message['content']);
         foreach ($contents as $new_content) {
             $new_contents[] = $new_content;
         }
