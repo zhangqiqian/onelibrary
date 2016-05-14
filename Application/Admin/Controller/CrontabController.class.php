@@ -315,7 +315,7 @@ class CrontabController extends Controller {
         $mBook = new BookModel();
         $mLocation = new LocationModel();
 
-        $now = time() - 2 * 86400;
+        $now = time();
         $today = intval($now / 86400) * 86400;
         $week = intval(date('w', $now));
         $week_names = array("日", "一", "二", "三", "四", "五", "六");
