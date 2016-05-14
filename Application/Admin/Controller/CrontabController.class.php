@@ -346,7 +346,7 @@ class CrontabController extends Controller {
             $users = $mUser->get_members_by_curricula($course['curricula_id']);
             if(empty($users)) continue;
             $location = $mLocation->get_location($course['location_id']);
-            $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 1);
+            $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
             $content = "提醒: 今天是".date('Y年m月d日', $today)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'] - 8*3600)." 在 ".$location['name']." 开始。\n\n";
             if(!empty($course_books)){
                 $content = $content."猜你喜欢下面的图书: \n";
