@@ -313,10 +313,12 @@ class CrontabController extends Controller {
         $mCurricula = new CurriculaModel();
         $mCourseBook = new CourseBookModel();
         $mBook = new BookModel();
+        $mLocation = new LocationModel();
 
-        $now = time();
+        $now = time() - 2 * 86400;
         $today = intval($now / 86400) * 86400;
         $week = intval(date('w', $now));
+        $week_names = array("日", "一", "二", "三", "四", "五", "六");
         echo "today: ".date('Y-m-d H:i:s', $today).", week: ".$week."\n";
         if($week > 5){
             return;
@@ -344,20 +346,23 @@ class CrontabController extends Controller {
             //找到与此相关的用户
             $users = $mUser->get_members_by_curricula($course['curricula_id']);
             if(empty($users)) continue;
-            $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
-            $content = "提醒: 课程<".$course['name'].">将在 ".date('H:i', $course['start_time'] - 8*3600)." 开始。\n\n";
+            $location = $mLocation->get_location($course['location_id']);
+            $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 1);
+            $content = "提醒: 今天是".date('Y年m月d日', $today)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'] - 8*3600)." 在 ".$location['name']." 开始。\n\n";
             if(!empty($course_books)){
                 $content = $content."猜你喜欢下面的图书: \n";
             }
             $i = 1;
+            $total_sim = 0;
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
                 $content = $content.$i.".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
                 $i += 1;
+                $total_sim += $course_book['similarity'];
             }
 
             $message = array(
-                'title' => "课程提醒: ".$course['name'],
+                'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $today).")",
                 'content' => $content,
                 'author' => array("Onelibrary"),
                 'category' => 0,//其他
@@ -386,7 +391,7 @@ class CrontabController extends Controller {
                         'message_id' => $message_id,
                         'status' => 0, //0:send
                         'priority' => 3,
-                        'similarity' => 1
+                        'similarity' => $total_sim > 0 ? round($total_sim/$i, 1) : 1
                     );
                     $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
