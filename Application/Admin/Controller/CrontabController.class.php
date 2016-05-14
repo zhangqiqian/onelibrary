@@ -319,7 +319,6 @@ class CrontabController extends Controller {
         $today = intval($now / 86400) * 86400;
         $week = intval(date('w', $now));
         $week_names = array("日", "一", "二", "三", "四", "五", "六");
-        echo "today: ".date('Y-m-d H:i:s', $today).", week: ".$week."\n";
         if($week > 5){
             return;
         }
@@ -377,7 +376,6 @@ class CrontabController extends Controller {
             //插入到message中
             $mMessage = new MessageModel();
             $message_id = $mMessage->insert_message($message);
-            echo "insert new message: ".$message["title"].", and message id is ".$message_id."\n";
 
             //找到与此相关的用户
             foreach ($users as $user) {
@@ -416,7 +414,6 @@ class CrontabController extends Controller {
                 foreach ($curricula['courses'] as $key => $course) {
                     $curricula['courses'][$key]['course_id'] = substr(md5($course['name']), 0, 8);
                 }
-                echo json_encode($curricula)."\n\n";
                 $mCurricula->update_curricula($curricula['curricula_id'], $curricula);
             }
         }
