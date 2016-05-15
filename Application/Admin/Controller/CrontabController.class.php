@@ -359,7 +359,7 @@ class CrontabController extends Controller {
                 $total_sim += $course_book['similarity'];
                 $i += 1;
             }
-            $avg_sim = $i > 0 ? round($total_sim/$i, 1) : 0;
+            $avg_sim = $i > 0 ? round($total_sim/$i, 1) : 20;
 
             $message = array(
                 'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $today).")",
