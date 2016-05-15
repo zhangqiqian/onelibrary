@@ -92,19 +92,13 @@ def main():
     book_collection = client[DB_NAME][BOOK_COLLECTION]
     course_book_collection = client[DB_NAME][COURSE_BOOK_COLLECTION]
 
-    books = book_collection.find()
     curriculas = currcula_collection.find()
     courses = {}
-    total = 0
-    count = 0
     for curricula in curriculas:
         if curricula['courses']:
             for course in curricula['courses'].values():
-                total += 1
-                # print course
                 course_id = course['course_id'] if course['course_id'] else md5(course['name']).hexdigest()[0:8]
                 if course_id not in courses.keys():
-                    count += 1
                     tags = analyse_keywords(course['name'], 10, True)
                     new_tags = []
                     for tag in tags:
@@ -118,38 +112,38 @@ def main():
                         'tags': new_tags
                     }
 
-    i = 0
-    for book in books:
-        book_id = int(book['book_id'])
-        for course in courses.values():
-            now = int(time.time())
-            course_id = course['course_id']
+    start = 0
+    limit = 1000
+    count = book_collection.count()
+    i = 1
+    j = 1
+    while start < count:
+        books = book_collection.find().sort("book_id").skip(start).limit(limit)
+        for book in books:
+            book_id = int(book['book_id'])
+            print "*"*80
+            print "%s: book %s -> %s" % (i, book_id, book["title"])
+            i += 1
+            for course in courses.values():
+                now = int(time.time())
+                course_id = course['course_id']
 
-            sim = similarity(course['tags'], book['tags'])
-            # if sim > 10:
-            #     i += 1
-            #     print "*"*80
-            #     print "course: %s" % course['name']
-            #     for tag in course['tags']:
-            #         print "---- %s --> %s" % (tag['tag'], tag['weight'])
-            #
-            #     print "book: %s" % book['title']
-            #     for tag in book['tags']:
-            #         print "---- %s --> %s" % (tag['tag'], tag['weight'])
-            #
-            #     print "%s sim: %s" % (i, sim)
-
-            if sim > 20:
-                record = {
-                    'course_id': course_id,
-                    'book_id': book_id,
-                    'similarity': sim,
-                    'status': 0,
-                    'mtime': now,
+                sim = similarity(course['tags'], book['tags'])
+                if sim > 20:
+                    print "---- %s: course: %s -> %s" % (j, course['name'], sim)
+                    j += 1
+                    record = {
+                        'course_id': course_id,
+                        'book_id': book_id,
+                        'similarity': sim,
+                        'status': 0,
+                        'mtime': now
                     }
-                course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
-            else:
-                course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
+                    course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
+                else:
+                    course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
+        start += limit
+
 
 if __name__ == "__main__":
     main()
