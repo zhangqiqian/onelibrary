@@ -83,7 +83,7 @@ def main():
     user_book_collection = client[DB_NAME][USER_BOOK_COLLECTION]
 
     books = book_collection.find()
-    members = member_collection.find()
+    members = member_collection.find({'status': 1})
     for book in books:
         members.rewind()
         book_id = int(book['book_id'])

@@ -33,7 +33,7 @@ def db_client(db_config):
     return client
 
 
-def analyse_keywords(content, topn=10, withweight=True):
+def analyse_keywords(content, topn=5, withweight=True):
     """
     分析单个实例的关键词
     :return:
@@ -99,7 +99,7 @@ def main():
             for course in curricula['courses'].values():
                 course_id = course['course_id'] if course['course_id'] else md5(course['name']).hexdigest()[0:8]
                 if course_id not in courses.keys():
-                    tags = analyse_keywords(course['name'], 10, True)
+                    tags = analyse_keywords(course['name'], 5, True)
                     new_tags = []
                     for tag in tags:
                         new_tags.append({

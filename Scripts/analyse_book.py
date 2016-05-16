@@ -129,7 +129,7 @@ def command():
         sys.exit(1)
 
     if opt.topK is None:
-        topK = 10
+        topK = 5
     else:
         topK = int(opt.topK)
 
