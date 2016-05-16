@@ -275,7 +275,6 @@ class CrontabController extends Controller {
         //member research keywords
         $mMember = new MemberModel();
         $members = $mMember->get_members();
-        $tags = array();
         foreach ($members as $member) {
             if(isset($member['research'])){
                 foreach ($member['research'] as $research) {
