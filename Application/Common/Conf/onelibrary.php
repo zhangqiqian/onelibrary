@@ -42,6 +42,19 @@ return array(
         0 => '其他',
     ),
 
+    /* Message Category Mapping */
+    'COMMON_KEYWORDS' => array(
+        1 => '图书馆学',
+        2 => '图书馆',
+        3 => '情报学',
+        4 => '档案学',
+        5 => '信息管理',
+        6 => '信息系统',
+        7 => '信息技术',
+        8 => '计算机',
+        9 => '图书情报',
+    ),
+
     /* Location Type Mapping */
     'LOCATION_TYPE_MAPPING' => array(
         1 => '院系楼',

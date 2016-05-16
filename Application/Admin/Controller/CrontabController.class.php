@@ -260,40 +260,36 @@ class CrontabController extends Controller {
 
     public function analyze_preference(){
         $mPref = new PreferenceModel();
+
+        //common keywords
+        $cmn_keywords = C('COMMON_KEYWORDS');
+        foreach ($cmn_keywords as $cmn_keyword) {
+            $pref = $mPref->get_preference_by_keyword($cmn_keyword);
+            if(empty($pref)){
+                $start_time = time() - 5 * 365 * 24 * 3600;
+                $end_time = 0;
+                $mPref->add_keyword($cmn_keyword, 1, 0, $start_time, $end_time);
+            }
+        }
+
+        //member research keywords
         $mMember = new MemberModel();
         $members = $mMember->get_members();
         $tags = array();
         foreach ($members as $member) {
-            if(isset($member['tags'])){
-                foreach ($member['tags'] as $tag) {
-                    if(isset($tags[$tag['tag']])){
-                        $tags[$tag['tag']]['weight'] += $tag['weight'];
-                        $tags[$tag['tag']]['count'] += 1;
-                    }else{
-                        $tags[$tag['tag']] = array(
-                            'weight' => $tag['weight'],
-                            'count' => 1
-                        );
+            if(isset($member['research'])){
+                foreach ($member['research'] as $research) {
+                    $pref = $mPref->get_preference_by_keyword($research);
+                    if(empty($pref)){
+                        $start_time = time() - 5 * 365 * 24 * 3600;
+                        $end_time = 0;
+                        $mPref->add_keyword($research, 1, 1, $start_time, $end_time);
                     }
                 }
             }
         }
 
-        foreach ($tags as $key => $tag) {
-            $pref = $mPref->get_preference_by_keyword($key);
-            $weight = round($tag['weight']/$tag['count'], 3);
-            if($pref){
-                $params = array(
-                    'weight' => $weight,
-                );
-                $mPref->update_preference($pref['pref_id'], $params);
-            }else{
-                $start_time = time() - 5 * 365 * 24 * 3600;
-                $end_time = 0;
-                $mPref->add_keyword($key, $weight, 1, $start_time, $end_time);
-            }
-        }
-
+        //curricula keywords
         $mCurricula = new CurriculaModel();
         $curriculas = $mCurricula->get_all_curriculas();
         foreach ($curriculas as $curricula) {
