@@ -96,20 +96,22 @@ class IndexController extends ApiController {
         $mMessage = new MessageModel();
         $message = $mMessage->get_message_for_app($message_id);
 
-        $mPublish = new PublishModel();
-        $publish = $mPublish->get_publish($publish_id);
-        $mPublishLog = new PublishLogModel();
-        $log = array(
-            'uid' => isset($publish['user_uid']) ? $publish['user_uid'] : 0,
-            'publish_id' => $publish_id,
-            'message_id' => $message_id,
-            'location_id' => isset($publish['location_id']) ? $publish['location_id'] : 0,
-            'status' => 2
-        );
-        $mPublishLog->insert_publish_log($log);
+        if($publish_id > 0){
+            $mPublish = new PublishModel();
+            $publish = $mPublish->get_publish($publish_id);
+            $mPublishLog = new PublishLogModel();
+            $log = array(
+                'uid' => isset($publish['user_uid']) ? $publish['user_uid'] : 0,
+                'publish_id' => $publish_id,
+                'message_id' => $message_id,
+                'location_id' => isset($publish['location_id']) ? $publish['location_id'] : 0,
+                'status' => 2
+            );
+            $mPublishLog->insert_publish_log($log);
 
-        $params = array('status' => 2); //switch to opened status
-        $mPublish->update_publish($publish['publish_id'], $params);
+            $params = array('status' => 2); //switch to opened status
+            $mPublish->update_publish($publish['publish_id'], $params);
+        }
 
         $this->ajaxReturn(array('errno' => 0, 'result' => $message));
     }
