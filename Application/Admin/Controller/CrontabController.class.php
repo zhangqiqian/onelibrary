@@ -262,7 +262,7 @@ class CrontabController extends Controller {
         $mPref = new PreferenceModel();
 
         //common keywords
-        $cmn_keywords = C('COMMON_KEYWORDS');
+        /*$cmn_keywords = C('COMMON_KEYWORDS');
         foreach ($cmn_keywords as $cmn_keyword) {
             $pref = $mPref->get_preference_by_keyword($cmn_keyword);
             if(empty($pref)){
@@ -270,7 +270,7 @@ class CrontabController extends Controller {
                 $end_time = 0;
                 $mPref->add_keyword($cmn_keyword, 1, 0, $start_time, $end_time);
             }
-        }
+        }*/
 
         //member research keywords
         $mMember = new MemberModel();
@@ -286,10 +286,20 @@ class CrontabController extends Controller {
                     }
                 }
             }
+            if(isset($member['projects'])){
+                foreach ($member['projects'] as $project) {
+                    $pref = $mPref->get_preference_by_keyword($project);
+                    if(empty($pref)){
+                        $start_time = time() - 5 * 365 * 24 * 3600;
+                        $end_time = 0;
+                        $mPref->add_keyword($project, 1, 1, $start_time, $end_time);
+                    }
+                }
+            }
         }
 
         //curricula keywords
-        $mCurricula = new CurriculaModel();
+        /*$mCurricula = new CurriculaModel();
         $curriculas = $mCurricula->get_all_curriculas();
         foreach ($curriculas as $curricula) {
             foreach ($curricula['courses'] as $course) {
@@ -300,7 +310,7 @@ class CrontabController extends Controller {
                     $mPref->add_keyword($course['name'], 1, 2, $start_time, $end_time);
                 }
             }
-        }
+        }*/
     }
 
     public function push_book_message_by_course(){
