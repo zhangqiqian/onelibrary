@@ -218,7 +218,7 @@ def handle_papers(papers_content=''):
     if not papers_content:
         return papers
 
-    soup = BeautifulSoup(papers_content)
+    soup = BeautifulSoup(papers_content, "html")
     table_tr_list = soup.find('table', {'class': 'GridTableContent'}).find_all('tr', {'bgcolor': True})
     for table_tr in table_tr_list:
         # 获取论文的部分字段
@@ -234,6 +234,8 @@ def handle_papers(papers_content=''):
         paper_type = table_td_list[5].get_text().strip()
         quote_count = table_td_list[6].get_text().strip()
         download_count = table_td_list[7].get_text().strip()
+
+        # time.sleep(10)  # 每篇文章之间等待10s
 
         # 从内容中获取部分字段
         detail_resp = urllib2.urlopen(urllib2.Request(detail_url, headers=CNKI_COMMON_HEADERS))
@@ -267,7 +269,7 @@ def detail_paper(detail_content=''):
         return False
 
     detail_content = detail_content.replace('utf-16', 'utf-8')
-    soup = BeautifulSoup(detail_content)
+    soup = BeautifulSoup(detail_content, 'html')
 
     # Title
     title_span = soup.find('span', {'id': 'chTitle'})
@@ -342,21 +344,59 @@ def save_papers(papers):
     client = db_client(MONGODB)
     collection = client[DB_NAME][COLLECTION]
     for paper in papers:
-        old_paper = collection.find({'title': paper["title"], 'author': paper["author"]})
+        old_paper = collection.find_one({'title': paper["title"], 'author': paper["author"]})
         if old_paper:
             continue
         paper_id = get_next_sequence("paper_id", client)
         paper["paper_id"] = paper_id
-        print "%s: %s" % (paper_id, paper["title"])
         collection.save(paper)
 
 
-def main(keyword='', topK=50):
+def main(keyword, topK=50):
     """
-
+    从关键词表中获取要查询的关键词,并按照关键词的.
     :return:
     """
-    pass
+    client = db_client(MONGODB)
+    keyword_collection = client[DB_NAME][KEYWORDS_COLLECTION]
+
+    keywords = {}
+    if keyword:
+        old_keyword = keyword_collection.find_one({'keyword': keyword})
+        if old_keyword:
+            keywords[old_keyword['pref_id']] = {
+                'pref_id': old_keyword['pref_id'],
+                'keyword': old_keyword['keyword'],
+                'weight': old_keyword['weight'],
+                'start_time': old_keyword['start_time'],
+                'end_time': old_keyword['end_time'],
+            }
+        else:
+            keywords[0] = {
+                'pref_id': 0,
+                'keyword': keyword,
+                'weight': 0,
+                'start_time': int(time.time()) - 5 * 365 * 24 * 3600,
+                'end_time': int(time.time()),
+            }
+    else:
+        keyword_records = keyword_collection.find()
+        for keyword_record in keyword_records:
+            if not keyword_record['end_time']:
+                keyword_record['end_time'] = int(time.time())
+            keywords[keyword_record['pref_id']] = {
+                'pref_id': keyword_record['pref_id'],
+                'keyword': keyword_record['keyword'],
+                'weight': keyword_record['weight'],
+                'start_time': keyword_record['start_time'],
+                'end_time': keyword_record['end_time'],
+            }
+
+    for new_keyword in keywords.values():
+        fetch_papers(new_keyword['keyword'].encode("utf-8"), new_keyword['start_time'], new_keyword['end_time'], topK)
+        if new_keyword['pref_id']:
+            keyword_collection.update({'pref_id': new_keyword['pref_id']}, {"$set": {'end_time': int(time.time())}})
+        break
 
 
 def command():
@@ -365,7 +405,7 @@ def command():
     parser.add_option("-k", dest="topK")
     opt, args = parser.parse_args()
 
-    if len(args) < 1:
+    if len(args) > 0:
         print(USAGE)
         sys.exit(1)
 
@@ -377,8 +417,4 @@ def command():
     main(opt.keyword, topK)
 
 if __name__ == "__main__":
-    # command()
-    # fetch_papers('图书馆')
-    # print get_cookie()
-    # detail_paper()
-    main()
+    command()
