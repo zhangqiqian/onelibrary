@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from optparse import OptionParser
 import urllib2
 import urllib
+import random
 
 
 USAGE = "Usage: python cnki_spider.py"
@@ -235,7 +236,8 @@ def handle_papers(papers_content=''):
         quote_count = table_td_list[6].get_text().strip()
         download_count = table_td_list[7].get_text().strip()
 
-        # time.sleep(10)  # 每篇文章之间等待10s
+        # seconds = random.randrange(10, 30)
+        # time.sleep(seconds)  # 每篇文章之间等待10~30s
 
         # 从内容中获取部分字段
         detail_resp = urllib2.urlopen(urllib2.Request(detail_url, headers=CNKI_COMMON_HEADERS))
