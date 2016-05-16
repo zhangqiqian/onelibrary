@@ -288,8 +288,8 @@ class CrontabController extends Controller {
                 );
                 $mPref->update_preference($pref['pref_id'], $params);
             }else{
-                $start_time = time();
-                $end_time = $start_time + 30 * 24 * 3600;
+                $start_time = time() - 5 * 365 * 24 * 3600;
+                $end_time = 0;
                 $mPref->add_keyword($key, $weight, 1, $start_time, $end_time);
             }
         }
@@ -300,8 +300,8 @@ class CrontabController extends Controller {
             foreach ($curricula['courses'] as $course) {
                 $pref = $mPref->get_preference_by_keyword($course['name']);
                 if(empty($pref)){
-                    $start_time = time();
-                    $end_time = $start_time + 30 * 24 * 3600;
+                    $start_time = time() - 5 * 365 * 24 * 3600;
+                    $end_time = 0;
                     $mPref->add_keyword($course['name'], 1, 2, $start_time, $end_time);
                 }
             }
