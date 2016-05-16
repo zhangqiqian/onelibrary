@@ -109,39 +109,40 @@ def main():
                     courses[course_id] = {
                         'course_id': course_id,
                         'name': course['name'],
-                        'tags': new_tags
+                        'tags': new_tags,
+                        'mtime': curricula['mtime']
                     }
 
     start = 0
     limit = 1000
     count = book_collection.count()
-    i = 1
-    j = 1
+    # i = 1
+    # j = 1
+    now = int(time.time())
     while start < count:
         books = book_collection.find().sort("book_id").skip(start).limit(limit)
         for book in books:
             book_id = int(book['book_id'])
-            print "*"*80
-            print "%s: book %s -> %s" % (i, book_id, book["title"])
-            i += 1
+            # print "*"*80
+            # print "%s: book %s -> %s" % (i, book_id, book["title"])
+            # i += 1
             for course in courses.values():
-                now = int(time.time())
                 course_id = course['course_id']
-
-                sim = similarity(course['tags'], book['tags'])
-                if sim > 20:
-                    print "---- %s: course: %s -> %s" % (j, course['name'], sim)
-                    j += 1
-                    record = {
-                        'course_id': course_id,
-                        'book_id': book_id,
-                        'similarity': sim,
-                        'status': 0,
-                        'mtime': now
-                    }
-                    course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
-                else:
-                    course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
+                if now - course['mtime'] <= 24 * 3600:
+                    sim = similarity(course['tags'], book['tags'])
+                    if sim > 20:
+                        # print "---- %s: course: %s -> %s" % (j, course['name'], sim)
+                        # j += 1
+                        record = {
+                            'course_id': course_id,
+                            'book_id': book_id,
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now
+                        }
+                        course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
+                    else:
+                        course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
         start += limit
 
 
