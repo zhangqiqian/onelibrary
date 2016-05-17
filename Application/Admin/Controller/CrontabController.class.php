@@ -353,16 +353,14 @@ class CrontabController extends Controller {
             $location = $mLocation->get_location($course['location_id']);
             $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
             $content = "提醒: 今天是".date('Y年m月d日', $today)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'])." 在 ".$location['name']." 开始。\n\n";
-            if(!empty($course_books)){
-                $content = $content."猜你喜欢下面的图书: \n";
-            }
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
-                $content = $content.".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
+                $book_content = "猜你喜欢下面的图书: \n";
+                $book_content = $book_content."《".$book['title']."》: ".$book['summary']."\n    —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
 
                 $message = array(
                     'title' => $book['title'],
-                    'content' => $content,
+                    'content' => $content.$book_content,
                     'author' => array($book['author']),
                     'category' => 7,//课程
                     'link' => 'http://www.onelibrary.cn',
@@ -395,7 +393,7 @@ class CrontabController extends Controller {
                             'expire_time' => $course['end_time'],
                             'message_id' => $message_id,
                             'status' => 0, //0:send
-                            'priority' => 3,
+                            'priority' => $priority,
                             'similarity' => $course_book['similarity']
                         );
                         $mPublish = new PublishModel();
