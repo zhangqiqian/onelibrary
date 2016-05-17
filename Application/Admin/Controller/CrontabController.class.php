@@ -353,60 +353,60 @@ class CrontabController extends Controller {
             $location = $mLocation->get_location($course['location_id']);
             $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
             $content = "提醒: 今天是".date('Y年m月d日', $today)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'])." 在 ".$location['name']." 开始。\n\n";
+            if(!empty($course_books)){
+                $content = $content."猜你喜欢下面的图书: \n";
+            }
+            $i = 0;
+            $total_sim = 0;
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
-                $book_content = "猜你喜欢下面的图书: \n";
-                $book_content = $book_content."《".$book['title']."》: ".$book['summary']."\n    —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
+                $content = $content.($i+1).".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
+                $total_sim += $course_book['similarity'];
+                $i += 1;
+            }
+            $avg_sim = $i > 0 ? round($total_sim/$i, 1) : 20;
 
-                $message = array(
-                    'title' => $book['title'],
-                    'content' => $content.$book_content,
-                    'author' => array($book['author']),
-                    'category' => 7,//课程
-                    'link' => 'http://www.onelibrary.cn',
-                    'pubdate' => time(),
-                    'status' => 0,  //0, no handle; 1, handled.
-                    'level' => 0,  //0, no level; 1...9
-                    'tags' => array('课程提醒', $course['name']),
-                    'tag_weight' => array(),
-                    'desc' => '',
-                );
-                //插入到message中
-                $mMessage = new MessageModel();
-                $message_id = $mMessage->insert_message($message);
+            $message = array(
+                'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $today).")",
+                'content' => $content,
+                'author' => array("Onelibrary"),
+                'category' => 7,//课程
+                'link' => 'http://www.onelibrary.cn',
+                'pubdate' => time(),
+                'status' => 0,  //0, no handle; 1, handled.
+                'level' => 0,  //0, no level; 1...9
+                'tags' => array('课程提醒', $course['name']),
+                'tag_weight' => array(),
+                'desc' => '',
+            );
+            //插入到message中
+            $mMessage = new MessageModel();
+            $message_id = $mMessage->insert_message($message);
 
-                if($course_book['similarity'] > 60){
-                    $priority = 3;
-                }elseif($course_book['similarity'] > 40){
-                    $priority = 2;
-                }else{
-                    $priority = 1;
-                }
-                //找到与此相关的用户
-                foreach ($users as $user) {
-                    //发布新的信息
-                    if($message_id > 0){
-                        $publish_message = array(
-                            'user_uid' => $user['uid'],
-                            'location_id' => $course['location_id'],
-                            'publish_time' => $course['start_time'] - 3600,
-                            'expire_time' => $course['end_time'],
-                            'message_id' => $message_id,
-                            'status' => 0, //0:send
-                            'priority' => $priority,
-                            'similarity' => $course_book['similarity']
-                        );
-                        $mPublish = new PublishModel();
-                        $publish_id = $mPublish->insert_publish($publish_message);
-                    }
-
-                    //更新user book的状态为1
-                    $data = array(
-                        'status' => 1
+            //找到与此相关的用户
+            foreach ($users as $user) {
+                //发布新的信息
+                if($message_id > 0){
+                    $publish_message = array(
+                        'user_uid' => $user['uid'],
+                        'location_id' => $course['location_id'],
+                        'publish_time' => $course['start_time'] - 3600,
+                        'expire_time' => $course['end_time'],
+                        'message_id' => $message_id,
+                        'status' => 0, //0:send
+                        'priority' => 3,
+                        'similarity' => $avg_sim
                     );
-                    foreach ($course_books as $course_book) {
-                        $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
-                    }
+                    $mPublish = new PublishModel();
+                    $publish_id = $mPublish->insert_publish($publish_message);
+                }
+
+                //更新user book的状态为1
+                $data = array(
+                    'status' => 1
+                );
+                foreach ($course_books as $course_book) {
+                    $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
                 }
             }
         }
