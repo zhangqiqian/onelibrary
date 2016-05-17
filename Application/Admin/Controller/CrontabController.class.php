@@ -140,7 +140,7 @@ class CrontabController extends Controller {
         $mMessage = new MessageModel();
 
         $end_time = time();
-        $start_time = $end_time - 24 * 3600;
+        $start_time = $end_time - 7 * 24 * 3600;
         
         $mMember = new MemberModel();
         $users = $mMember->get_members();
@@ -358,13 +358,29 @@ class CrontabController extends Controller {
             }
             $i = 0;
             $total_sim = 0;
+            $tags = array();
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
                 $content = $content.($i+1).".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
                 $total_sim += $course_book['similarity'];
+                if(isset($book['tags'])){
+                    foreach ($book['tags'] as $book_tag) {
+                        $tags[$book_tag['tag']] = $book_tag['weight'];
+                    }
+                }
                 $i += 1;
             }
             $avg_sim = $i > 0 ? round($total_sim/$i, 1) : 20;
+
+            arsort($tags);
+            $slice_tags = array_slice($tags, 0, 5);
+            $new_tags = array();
+            foreach ($slice_tags as $key => $weight) {
+                $new_tags[] = array(
+                    'tag' => $key,
+                    'weight' => $weight,
+                );
+            }
 
             $message = array(
                 'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $today).")",
@@ -376,7 +392,7 @@ class CrontabController extends Controller {
                 'status' => 0,  //0, no handle; 1, handled.
                 'level' => 0,  //0, no level; 1...9
                 'tags' => array('课程提醒', $course['name']),
-                'tag_weight' => array(),
+                'tag_weight' => $new_tags,
                 'desc' => '',
             );
             //插入到message中
