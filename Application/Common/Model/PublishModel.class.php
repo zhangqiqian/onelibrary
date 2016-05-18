@@ -27,7 +27,7 @@ class PublishModel extends MongoModel{
         array('publish_time', NOW_TIME, self::MODEL_INSERT),
         array('expire_time', 0, self::MODEL_INSERT),
         array('message_id', 0, self::MODEL_INSERT),
-        array('status', 0, self::MODEL_INSERT), //0:send; 1:receive 2:read
+        array('status', 0, self::MODEL_INSERT), //0:pushed; 1:received 2:opened 3:invalid
         array('priority', 0, self::MODEL_INSERT), //order by priority
         array('similarity', 0, self::MODEL_INSERT), //0-100
         array('mtime', NOW_TIME, self::MODEL_BOTH),
@@ -41,7 +41,7 @@ class PublishModel extends MongoModel{
      * @return array
      */
     public function get_publish_list($start = 0, $limit = 20){
-        $publishes = $this->order('publish_id desc')->limit($start.','.$limit)->select();
+        $publishes = $this->order('publish_time desc')->limit($start.','.$limit)->select();
         $count = $this->count();
 
         if(!$publishes){
