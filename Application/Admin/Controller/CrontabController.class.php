@@ -453,7 +453,7 @@ class CrontabController extends Controller {
         }
         $mPublish = new PublishModel();
         $mMessage = new MessageModel();
-        $push_messages = $mPublish->get_publishes_by_status(0);
+        $push_messages = $mPublish->get_publishes_by_status(0, 20);
         foreach ($push_messages as $push_message) {
             unset($push_message['_id']);
             $message = $mMessage->get_message($push_message['message_id']);
