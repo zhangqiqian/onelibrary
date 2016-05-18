@@ -76,7 +76,7 @@ class CrontabController extends Controller {
                         'user_uid' => $user['uid'],
                         'location_id' => $location_id,
                         'publish_time' => time(),
-                        'expire_time' => time() + 30 * 24 * 3600,
+                        'expire_time' => time() + 2 * 24 * 3600,
                         'message_id' => $message_id,
                         'status' => 0, //0:send
                         'priority' => $priority,
@@ -103,6 +103,9 @@ class CrontabController extends Controller {
         if($user_location){
             $locations = array();
             foreach ($user_location['locations'] as $key => $location) {
+                if($location['type'] == 5){
+                    continue;
+                }
                 $square_sum = 0;
                 foreach ($location['tags'] as $location_tag) {
                     foreach ($message_tags as $message_tag) {
@@ -112,18 +115,21 @@ class CrontabController extends Controller {
                         }
                     }
                 }
-                $locations[$key] = sqrt($square_sum);
+                $locations[$key] = array(
+                    'value' => sqrt($square_sum),
+                    'count' => $location['count'],
+                );
             }
 
-            $max = 0;
-            $id = 0;
+            $value_max = 0;
+            $value_id = 0;
             foreach ($locations as $key => $val) {
-                if($val > $max){
-                    $max = $val;
-                    $id = $key;
+                if($val['value'] > $value_max){
+                    $value_max = $val['value'];
+                    $value_id = $key;
                 }
             }
-            $location_id = $id;
+            $location_id = $value_id;
         }
         
         return $location_id;
@@ -205,7 +211,7 @@ class CrontabController extends Controller {
                         'weight' => $weight,
                     );
                 }
-                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 10);
+                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 50);
             }
             $user_location['locations'] = $locations;
             $mUserLocation->update_user_location($user['uid'], $user_location);

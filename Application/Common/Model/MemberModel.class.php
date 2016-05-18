@@ -134,7 +134,7 @@ class MemberModel extends MongoModel{
             'uid' => array('$ne' => 1),
             'status' => 1,
         );
-        $members = $this->where($map)->select();
+        $members = $this->where($map)->order("uid")->select();
         if(!$members){
             $members = array();
         }
