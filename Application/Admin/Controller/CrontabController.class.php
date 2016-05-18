@@ -358,10 +358,22 @@ class CrontabController extends Controller {
             }
             $i = 0;
             $total_sim = 0;
-            $tags = array();
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
-                $content = $content.($i+1).".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
+                
+                $book_arr = array();
+                if(!empty(trim($book['author']))){
+                    $book_arr[] = $book['author'];
+                }
+                if(!empty(trim($book['publisher']))){
+                    $book_arr[] = $book['publisher'];
+                }
+                if(!empty(trim($book['pubdate']))){
+                    $book_arr[] = $book['pubdate'];
+                }
+                $book_info = implode(', ', $book_arr);
+
+                $content = $content.($i+1).".《".$book['title']."》: ".$book['summary']." \n   —— ".$book_info."\n";
                 $total_sim += $course_book['similarity'];
                 $i += 1;
             }
@@ -401,7 +413,6 @@ class CrontabController extends Controller {
                     $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
                 }
-                break;
             }
 
             //更新user book的状态为1
@@ -411,7 +422,6 @@ class CrontabController extends Controller {
             foreach ($course_books as $course_book) {
                 $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
             }
-            break;
         }
     }
 
