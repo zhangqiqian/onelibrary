@@ -321,7 +321,7 @@ class CrontabController extends Controller {
         $mLocation = new LocationModel();
 
         $now = time();
-        $today = intval($now / 86400) * 86400;
+        $today_timestamp = intval($now / 86400) * 86400;
         $week = intval(date('w', $now));
         $week_names = array("日", "一", "二", "三", "四", "五", "六");
         if($week > 5){
@@ -337,8 +337,8 @@ class CrontabController extends Controller {
                     $courses[$course_key] = array(
                         'name' => $course['name'],
                         'course_id' => $course['course_id'],
-                        'start_time' => $today + $course['start_time'] - 8*3600,
-                        'end_time' => $today + $course['end_time'] - 8*3600,
+                        'start_time' => $today_timestamp + $course['start_time'] - 8*3600,
+                        'end_time' => $today_timestamp + $course['end_time'] - 8*3600,
                         'location_id' => $course['classroom'],
                         'curricula_id' => $curricula['curricula_id']
                     );
@@ -352,7 +352,7 @@ class CrontabController extends Controller {
             if(empty($users)) continue;
             $location = $mLocation->get_location($course['location_id']);
             $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
-            $content = "提醒: 今天是".date('Y年m月d日', $today)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'])." 在 ".$location['name']." 开始。\n\n";
+            $content = "提醒: 今天是".date('Y年m月d日', $now)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'])." 在 ".$location['name']." 开始。\n\n";
             if(!empty($course_books)){
                 $content = $content."猜你喜欢下面的图书: \n";
             }
@@ -383,7 +383,7 @@ class CrontabController extends Controller {
             }
 
             $message = array(
-                'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $today).")",
+                'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $now).")",
                 'content' => $content,
                 'author' => array("Onelibrary"),
                 'category' => 7,//课程
@@ -416,15 +416,17 @@ class CrontabController extends Controller {
                     $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
                 }
-
-                //更新user book的状态为1
-                $data = array(
-                    'status' => 1
-                );
-                foreach ($course_books as $course_book) {
-                    $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
-                }
+                break;
             }
+
+            //更新user book的状态为1
+            $data = array(
+                'status' => 1
+            );
+            foreach ($course_books as $course_book) {
+                $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
+            }
+            break;
         }
     }
 
