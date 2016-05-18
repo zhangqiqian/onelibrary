@@ -443,4 +443,34 @@ class CrontabController extends Controller {
             }
         }
     }
+
+
+    public function repulish_messages(){
+        $now = date("H", time());
+        $hour = intval($now);
+        if($hour > 22 || $hour < 6){
+            return ;
+        }
+        $mPublish = new PublishModel();
+        $mMessage = new MessageModel();
+        $push_messages = $mPublish->get_publishes_by_status(0);
+        foreach ($push_messages as $push_message) {
+            unset($push_message['_id']);
+            unset($push_message['publish_id']);
+            $message = $mMessage->get_message($push_message['message_id']);
+            if($message){
+                if($message['category'] == 7){
+                    continue;
+                }
+                if(!isset($message['tag_weight'])){
+                    $message['tag_weight'] = array();
+                }
+                $location_id = $this->get_user_location($push_message['user_uid'], $message['tag_weight']);
+                $push_message['location_id'] = $location_id;
+                $push_message['publish_time'] = time();
+                $push_message['expire_time'] = time() + 2 * 24 * 3600;
+                $mPublish->update_publish($push_message['publish_id'], $push_message);
+            }
+        }
+    }
 }

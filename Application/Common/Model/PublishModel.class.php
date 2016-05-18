@@ -102,8 +102,8 @@ class PublishModel extends MongoModel{
         $params = array(
             'user_uid' => $uid, //who
             'location_id' => $location_id, //where
-            'publish_time' => array('$lte', time()), //when
-            'expire_time' => array('$gte', time()), //when
+            'publish_time' => array('lte', time()), //when
+            'expire_time' => array('gte', time()), //when
             'status' => 0, //no read
         );
         $publishes = $this->where($params)->order('mtime desc')->select();
@@ -114,6 +114,29 @@ class PublishModel extends MongoModel{
             $ret[] = $message;
         }
         return $ret;
+    }
+
+    /**
+     * 获取所有publish by status
+     * @param int $status
+     * @param  int $limit
+     * @return array
+     */
+    public function get_publishes_by_status($status = 0, $limit = 0){
+        $params = array(
+            'expire_time' => array('lt', time()), //when
+            'status' => $status, //no read
+        );
+
+        if($limit > 0){
+            $publishes = $this->where($params)->order('publish_time')->limit($limit)->select();
+        }else{
+            $publishes = $this->where($params)->order('publish_time')->select();
+        }
+        if(!$publishes){
+            $publishes = array();
+        }
+        return $publishes;
     }
 
     /**
