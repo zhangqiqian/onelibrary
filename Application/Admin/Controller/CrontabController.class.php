@@ -429,7 +429,6 @@ class CrontabController extends Controller {
             foreach ($course_books as $course_book) {
                 $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
             }
-            break;
         }
     }
 
