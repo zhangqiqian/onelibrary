@@ -326,8 +326,9 @@ class CrontabController extends Controller {
         $mBook = new BookModel();
         $mLocation = new LocationModel();
 
-        $now = time();
-        $today_timestamp = intval($now / 86400) * 86400;
+        $now = strtotime("2016-05-19 06:20:00");//time();
+        $now_time = date('Y-m-d', $now);
+        $today_timestamp = strtotime($now_time." UTC");
         $week = intval(date('w', $now));
         $week_names = array("日", "一", "二", "三", "四", "五", "六");
         if($week > 5){
@@ -428,6 +429,7 @@ class CrontabController extends Controller {
             foreach ($course_books as $course_book) {
                 $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
             }
+            break;
         }
     }
 
