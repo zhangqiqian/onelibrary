@@ -21,6 +21,8 @@ DB_NAME = "onelibrary"
 CURRICULA_COLLECTION = "t_curricula"
 BOOK_COLLECTION = "t_book"
 COURSE_BOOK_COLLECTION = "t_course_book"
+PAPER_COLLECTION = "t_paper"
+COURSE_PAPER_COLLECTION = "t_course_paper"
 
 
 def db_client(db_config):
@@ -82,36 +84,13 @@ def similarity(tags, book_tags):
     return sim
 
 
-def main():
+def course_book_similarity(client, courses):
     """
-    获取所有数据
+    计算课程与图书的相似性
     :return:
     """
-    client = db_client(MONGODB)
-    currcula_collection = client[DB_NAME][CURRICULA_COLLECTION]
     book_collection = client[DB_NAME][BOOK_COLLECTION]
     course_book_collection = client[DB_NAME][COURSE_BOOK_COLLECTION]
-
-    curriculas = currcula_collection.find()
-    courses = {}
-    for curricula in curriculas:
-        if curricula['courses']:
-            for course in curricula['courses'].values():
-                course_id = course['course_id'] if course['course_id'] else md5(course['name']).hexdigest()[0:8]
-                if course_id not in courses.keys():
-                    tags = analyse_keywords(course['name'], 5, True)
-                    new_tags = []
-                    for tag in tags:
-                        new_tags.append({
-                            'tag': tag[0],
-                            'weight': tag[1]
-                        })
-                    courses[course_id] = {
-                        'course_id': course_id,
-                        'name': course['name'],
-                        'tags': new_tags,
-                        'mtime': curricula['mtime']
-                    }
 
     start = 0
     limit = 1000
@@ -140,10 +119,85 @@ def main():
                             'status': 0,
                             'mtime': now
                         }
-                        course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
+                        course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record,
+                                                               True)
                     else:
                         course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
         start += limit
+
+
+def course_paper_similarity(client, courses):
+    """
+    计算课程与论文的相似性
+    :return:
+    """
+    paper_collection = client[DB_NAME][PAPER_COLLECTION]
+    course_paper_collection = client[DB_NAME][COURSE_PAPER_COLLECTION]
+
+    start = 0
+    limit = 1000
+    count = paper_collection.count()
+    i = 1
+    j = 1
+    now = int(time.time())
+    while start < count:
+        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
+        for paper in papers:
+            paper_id = int(paper['paper_id'])
+            print "*"*80
+            print "%s: book %s -> %s" % (i, paper_id, paper["title"])
+            i += 1
+            for course in courses.values():
+                course_id = course['course_id']
+                if (now - paper['ctime']) <= 24 * 3600 or (now - course['mtime']) <= 24 * 3600:
+                    sim = similarity(course['tags'], paper['tags'])
+                    if sim > 0:
+                        print "---- %s: course: %s -> %s" % (j, course['name'], sim)
+                        j += 1
+                        record = {
+                            'course_id': course_id,
+                            'paper_id': paper_id,
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now
+                        }
+                        course_paper_collection.find_and_modify({'course_id': course_id, 'paper_id': paper_id}, record, True)
+                    else:
+                        course_paper_collection.delete_many({'course_id': course_id, 'paper_id': paper_id})
+        start += limit
+
+
+def main():
+    """
+    获取所有数据
+    :return:
+    """
+    client = db_client(MONGODB)
+    currcula_collection = client[DB_NAME][CURRICULA_COLLECTION]
+
+    curriculas = currcula_collection.find()
+    courses = {}
+    for curricula in curriculas:
+        if curricula['courses']:
+            for course in curricula['courses'].values():
+                course_id = course['course_id'] if course['course_id'] else md5(course['name']).hexdigest()[0:8]
+                if course_id not in courses.keys():
+                    tags = analyse_keywords(course['name'], 5, True)
+                    new_tags = []
+                    for tag in tags:
+                        new_tags.append({
+                            'tag': tag[0],
+                            'weight': tag[1]
+                        })
+                    courses[course_id] = {
+                        'course_id': course_id,
+                        'name': course['name'],
+                        'tags': new_tags,
+                        'mtime': curricula['mtime']
+                    }
+
+    course_book_similarity(client, courses)
+    course_paper_similarity(client, courses)
 
 
 if __name__ == "__main__":

@@ -19,6 +19,8 @@ DB_NAME = "onelibrary"
 MEMBER_COLLECTION = "t_member"
 BOOK_COLLECTION = "t_book"
 USER_BOOK_COLLECTION = "t_user_book"
+PAPER_COLLECTION = "t_paper"
+USER_PAPER_COLLECTION = "t_user_paper"
 
 
 def db_client(db_config):
@@ -68,8 +70,80 @@ def similarity(user_tags, book_tags):
                 cmn_tag_weight += book_tag['weight']
             total_weight += book_tag['weight']
         sim = round(cmn_tag_weight / total_weight * 100, 1)
-
     return sim
+
+
+def user_book_similarity(client, new_members):
+    """
+    计算用户与图书的相似性
+    :return:
+    """
+    book_collection = client[DB_NAME][BOOK_COLLECTION]
+    user_book_collection = client[DB_NAME][USER_BOOK_COLLECTION]
+
+    start = 0
+    limit = 1000
+    count = book_collection.count()
+    now = int(time.time())
+    while start < count:
+        books = book_collection.find().sort("book_id").skip(start).limit(limit)
+        for book in books:
+            book_id = int(book['book_id'])
+            for new_member in new_members:
+                if now - new_member['mtime'] <= 3600:
+                    uid = int(new_member['uid'])
+                    if uid == 1:
+                        continue
+                    sim = similarity(new_member['tags'], book['tags'])
+                    if sim > 10:
+                        record = {
+                            'uid': uid,
+                            'book_id': book_id,
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now,
+                        }
+                        user_book_collection.find_and_modify({'uid': uid, 'book_id': book_id}, record, True)
+                    else:
+                        user_book_collection.delete_many({'uid': uid, 'book_id': book_id})
+        start += limit
+
+
+def user_paper_similarity(client, new_members):
+    """
+    计算用户与论文的相似性
+    :return:
+    """
+    paper_collection = client[DB_NAME][PAPER_COLLECTION]
+    user_paper_collection = client[DB_NAME][USER_PAPER_COLLECTION]
+
+    start = 0
+    limit = 1000
+    count = paper_collection.count()
+    now = int(time.time())
+    while start < count:
+        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
+        for paper in papers:
+            paper_id = int(paper['paper_id'])
+            for new_member in new_members:
+                uid = int(new_member['uid'])
+                if uid == 1:
+                    continue
+                # get old user paper record and compare similarity
+                if (now - paper['ctime']) <= 24 * 3600 or (now - new_member['mtime']) <= 3600:
+                    sim = similarity(new_member['tags'], paper['tags'])
+                    if sim > 0:
+                        record = {
+                            'uid': uid,
+                            'paper_id': paper_id,
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now
+                        }
+                        user_paper_collection.find_and_modify({'uid': uid, 'paper_id': paper_id}, record, True)
+                    else:
+                        user_paper_collection.delete_many({'uid': uid, 'paper_id': paper_id})
+        start += limit
 
 
 def main():
@@ -79,8 +153,6 @@ def main():
     """
     client = db_client(MONGODB)
     member_collection = client[DB_NAME][MEMBER_COLLECTION]
-    book_collection = client[DB_NAME][BOOK_COLLECTION]
-    user_book_collection = client[DB_NAME][USER_BOOK_COLLECTION]
 
     members = member_collection.find({'status': 1})
     new_members = []
@@ -91,46 +163,9 @@ def main():
             'tags': member['tags'],
             'nickname': member['nickname'],
         })
+    user_book_similarity(client, new_members)
+    user_paper_similarity(client, new_members)
 
-    start = 0
-    limit = 1000
-    count = book_collection.count()
-    # i = 1
-    # j = 1
-    now = int(time.time())
-    while start < count:
-        books = book_collection.find().sort("book_id").skip(start).limit(limit)
-        for book in books:
-            members.rewind()
-            book_id = int(book['book_id'])
-            # print "*" * 80
-            # print "%s: book %s -> %s" % (i, book_id, book["title"])
-            # i += 1
-            for new_member in new_members:
-                if now - new_member['mtime'] <= 24 * 3600:
-                    uid = int(new_member['uid'])
-                    if uid == 1:
-                        continue
-                    # get old user book record and compare similarity
-                    user_book = user_book_collection.find_one({'uid': uid, 'book_id': book_id})
-
-                    sim = similarity(new_member['tags'], book['tags'])
-                    if sim > 10:
-                        if user_book and sim <= user_book['similarity']:
-                            continue
-                        # print "---- %s: member: %s(%s) -> %s" % (j, uid, new_member["nickname"], sim)
-                        # j += 1
-                        record = {
-                            'uid': uid,
-                            'book_id': book_id,
-                            'similarity': sim,
-                            'status': 0,
-                            'mtime': now,
-                            }
-                        user_book_collection.find_and_modify({'uid': uid, 'book_id': book_id}, record, True)
-                    else:
-                        user_book_collection.delete_many({'uid': uid, 'book_id': book_id})
-        start += limit
 
 if __name__ == "__main__":
     main()
