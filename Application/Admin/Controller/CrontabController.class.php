@@ -14,11 +14,13 @@ use Common\Model\CurriculaModel;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
+use Common\Model\PaperModel;
 use Common\Model\PreferenceModel;
 use Common\Model\PublishModel;
 use Common\Model\UserBookModel;
 use Common\Model\UserLocationLogModel;
 use Common\Model\UserLocationModel;
+use Common\Model\UserPaperModel;
 use Think\Controller;
 
 class CrontabController extends Controller {
@@ -489,6 +491,77 @@ class CrontabController extends Controller {
                 );
                 echo json_encode($push_message)."\n";
                 $mPublish->update_publish($push_message['publish_id'], $new_push_message);
+            }
+        }
+    }
+
+    public function publish_paper_message(){
+        $mUser = new MemberModel();
+        $mUserPaper = new UserPaperModel();
+        $mPaper = new PaperModel();
+
+        $now = date("H", time());
+        $hour = intval($now);
+        if($hour > 22 || $hour < 6){
+            return ;
+        }
+        //获取所有的用户
+        $users = $mUser->get_members();
+        foreach ($users as $user) {
+            if($user['grade'] == 1){
+                continue;
+            }
+            //查找新的user paper
+            $user_papers = $mUserPaper->get_user_papers($user['uid'], 0, 1);
+            //插入新的paper信息
+            foreach ($user_papers as $user_paper) {
+                $paper = $mPaper->get_paper($user_paper['paper_id']);
+                $message = array(
+                    'title' => $paper['title'],
+                    'content' => $paper['summary']."\n\n——《".$paper['title']."》,".$paper['author'].", ".$paper['journal'].", ".$paper['period'],
+                    'author' => array($paper['author']),
+                    'category' => 2,//期刊论文
+                    'link' => $paper['link'],
+                    'pubdate' => $paper['pubdate'],
+                    'status' => 0,  //0, no handle; 1, handled.
+                    'level' => 0,  //0, no level; 1...9
+                    'tags' => $paper['keywords'],
+                    'tag_weight' => $paper['tags'],
+                    'desc' => '',
+                );
+                //插入到message中
+                $mMessage = new MessageModel();
+                $message_id = $mMessage->insert_message($message);
+
+                $location_id = $this->get_user_location($user['uid'], $paper['tags']);
+                //发布新的信息
+                if($message_id > 0){
+                    if($user_paper['similarity'] > 60){
+                        $priority = 3;
+                    }elseif($user_paper['similarity'] > 30){
+                        $priority = 2;
+                    }else{
+                        $priority = 1;
+                    }
+                    $publish_message = array(
+                        'user_uid' => $user['uid'],
+                        'location_id' => $location_id,
+                        'publish_time' => time(),
+                        'expire_time' => time() + 7 * 24 * 3600,
+                        'message_id' => $message_id,
+                        'status' => 0, //0:send
+                        'priority' => $priority,
+                        'similarity' => $user_paper['similarity']
+                    );
+                    $mPublish = new PublishModel();
+                    $publish_id = $mPublish->insert_publish($publish_message);
+                }
+
+                //更新user paper的状态为1
+                $data = array(
+                    'status' => 1
+                );
+                $mUserPaper->update_user_paper($user['uid'], $paper['paper_id'], $data);
             }
         }
     }
