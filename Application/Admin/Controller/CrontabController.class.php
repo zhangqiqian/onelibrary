@@ -516,6 +516,9 @@ class CrontabController extends Controller {
             //插入新的paper信息
             foreach ($user_papers as $user_paper) {
                 $paper = $mPaper->get_paper($user_paper['paper_id']);
+                if(empty($paper)){
+                    continue;
+                }
                 $message = array(
                     'title' => $paper['title'],
                     'content' => $paper['summary']."\n\n——《".$paper['title']."》,".$paper['author'].", ".$paper['journal'].", ".$paper['period'],
