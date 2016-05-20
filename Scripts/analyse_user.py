@@ -62,7 +62,6 @@ def main(topn=10, withweight=True):
     now = int(time.time())
     for member in members:
         if 'tags' not in member.keys() or (now - member['mtime']) <= 3600:
-            print "%s" % member['nickname']
             major = MAJOR_LIST[member['major']] if member['major'] > 0 else ''
             interests = member['interests'] if 'interests' in member.keys() else []
             research = member['research'] if 'research' in member.keys() else []

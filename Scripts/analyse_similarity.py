@@ -128,7 +128,7 @@ def user_paper_similarity(client, new_members):
                 # get old user paper record and compare similarity
                 if (now - paper['ctime']) <= 24 * 3600 or (now - new_member['mtime']) <= 3600:
                     sim = similarity(new_member['tags'], paper['tags'])
-                    if sim > 0:
+                    if sim > 10:
                         record = {
                             'uid': uid,
                             'paper_id': paper_id,
