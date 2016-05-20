@@ -326,7 +326,7 @@ class CrontabController extends Controller {
         $mBook = new BookModel();
         $mLocation = new LocationModel();
 
-        $now = strtotime("2016-05-19 06:20:00");//time();
+        $now = time();
         $now_time = date('Y-m-d', $now);
         $today_timestamp = strtotime($now_time." UTC");
         $week = intval(date('w', $now));
