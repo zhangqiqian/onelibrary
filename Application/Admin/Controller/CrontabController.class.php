@@ -76,7 +76,7 @@ class CrontabController extends Controller {
                         'user_uid' => $user['uid'],
                         'location_id' => $location_id,
                         'publish_time' => time(),
-                        'expire_time' => time() + 2 * 24 * 3600,
+                        'expire_time' => time() + 30 * 24 * 3600,
                         'message_id' => $message_id,
                         'status' => 0, //0:send
                         'priority' => $priority,

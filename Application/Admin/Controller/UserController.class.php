@@ -317,6 +317,7 @@ class UserController extends AdminController {
             'research' => $researches_arr,
             'projects' => $projects_arr,
             'curricula_id' => $curricula_id,
+            'mtime' => time(),
         );
         $mMember = new MemberModel();
         $ret = $mMember->update_member($uid, $userinfo);

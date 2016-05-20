@@ -231,7 +231,6 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function update_member($uid, $userinfo){
-        $userinfo['mtime'] = time();
         $ret = $this->where(array('uid' => $uid))->save($userinfo);
         return $ret;
     }

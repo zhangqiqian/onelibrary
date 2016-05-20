@@ -98,11 +98,11 @@ def course_book_similarity(client, courses):
     now = int(time.time())
     while start < count:
         books = book_collection.find().sort("book_id").skip(start).limit(limit)
-        for book in books:
-            book_id = int(book['book_id'])
-            for course in courses.values():
-                course_id = course['course_id']
-                if now - course['mtime'] <= 24 * 3600:
+        for course in courses.values():
+            course_id = course['course_id']
+            if now - course['mtime'] <= 24 * 3600:
+                for book in books:
+                    book_id = int(book['book_id'])
                     sim = similarity(course['tags'], book['tags'])
                     if sim > 20:
                         record = {
@@ -112,9 +112,9 @@ def course_book_similarity(client, courses):
                             'status': 0,
                             'mtime': now
                         }
-                        course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
+                        course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id, "status": 0}, record, True)
                     else:
-                        course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
+                        course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id, "status": 0})
         start += limit
 
 
@@ -132,13 +132,13 @@ def course_paper_similarity(client, courses):
     now = int(time.time())
     while start < count:
         papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
-        for paper in papers:
-            paper_id = int(paper['paper_id'])
-            for course in courses.values():
-                course_id = course['course_id']
+        for course in courses.values():
+            course_id = course['course_id']
+            for paper in papers:
+                paper_id = int(paper['paper_id'])
                 if (now - paper['ctime']) <= 24 * 3600 or (now - course['mtime']) <= 24 * 3600:
                     sim = similarity(course['tags'], paper['tags'])
-                    if sim > 0:
+                    if sim > 20:
                         record = {
                             'course_id': course_id,
                             'paper_id': paper_id,
@@ -146,9 +146,9 @@ def course_paper_similarity(client, courses):
                             'status': 0,
                             'mtime': now
                         }
-                        course_paper_collection.find_and_modify({'course_id': course_id, 'paper_id': paper_id}, record, True)
+                        course_paper_collection.find_and_modify({'course_id': course_id, 'paper_id': paper_id, "status": 0}, record, True)
                     else:
-                        course_paper_collection.delete_many({'course_id': course_id, 'paper_id': paper_id})
+                        course_paper_collection.delete_many({'course_id': course_id, 'paper_id': paper_id, "status": 0})
         start += limit
 
 
@@ -182,7 +182,7 @@ def main():
                     }
 
     course_book_similarity(client, courses)
-    course_paper_similarity(client, courses)
+    # course_paper_similarity(client, courses)
 
 if __name__ == "__main__":
     main()

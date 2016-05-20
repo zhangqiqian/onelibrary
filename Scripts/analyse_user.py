@@ -58,29 +58,23 @@ def main(topn=10, withweight=True):
     """
     client = db_client(MONGODB)
     member_collection = client[DB_NAME][MEMBER_COLLECTION]
-    members = member_collection.find({'status': 1})
+    members = member_collection.find({'uid': {'$gt': 1}, 'status': 1})
+    now = int(time.time())
     for member in members:
-        if member['uid'] == 1:
-            continue
-        major = MAJOR_LIST[member['major']] if member['major'] > 0 else ''
-        interests = member['interests'] if 'interests' in member.keys() else []
-        research = member['research'] if 'research' in member.keys() else []
-        # courses = []
-        # if 'curricula_id' in member.keys() and member['curricula_id'] > 0:
-        #     curricula_collection = client[DB_NAME][CURRICULA_COLLECTION]
-        #     curricula = curricula_collection.find_one({"curricula_id": member['curricula_id']})
-        #     for course in curricula['courses'].values():
-        #         courses.append(course['name'].strip())
-        words = [major] + interests + research
-        content = ','.join(words)
-        all_tags = analyse(content, topn, withweight)
+        if 'tags' not in member.keys() or (now - member['mtime']) <= 3600:
+            print "%s" % member['nickname']
+            major = MAJOR_LIST[member['major']] if member['major'] > 0 else ''
+            interests = member['interests'] if 'interests' in member.keys() else []
+            research = member['research'] if 'research' in member.keys() else []
+            words = [major] + interests + research
+            content = ','.join(words)
+            all_tags = analyse(content, topn, withweight)
 
-        member_tags = []
-        for tag in all_tags:
-            member_tags.append({'tag': tag[0], 'weight': tag[1]})
-        member['tags'] = member_tags
-        member['mtime'] = int(time.time())
-        member_collection.save(member)
+            member_tags = []
+            for tag in all_tags:
+                member_tags.append({'tag': tag[0], 'weight': tag[1]})
+            member['tags'] = member_tags
+            member_collection.save(member)
 
 
 def command():
