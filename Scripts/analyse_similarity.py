@@ -158,8 +158,8 @@ def main():
                 'tags': member['tags'],
                 'nickname': member['nickname'],
             })
-    # user_book_similarity(client, new_members)
-    user_paper_similarity(client, new_members)
+    user_book_similarity(client, new_members)
+    # user_paper_similarity(client, new_members)
 
 
 if __name__ == "__main__":
