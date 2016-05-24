@@ -521,7 +521,7 @@ class CrontabController extends Controller {
                 }
                 $message = array(
                     'title' => $paper['title'],
-                    'content' => $paper['summary']."\n\n——《".$paper['title']."》,".$paper['author'].", ".$paper['journal'].", ".$paper['period'],
+                    'content' => $paper['summary']."\n\n——《".$paper['title']."》, ".$paper['author'].", ".$paper['journal'].", ".$paper['period'],
                     'author' => array($paper['author']),
                     'category' => 2,//期刊论文
                     'link' => $paper['link'],
