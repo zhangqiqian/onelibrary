@@ -28,39 +28,11 @@
             <li class="active">Publish</li>
           </ol>
           <div>
-              <form id="search" class="form-inline" action="" method="post">
-                  <div class="btn-group btn-group-sm">
-                      <button type="button" class="btn btn-primary">User</button>
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          <span class="caret"></span>
-                          <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                          <li><a href="#">All</a></li>
-                          <li class="divider"></li>
-                          <li><a href="#">Another action</a></li>
-                          <li><a href="#">Something else here</a></li>
-                          <li><a href="#">Separated link</a></li>
-                      </ul>
-                  </div>
-                  <div class="btn-group btn-group-sm">
-                      <button type="button" class="btn btn-success">Location</button>
-                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          <span class="caret"></span>
-                          <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                          <li><a href="#">All</a></li>
-                          <li class="divider"></li>
-                          <li><a href="#">Another action</a></li>
-                          <li><a href="#">Something else here</a></li>
-                          <li><a href="#">Separated link</a></li>
-                      </ul>
-                  </div>
-                  <div class="input-group input-group-sm">
-                      <input type="text" class="form-control" placeholder="Title">
+              <form id="searchForm" class="form-inline" action="{:U('Settings/publish')}" method="post">
+                  <div class="input-group input-group-sm col-sm-3">
+                      <input type="text" name="search" value="{$search}" class="form-control" placeholder="User name" autocomplete="off">
                       <span class="input-group-btn">
-                        <button class="btn btn-primary" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                       </span>
                   </div>
               </form>
@@ -105,11 +77,11 @@
           <div class="text-center">
               <nav>
                   <ul class="pager">
-                      <li><a href="{:U('Settings/publish')}/start/0/limit/{$limit}/search/{$search}">首页</a></li>
-                      <li <eq name="page" value="1">class="disabled"</eq>><a href="{:U('Settings/publish')}/start/{$prev_start}/limit/20/search/{$search}">上一页</a></li>
+                      <li><a href="{:U('Settings/publish')}/search/{$search}/start/0/limit/{$limit}">首页</a></li>
+                      <li <eq name="page" value="1">class="disabled"</eq>><a href="{:U('Settings/publish')}/search/{$search}/start/{$prev_start}/limit/20">上一页</a></li>
                       <span class="label" style="color: #337ab7"> {$page}/{$pages} </span>
-                      <li <if condition="$page == $pages">class="disabled"</if>><a href="{:U('Settings/publish')}/start/{$next_start}/limit/20/search/{$search}">下一页</a></li>
-                      <li><a href="{:U('Settings/publish')}/start/{$last_start}/limit/{$limit}/search/{$search}">末页</a></li>
+                      <li <if condition="$page == $pages">class="disabled"</if>><a href="{:U('Settings/publish')}/search/{$search}/start/{$next_start}/limit/20">下一页</a></li>
+                      <li><a href="{:U('Settings/publish')}/search/{$search}/start/{$last_start}/limit/{$limit}">末页</a></li>
                   </ul>
               </nav>
           </div>
@@ -176,6 +148,7 @@
   <script type="text/javascript" src="__STATIC__/moment/moment-with-locales.min.js"></script>
   <link href="__STATIC__/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
   <script type="text/javascript" src="__STATIC__/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+  <!--<script type="text/javascript" src="__STATIC__/bootstrap/js/typeahead.js"></script>-->
   <script type="text/javascript">
     $(document).ajaxStart(function(){
       $("button:submit").attr("disabled", true);
@@ -270,5 +243,36 @@
         }
       }, "json");
     }
+
+    /*jQuery(function () {
+        /!*** 1.基本示例 ***!/
+        var provinces = ["广东省", "福建省", "山西省", "山东省","湖北省", "湖南省", "陕西省", "上海市", "北京市", "广西省"];
+
+        var substringMatcher = function (strs) {
+            return function findMatches(q, cb) {
+                var matches, substrRegex;
+                matches = [];
+                substrRegex = new RegExp(q, 'i');
+                $.each(strs, function (i, str) {
+                    if (substrRegex.test(str)) {
+                        matches.push({ value: str });
+                    }
+                });
+                cb(matches);
+            };
+        };
+
+        $('#test_text').typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 1
+                },
+                {
+                    name: 'provinces',
+                    displayKey: 'value',
+                    source: substringMatcher(provinces)
+                });
+
+    });*/
   </script>
 </block>

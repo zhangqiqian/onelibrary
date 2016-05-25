@@ -36,13 +36,24 @@ class PublishModel extends MongoModel{
 
     /**
      * 获取所有publish
+     * @param int $uid
      * @param int $start
      * @param int $limit
      * @return array
      */
-    public function get_publish_list($start = 0, $limit = 20){
-        $publishes = $this->order('publish_time desc')->limit($start.','.$limit)->select();
-        $count = $this->count();
+    public function get_publish_list($uid = 0, $start = 0, $limit = 20){
+        $where = array();
+        if($uid > 0){
+            $where['user_uid'] = $uid;
+        }
+
+        if(empty($where)){
+            $publishes = $this->order('publish_time desc')->limit($start.','.$limit)->select();
+            $count = $this->count();
+        }else{
+            $publishes = $this->where($where)->order('publish_time desc')->limit($start.','.$limit)->select();
+            $count = $this->where($where)->count();
+        }
 
         if(!$publishes){
             $publishes = array();

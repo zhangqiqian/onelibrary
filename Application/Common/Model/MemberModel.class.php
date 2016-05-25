@@ -206,6 +206,22 @@ class MemberModel extends MongoModel{
         return $member;
     }
 
+    /**
+     * 获取用户信息
+     * @param $username
+     * @return array
+     */
+    public function get_member_by_name($username){
+        $member = $this->where(array('nickname' => $username))->find();
+        if(empty($member)){
+            $member = array();
+        }
+        unset($member['_id']);
+        unset($member['ctime']);
+        unset($member['mtime']);
+        return $member;
+    }
+
     public function create_member($uid){
         $user = $this->where(array('uid' => intval($uid)))->find();
         if(!$user){ //未注册
