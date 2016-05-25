@@ -1,6 +1,6 @@
 {
-    "name": "onelibrary-1.2.1.apk",
-    "version": "1.2.1",
-    "description": "修复Bug: \n(1) 参数Publish的ID缺失，导致记录失败。",
+    "name": "onelibrary-1.2.2.apk",
+    "version": "1.2.2",
+    "description": "修复Bug: \n(1) 个人信息中用户课程表显示错误。",
     "url": "http://115.28.223.203:8080/Download/android"
 }
