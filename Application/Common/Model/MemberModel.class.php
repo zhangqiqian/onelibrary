@@ -134,7 +134,7 @@ class MemberModel extends MongoModel{
             'uid' => array('$ne' => 1),
             'status' => 1,
         );
-        $members = $this->where($map)->select();
+        $members = $this->where($map)->order("uid")->select();
         if(!$members){
             $members = array();
         }
@@ -231,7 +231,6 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function update_member($uid, $userinfo){
-        $userinfo['mtime'] = time();
         $ret = $this->where(array('uid' => $uid))->save($userinfo);
         return $ret;
     }

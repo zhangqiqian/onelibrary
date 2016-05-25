@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
 import sys
@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from optparse import OptionParser
 import urllib2
 import urllib
-import random
+import jieba.analyse
 
 
 USAGE = "Usage: python cnki_spider.py"
@@ -148,7 +148,6 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
         first_query_string = urllib.urlencode(first_params)
         basr_url = 'http://epub.cnki.net/KNS/request/SearchHandler.ashx?' + first_query_string
         urllib2.urlopen(urllib2.Request(basr_url, headers=CNKI_COMMON_HEADERS))
-
         # 构建第二次提交参数，不过貌似这些参数对返回值没有影响，尝试了修改keyValue和spvalue依然能正常返回
         second_params = {
             'pagename': 'ASP.brief_result_aspx',
@@ -173,17 +172,27 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
             pages_str = mth.groups()[0]
             pages_str = pages_str.replace(',', '')
             pages = int(pages_str)
+        print "pages: %s" % pages
+        mth = re.search(r'找到&nbsp;([\d,]+)&nbsp;条结果', content)
+        total = 0
+        if mth:
+            total_str = mth.groups()[0]
+            total_str = total_str.replace(',', '')
+            total = int(total_str)
+
+        print "total: %s" % total
+        if not total:
+            continue
 
         # 处理第一页
-        papers = handle_papers(content)
-        # 保存第一页的内容到数据库
-        save_papers(papers)
+        print "page: 1"
+        handle_papers(content)
 
         # 搜索下一页
         for i in range(pages):
             if i == 0:  # 排除第一页
                 continue
-
+            print "page: %d" % (i+1)
             next_params = {
                 'curpage': i+1,
                 'RecordsPerPage': topn,
@@ -198,13 +207,12 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
             }
             next_query_string = urllib.urlencode(next_params)
             next_url = 'http://epub.cnki.net/kns/brief/brief.aspx?' + next_query_string
+            print "next url: %s" % next_url
             next_response = urllib2.urlopen(urllib2.Request(next_url, headers=CNKI_COMMON_HEADERS))
             next_content = next_response.read()
 
             # 处理下一页
-            next_papers = handle_papers(next_content)
-            # 保存下一页的内容到数据库
-            save_papers(next_papers)
+            handle_papers(next_content)
 
 
 def handle_papers(papers_content=''):
@@ -215,11 +223,11 @@ def handle_papers(papers_content=''):
     """
     base_uri = 'http://www.cnki.net'
 
-    papers = []
     if not papers_content:
-        return papers
+        return
 
-    soup = BeautifulSoup(papers_content, "html")
+    soup = BeautifulSoup(papers_content, 'lxml')
+
     table_tr_list = soup.find('table', {'class': 'GridTableContent'}).find_all('tr', {'bgcolor': True})
     for table_tr in table_tr_list:
         # 获取论文的部分字段
@@ -233,23 +241,25 @@ def handle_papers(papers_content=''):
         publisher = table_td_list[3].get_text().strip()
         pubdate = table_td_list[4].get_text().strip()
         paper_type = table_td_list[5].get_text().strip()
-        quote_count = table_td_list[6].get_text().strip()
-        download_count = table_td_list[7].get_text().strip()
-
-        # seconds = random.randrange(10, 30)
-        # time.sleep(seconds)  # 每篇文章之间等待10~30s
 
         # 从内容中获取部分字段
         detail_resp = urllib2.urlopen(urllib2.Request(detail_url, headers=CNKI_COMMON_HEADERS))
         detail_content = detail_resp.read()
         data = detail_paper(detail_content)
 
+        if not data:
+            continue
+
+        print "title: %s" % data['title']
+
         # 合并字段
         data['link'] = detail_url
-        data['pubdate'] = pubdate
+        if ':' in pubdate:
+            time_format = '%Y-%m-%d %H:%M'
+        else:
+            time_format = '%Y-%m-%d'
+        data['pubdate'] = int(time.mktime(time.strptime(pubdate, time_format)))
         data['paper_type'] = paper_type
-        data['quote_count'] = quote_count
-        data['download_count'] = download_count
         if not data['author']:
             data['author'] = author
         if not data['journal']:
@@ -257,8 +267,24 @@ def handle_papers(papers_content=''):
         if not data['period']:
             data['period'] = pubdate
 
-        papers.append(data)
-    return papers
+        # 保存第一页的内容到数据库
+        save_paper(data)
+
+
+def analyse_keywords(content, topn=5, withweight=True):
+    """
+    分析单个实例的关键词
+    :return:
+    """
+    tags = jieba.analyse.extract_tags(content, topn, withweight)
+    new_tags = []
+    if tags:
+        for tag in tags:
+            new_tags.append({
+                'tag': tag[0],
+                'weight': tag[1],
+            })
+    return new_tags
 
 
 def detail_paper(detail_content=''):
@@ -271,10 +297,12 @@ def detail_paper(detail_content=''):
         return False
 
     detail_content = detail_content.replace('utf-16', 'utf-8')
-    soup = BeautifulSoup(detail_content, 'html')
+    soup = BeautifulSoup(detail_content, 'lxml')
 
     # Title
     title_span = soup.find('span', {'id': 'chTitle'})
+    if not title_span:
+        return False
     title = title_span.get_text().strip()
     title = title.replace('\n', '')
     title = title.replace(' ', '')
@@ -289,6 +317,8 @@ def detail_paper(detail_content=''):
 
     # Author
     author_soup = soup.find('div', {'class': 'author'})
+    if not author_soup:
+        return False
     authors = []
     institutions = []
     if author_soup:
@@ -302,6 +332,8 @@ def detail_paper(detail_content=''):
 
     # Summary
     summary_span = soup.find('span', {'id': 'ChDivSummary'})
+    if not summary_span:
+        return False
     summary = summary_span.get_text().strip()
     summary = summary.replace(' ', '')
 
@@ -321,6 +353,9 @@ def detail_paper(detail_content=''):
             project = text.strip()
             break
 
+    analyse_content = u"关键词: %s, 标题: %s, 摘要: %s, 项目: %s" % (', '.join(keywords), title, summary, project)
+    tags = analyse_keywords(analyse_content)
+
     data = {
         'title': title,
         'author': ';'.join(authors),
@@ -330,14 +365,14 @@ def detail_paper(detail_content=''):
         'period': journal[2] if len(journal) > 2 else '',
         'keywords': keywords,
         'project': project,
-        'status': 0,
         'ctime': int(time.time()),
         'source': 'cnki',
+        'tags': tags
     }
     return data
 
 
-def save_papers(papers):
+def save_paper(paper):
     """
     获取网页Top数据
     :param papers:
@@ -345,10 +380,8 @@ def save_papers(papers):
     """
     client = db_client(MONGODB)
     collection = client[DB_NAME][COLLECTION]
-    for paper in papers:
-        old_paper = collection.find_one({'title': paper["title"], 'author': paper["author"]})
-        if old_paper:
-            continue
+    old_paper = collection.find_one({'title': paper["title"], 'author': paper["author"]})
+    if not old_paper:
         paper_id = get_next_sequence("paper_id", client)
         paper["paper_id"] = paper_id
         collection.save(paper)
@@ -362,6 +395,7 @@ def main(keyword, topK=50):
     client = db_client(MONGODB)
     keyword_collection = client[DB_NAME][KEYWORDS_COLLECTION]
 
+    now = int(time.time())
     keywords = {}
     if keyword:
         old_keyword = keyword_collection.find_one({'keyword': keyword})
@@ -379,26 +413,29 @@ def main(keyword, topK=50):
                 'keyword': keyword,
                 'weight': 0,
                 'start_time': int(time.time()) - 5 * 365 * 24 * 3600,
-                'end_time': int(time.time()),
+                'end_time': 0,
             }
     else:
-        keyword_records = keyword_collection.find()
+        keyword_records = keyword_collection.find({'end_time': {'$lt': now}})
         for keyword_record in keyword_records:
-            if not keyword_record['end_time']:
-                keyword_record['end_time'] = int(time.time())
             keywords[keyword_record['pref_id']] = {
                 'pref_id': keyword_record['pref_id'],
                 'keyword': keyword_record['keyword'],
                 'weight': keyword_record['weight'],
                 'start_time': keyword_record['start_time'],
-                'end_time': keyword_record['end_time'],
+                'end_time': keyword_record['end_time']
             }
 
     for new_keyword in keywords.values():
-        fetch_papers(new_keyword['keyword'].encode("utf-8"), new_keyword['start_time'], new_keyword['end_time'], topK)
+        # print "keyword: %s " % (new_keyword['keyword'])
+        if not new_keyword['end_time']:
+            start_time = new_keyword['start_time']
+        else:
+            start_time = new_keyword['end_time']
+        end_time = start_time + 30 * 24 * 3600
+        fetch_papers(new_keyword['keyword'].encode("utf-8"), start_time, end_time, topK)
         if new_keyword['pref_id']:
-            keyword_collection.update({'pref_id': new_keyword['pref_id']}, {"$set": {'end_time': int(time.time())}})
-        break
+            keyword_collection.update({'pref_id': new_keyword['pref_id']}, {"$set": {'end_time': end_time}})
 
 
 def command():

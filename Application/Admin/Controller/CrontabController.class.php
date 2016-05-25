@@ -14,11 +14,13 @@ use Common\Model\CurriculaModel;
 use Common\Model\LocationModel;
 use Common\Model\MemberModel;
 use Common\Model\MessageModel;
+use Common\Model\PaperModel;
 use Common\Model\PreferenceModel;
 use Common\Model\PublishModel;
 use Common\Model\UserBookModel;
 use Common\Model\UserLocationLogModel;
 use Common\Model\UserLocationModel;
+use Common\Model\UserPaperModel;
 use Think\Controller;
 
 class CrontabController extends Controller {
@@ -103,6 +105,9 @@ class CrontabController extends Controller {
         if($user_location){
             $locations = array();
             foreach ($user_location['locations'] as $key => $location) {
+                if($location['type'] == 5){
+                    continue;
+                }
                 $square_sum = 0;
                 foreach ($location['tags'] as $location_tag) {
                     foreach ($message_tags as $message_tag) {
@@ -112,18 +117,21 @@ class CrontabController extends Controller {
                         }
                     }
                 }
-                $locations[$key] = sqrt($square_sum);
+                $locations[$key] = array(
+                    'value' => sqrt($square_sum),
+                    'count' => $location['count'],
+                );
             }
 
-            $max = 0;
-            $id = 0;
+            $value_max = 0;
+            $value_id = 0;
             foreach ($locations as $key => $val) {
-                if($val > $max){
-                    $max = $val;
-                    $id = $key;
+                if($val['value'] > $value_max){
+                    $value_max = $val['value'];
+                    $value_id = $key;
                 }
             }
-            $location_id = $id;
+            $location_id = $value_id;
         }
         
         return $location_id;
@@ -205,7 +213,7 @@ class CrontabController extends Controller {
                         'weight' => $weight,
                     );
                 }
-                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 10);
+                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 50);
             }
             $user_location['locations'] = $locations;
             $mUserLocation->update_user_location($user['uid'], $user_location);
@@ -321,7 +329,8 @@ class CrontabController extends Controller {
         $mLocation = new LocationModel();
 
         $now = time();
-        $today = intval($now / 86400) * 86400;
+        $now_time = date('Y-m-d', $now);
+        $today_timestamp = strtotime($now_time." UTC");
         $week = intval(date('w', $now));
         $week_names = array("日", "一", "二", "三", "四", "五", "六");
         if($week > 5){
@@ -337,8 +346,8 @@ class CrontabController extends Controller {
                     $courses[$course_key] = array(
                         'name' => $course['name'],
                         'course_id' => $course['course_id'],
-                        'start_time' => $today + $course['start_time'] - 8*3600,
-                        'end_time' => $today + $course['end_time'] - 8*3600,
+                        'start_time' => $today_timestamp + $course['start_time'] - 8*3600,
+                        'end_time' => $today_timestamp + $course['end_time'] - 8*3600,
                         'location_id' => $course['classroom'],
                         'curricula_id' => $curricula['curricula_id']
                     );
@@ -352,38 +361,35 @@ class CrontabController extends Controller {
             if(empty($users)) continue;
             $location = $mLocation->get_location($course['location_id']);
             $course_books = $mCourseBook->get_course_books($course['course_id'], 20, 3);
-            $content = "提醒: 今天是".date('Y年m月d日', $today)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'])." 在 ".$location['name']." 开始。\n\n";
+            $content = "提醒: 今天是".date('Y年m月d日', $now)."星期".$week_names[$week].", <".$course['name'].">课程将于".date('H:i', $course['start_time'])." 在 ".$location['name']." 开始。\n\n";
             if(!empty($course_books)){
                 $content = $content."猜你喜欢下面的图书: \n";
             }
             $i = 0;
             $total_sim = 0;
-            $tags = array();
             foreach ($course_books as $course_book) {
                 $book = $mBook->get_book($course_book['book_id']);
-                $content = $content.($i+1).".《".$book['title']."》: ".$book['summary']." \n   —— ".$book['author'].", ".$book['publisher'].", ".$book['pubdate']."\n";
-                $total_sim += $course_book['similarity'];
-                if(isset($book['tags'])){
-                    foreach ($book['tags'] as $book_tag) {
-                        $tags[$book_tag['tag']] = $book_tag['weight'];
-                    }
+                
+                $book_arr = array();
+                if(!empty(trim($book['author']))){
+                    $book_arr[] = $book['author'];
                 }
+                if(!empty(trim($book['publisher']))){
+                    $book_arr[] = $book['publisher'];
+                }
+                if(!empty(trim($book['pubdate']))){
+                    $book_arr[] = $book['pubdate'];
+                }
+                $book_info = implode(', ', $book_arr);
+
+                $content = $content.($i+1).".《".$book['title']."》: ".$book['summary']." \n   —— ".$book_info."\n";
+                $total_sim += $course_book['similarity'];
                 $i += 1;
             }
             $avg_sim = $i > 0 ? round($total_sim/$i, 1) : 20;
 
-            arsort($tags);
-            $slice_tags = array_slice($tags, 0, 5);
-            $new_tags = array();
-            foreach ($slice_tags as $key => $weight) {
-                $new_tags[] = array(
-                    'tag' => $key,
-                    'weight' => $weight,
-                );
-            }
-
             $message = array(
-                'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $today).")",
+                'title' => "课程提醒: ".$course['name']."(".date('Y年m月d日', $now).")",
                 'content' => $content,
                 'author' => array("Onelibrary"),
                 'category' => 7,//课程
@@ -392,7 +398,7 @@ class CrontabController extends Controller {
                 'status' => 0,  //0, no handle; 1, handled.
                 'level' => 0,  //0, no level; 1...9
                 'tags' => array('课程提醒', $course['name']),
-                'tag_weight' => $new_tags,
+                'tag_weight' => array(),
                 'desc' => '',
             );
             //插入到message中
@@ -416,14 +422,14 @@ class CrontabController extends Controller {
                     $mPublish = new PublishModel();
                     $publish_id = $mPublish->insert_publish($publish_message);
                 }
+            }
 
-                //更新user book的状态为1
-                $data = array(
-                    'status' => 1
-                );
-                foreach ($course_books as $course_book) {
-                    $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
-                }
+            //更新user book的状态为1
+            $data = array(
+                'status' => 1
+            );
+            foreach ($course_books as $course_book) {
+                $mCourseBook->update_course_book($course['course_id'], $course_book['book_id'], $data);
             }
         }
     }
@@ -437,6 +443,128 @@ class CrontabController extends Controller {
                     $curricula['courses'][$key]['course_id'] = substr(md5($course['name']), 0, 8);
                 }
                 $mCurricula->update_curricula($curricula['curricula_id'], $curricula);
+            }
+        }
+    }
+
+
+    public function repulish_messages(){
+        $now = date("H", time());
+        $hour = intval($now);
+        if($hour > 22 || $hour < 6){
+            return ;
+        }
+        $mPublish = new PublishModel();
+        $mMessage = new MessageModel();
+        $push_messages = $mPublish->get_publishes_by_status(0, 20);
+        foreach ($push_messages as $push_message) {
+            unset($push_message['_id']);
+            $message = $mMessage->get_message($push_message['message_id']);
+            if($message){
+                if($message['category'] == 7){
+                    continue;
+                }
+                if(($push_message['mtime'] - $push_message['ctime']) > 30 * 24 * 3600 ){
+                    $push_message['status'] = 3; //invalid
+                    $mPublish->update_publish($push_message['publish_id'], $push_message);
+                    continue;
+                }
+
+                $mMember = new MemberModel();
+                $member = $mMember->get_member($push_message['user_uid']);
+                if($member && intval($member['status']) == 2){
+                    continue;
+                }
+
+                if($push_message['similarity'] < 20){
+                    continue;
+                }
+
+                if(!isset($message['tag_weight'])){
+                    $message['tag_weight'] = array();
+                }
+                $location_id = $this->get_user_location($push_message['user_uid'], $message['tag_weight']);
+                $new_push_message = array(
+                    'location_id' => $location_id,
+                    'publish_time' => time(),
+                    'expire_time' => time() + 2 * 24 * 3600
+                );
+                echo json_encode($push_message)."\n";
+                $mPublish->update_publish($push_message['publish_id'], $new_push_message);
+            }
+        }
+    }
+
+    public function publish_paper_message(){
+        $mUser = new MemberModel();
+        $mUserPaper = new UserPaperModel();
+        $mPaper = new PaperModel();
+
+        $now = date("H", time());
+        $hour = intval($now);
+        if($hour > 22 || $hour < 6){
+            return ;
+        }
+        //获取所有的用户
+        $users = $mUser->get_members();
+        foreach ($users as $user) {
+            if($user['grade'] == 1){
+                continue;
+            }
+            //查找新的user paper
+            $user_papers = $mUserPaper->get_user_papers($user['uid'], 0, 1);
+            //插入新的paper信息
+            foreach ($user_papers as $user_paper) {
+                $paper = $mPaper->get_paper($user_paper['paper_id']);
+                if(empty($paper)){
+                    continue;
+                }
+                $message = array(
+                    'title' => $paper['title'],
+                    'content' => $paper['summary']."\n\n——《".$paper['title']."》, ".$paper['author'].", ".$paper['journal'].", ".$paper['period'],
+                    'author' => array($paper['author']),
+                    'category' => 2,//期刊论文
+                    'link' => $paper['link'],
+                    'pubdate' => $paper['pubdate'],
+                    'status' => 0,  //0, no handle; 1, handled.
+                    'level' => 0,  //0, no level; 1...9
+                    'tags' => $paper['keywords'],
+                    'tag_weight' => $paper['tags'],
+                    'desc' => '',
+                );
+                //插入到message中
+                $mMessage = new MessageModel();
+                $message_id = $mMessage->insert_message($message);
+
+                $location_id = $this->get_user_location($user['uid'], $paper['tags']);
+                //发布新的信息
+                if($message_id > 0){
+                    if($user_paper['similarity'] > 60){
+                        $priority = 3;
+                    }elseif($user_paper['similarity'] > 30){
+                        $priority = 2;
+                    }else{
+                        $priority = 1;
+                    }
+                    $publish_message = array(
+                        'user_uid' => $user['uid'],
+                        'location_id' => $location_id,
+                        'publish_time' => time(),
+                        'expire_time' => time() + 7 * 24 * 3600,
+                        'message_id' => $message_id,
+                        'status' => 0, //0:send
+                        'priority' => $priority,
+                        'similarity' => $user_paper['similarity']
+                    );
+                    $mPublish = new PublishModel();
+                    $publish_id = $mPublish->insert_publish($publish_message);
+                }
+
+                //更新user paper的状态为1
+                $data = array(
+                    'status' => 1
+                );
+                $mUserPaper->update_user_paper($user['uid'], $paper['paper_id'], $data);
             }
         }
     }

@@ -21,6 +21,8 @@ DB_NAME = "onelibrary"
 CURRICULA_COLLECTION = "t_curricula"
 BOOK_COLLECTION = "t_book"
 COURSE_BOOK_COLLECTION = "t_course_book"
+PAPER_COLLECTION = "t_paper"
+COURSE_PAPER_COLLECTION = "t_course_paper"
 
 
 def db_client(db_config):
@@ -82,6 +84,72 @@ def similarity(tags, book_tags):
     return sim
 
 
+def course_book_similarity(client, courses):
+    """
+    计算课程与图书的相似性
+    :return:
+    """
+    book_collection = client[DB_NAME][BOOK_COLLECTION]
+    course_book_collection = client[DB_NAME][COURSE_BOOK_COLLECTION]
+
+    start = 0
+    limit = 1000
+    count = book_collection.count()
+    now = int(time.time())
+    while start < count:
+        books = book_collection.find().sort("book_id").skip(start).limit(limit)
+        for course in courses.values():
+            if now - course['mtime'] <= 24 * 3600:
+                books.rewind()
+                for book in books:
+                    sim = similarity(course['tags'], book['tags'])
+                    if sim > 20:
+                        record = {
+                            'course_id': course['course_id'],
+                            'book_id': book['book_id'],
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now
+                        }
+                        course_book_collection.find_and_modify({'course_id': course['course_id'], 'book_id': book['book_id'], "status": 0}, record, True)
+                    else:
+                        course_book_collection.delete_many({'course_id': course['course_id'], 'book_id': book['book_id'], "status": 0})
+        start += limit
+
+
+def course_paper_similarity(client, courses):
+    """
+    计算课程与论文的相似性
+    :return:
+    """
+    paper_collection = client[DB_NAME][PAPER_COLLECTION]
+    course_paper_collection = client[DB_NAME][COURSE_PAPER_COLLECTION]
+
+    start = 0
+    limit = 1000
+    count = paper_collection.count()
+    now = int(time.time())
+    while start < count:
+        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
+        for course in courses.values():
+            papers.rewind()
+            for paper in papers:
+                if (now - paper['ctime']) <= 24 * 3600 or (now - course['mtime']) <= 24 * 3600:
+                    sim = similarity(course['tags'], paper['tags'])
+                    if sim > 0:
+                        record = {
+                            'course_id': course['course_id'],
+                            'paper_id': paper['paper_id'],
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now
+                        }
+                        course_paper_collection.find_and_modify({'course_id': course['course_id'], 'paper_id': paper['paper_id'], "status": 0}, record, True)
+                    else:
+                        course_paper_collection.delete_many({'course_id': course['course_id'], 'paper_id': paper['paper_id'], "status": 0})
+        start += limit
+
+
 def main():
     """
     获取所有数据
@@ -89,8 +157,6 @@ def main():
     """
     client = db_client(MONGODB)
     currcula_collection = client[DB_NAME][CURRICULA_COLLECTION]
-    book_collection = client[DB_NAME][BOOK_COLLECTION]
-    course_book_collection = client[DB_NAME][COURSE_BOOK_COLLECTION]
 
     curriculas = currcula_collection.find()
     courses = {}
@@ -113,38 +179,8 @@ def main():
                         'mtime': curricula['mtime']
                     }
 
-    start = 0
-    limit = 1000
-    count = book_collection.count()
-    # i = 1
-    # j = 1
-    now = int(time.time())
-    while start < count:
-        books = book_collection.find().sort("book_id").skip(start).limit(limit)
-        for book in books:
-            book_id = int(book['book_id'])
-            # print "*"*80
-            # print "%s: book %s -> %s" % (i, book_id, book["title"])
-            # i += 1
-            for course in courses.values():
-                course_id = course['course_id']
-                if now - course['mtime'] <= 24 * 3600:
-                    sim = similarity(course['tags'], book['tags'])
-                    if sim > 20:
-                        # print "---- %s: course: %s -> %s" % (j, course['name'], sim)
-                        # j += 1
-                        record = {
-                            'course_id': course_id,
-                            'book_id': book_id,
-                            'similarity': sim,
-                            'status': 0,
-                            'mtime': now
-                        }
-                        course_book_collection.find_and_modify({'course_id': course_id, 'book_id': book_id}, record, True)
-                    else:
-                        course_book_collection.delete_many({'course_id': course_id, 'book_id': book_id})
-        start += limit
-
+    course_book_similarity(client, courses)
+    # course_paper_similarity(client, courses)
 
 if __name__ == "__main__":
     main()

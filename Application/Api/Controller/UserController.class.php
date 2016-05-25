@@ -215,6 +215,7 @@ class UserController extends ApiController {
             'research' => $researches,
             'projects' => $projects,
             'curricula_id' => $curricula_id,
+            'mtime' => time()
         );
         $mMember = new MemberModel();
         $ret = $mMember->update_member($uid, $userinfo);
