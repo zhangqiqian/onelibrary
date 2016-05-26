@@ -212,7 +212,8 @@ class MemberModel extends MongoModel{
      * @return array
      */
     public function get_member_by_name($username){
-        $member = $this->where(array('nickname' => $username))->find();
+        $like = array('like', $username);
+        $member = $this->where(array('nickname' => $like))->select();
         if(empty($member)){
             $member = array();
         }

@@ -281,21 +281,23 @@ class SettingsController extends AdminController {
     }
 
     public function publish(){
-        $username = I('search', '', 'trim');
+        $search = I('search', '', 'trim');
         $start = I('start', 0, 'intval');
         $limit = I('limit', 20, 'intval');
 
-        var_dump($username);
-        $uid = 0;
-        if ($username){
+        $uids = array();
+        if($search){
             $mMember = new MemberModel();
-            $member = $mMember->get_member_by_name($username);
-            if($member){
-                $uid = $member['uid'];
+            $members = $mMember->get_member_by_name($search);
+            if($members){
+                foreach ($members as $member) {
+                    $uids[] = $member['uid'];
+                }
             }
         }
+        
         $mPublish = new PublishModel();
-        $ret = $mPublish->get_publish_list($uid, $start, $limit);
+        $ret = $mPublish->get_publish_list($uids, $start, $limit);
         $count = $ret['count'];
         $pages = intval($count / $limit) + 1;
         $page = intval($start / $limit) + 1;
@@ -311,7 +313,7 @@ class SettingsController extends AdminController {
         $this->assign('next_start', $next_start);
         $this->assign('last_start', $last_start);
         $this->assign('limit', $limit);
-        $this->assign('search', $username);
+        $this->assign('search', $search);
         $this->display();
     }
 

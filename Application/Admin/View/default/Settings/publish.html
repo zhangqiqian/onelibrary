@@ -77,11 +77,11 @@
           <div class="text-center">
               <nav>
                   <ul class="pager">
-                      <li><a href="{:U('Settings/publish')}/search/{$search}/start/0/limit/{$limit}">首页</a></li>
-                      <li <eq name="page" value="1">class="disabled"</eq>><a href="{:U('Settings/publish')}/search/{$search}/start/{$prev_start}/limit/20">上一页</a></li>
+                      <li><a href="{:U('Settings/publish')}/start/0/limit/{$limit}/search/{$search}/">首页</a></li>
+                      <li <eq name="page" value="1">class="disabled"</eq>><a href="{:U('Settings/publish')}/start/{$prev_start}/limit/20/search/{$search}/">上一页</a></li>
                       <span class="label" style="color: #337ab7"> {$page}/{$pages} </span>
-                      <li <if condition="$page == $pages">class="disabled"</if>><a href="{:U('Settings/publish')}/search/{$search}/start/{$next_start}/limit/20">下一页</a></li>
-                      <li><a href="{:U('Settings/publish')}/search/{$search}/start/{$last_start}/limit/{$limit}">末页</a></li>
+                      <li <if condition="$page == $pages">class="disabled"</if>><a href="{:U('Settings/publish')}/start/{$next_start}/limit/20/search/{$search}/">下一页</a></li>
+                      <li><a href="{:U('Settings/publish')}/start/{$last_start}/limit/{$limit}/search/{$search}/">末页</a></li>
                   </ul>
               </nav>
           </div>

@@ -36,15 +36,15 @@ class PublishModel extends MongoModel{
 
     /**
      * 获取所有publish
-     * @param int $uid
+     * @param array $uids
      * @param int $start
      * @param int $limit
      * @return array
      */
-    public function get_publish_list($uid = 0, $start = 0, $limit = 20){
+    public function get_publish_list($uids = array(), $start = 0, $limit = 20){
         $where = array();
-        if($uid > 0){
-            $where['user_uid'] = $uid;
+        if(!empty($uids)){
+            $where['user_uid'] = array('in', $uids);
         }
 
         if(empty($where)){
