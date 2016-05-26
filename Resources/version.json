@@ -1,6 +1,6 @@
 {
     "name": "onelibrary-1.2.2.apk",
     "version": "1.2.2",
-    "description": "修复Bug: \n(1) 个人信息中用户课程表显示错误。",
+    "description": "修复Bug: \n(1) 个人信息中用户课程表显示错误。\n(2) 解决循环更新的问题。",
     "url": "http://115.28.223.203:8080/Download/android"
 }
