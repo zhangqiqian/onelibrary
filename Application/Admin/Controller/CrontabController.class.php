@@ -291,6 +291,7 @@ class CrontabController extends Controller {
         $mMember = new MemberModel();
         $members = $mMember->get_members();
         foreach ($members as $member) {
+            if($member['grade'] == 1) continue;
             if(isset($member['research'])){
                 foreach ($member['research'] as $research) {
                     $new_all_keywords[] = $research;
