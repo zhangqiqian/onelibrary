@@ -22,7 +22,7 @@ class PreferenceModel extends MongoModel{
     protected $_auto = array(
         array('pref_id', 0, self::MODEL_INSERT),
         array('keyword', '', self::MODEL_INSERT),
-        array('type', 1, self::MODEL_INSERT), //1: user / 2: course
+        array('type', 1, self::MODEL_INSERT), //0: common, 1: research, 2: project, 3: course
         array('weight', 0.0, self::MODEL_INSERT),
         array('start_time', 0, self::MODEL_INSERT),
         array('end_time', 0, self::MODEL_INSERT),

@@ -269,16 +269,23 @@ class CrontabController extends Controller {
     public function analyze_preference(){
         $mPref = new PreferenceModel();
 
+        $old_all_keywords = array();
+        $preferences = $mPref->get_all_preferences();
+        foreach ($preferences as $preference) {
+            $old_all_keywords[] = $preference['keyword'];
+        }
+
+        $new_all_keywords = array();
         //common keywords
-        /*$cmn_keywords = C('COMMON_KEYWORDS');
+        $cmn_keywords = C('COMMON_KEYWORDS');
         foreach ($cmn_keywords as $cmn_keyword) {
-            $pref = $mPref->get_preference_by_keyword($cmn_keyword);
-            if(empty($pref)){
+            $new_all_keywords[] = $cmn_keyword;
+            if(!in_array($cmn_keyword, $old_all_keywords)){
                 $start_time = time() - 5 * 365 * 24 * 3600;
                 $end_time = 0;
                 $mPref->add_keyword($cmn_keyword, 1, 0, $start_time, $end_time);
             }
-        }*/
+        }
 
         //member research keywords
         $mMember = new MemberModel();
@@ -286,8 +293,9 @@ class CrontabController extends Controller {
         foreach ($members as $member) {
             if(isset($member['research'])){
                 foreach ($member['research'] as $research) {
-                    $pref = $mPref->get_preference_by_keyword($research);
-                    if(empty($pref)){
+                    $new_all_keywords[] = $research;
+                    if(!in_array($research, $old_all_keywords)){
+                        echo "---- add new keyword: ".$research."\n";
                         $start_time = time() - 5 * 365 * 24 * 3600;
                         $end_time = 0;
                         $mPref->add_keyword($research, 1, 1, $start_time, $end_time);
@@ -296,11 +304,12 @@ class CrontabController extends Controller {
             }
             if(isset($member['projects'])){
                 foreach ($member['projects'] as $project) {
-                    $pref = $mPref->get_preference_by_keyword($project);
-                    if(empty($pref)){
+                    $new_all_keywords[] = $project;
+                    if(!in_array($project, $old_all_keywords)){
+                        echo "---- add new keyword: ".$project."\n";
                         $start_time = time() - 5 * 365 * 24 * 3600;
                         $end_time = 0;
-                        $mPref->add_keyword($project, 1, 1, $start_time, $end_time);
+                        $mPref->add_keyword($project, 1, 2, $start_time, $end_time);
                     }
                 }
             }
@@ -311,14 +320,20 @@ class CrontabController extends Controller {
         $curriculas = $mCurricula->get_all_curriculas();
         foreach ($curriculas as $curricula) {
             foreach ($curricula['courses'] as $course) {
-                $pref = $mPref->get_preference_by_keyword($course['name']);
-                if(empty($pref)){
+                $all_keywords[] = $course;
+                if(!in_array($course, $old_all_keywords)){
                     $start_time = time() - 5 * 365 * 24 * 3600;
                     $end_time = 0;
-                    $mPref->add_keyword($course['name'], 1, 2, $start_time, $end_time);
+                    $mPref->add_keyword($course['name'], 1, 3, $start_time, $end_time);
                 }
             }
         }*/
+
+        $new_all_keywords = array_unique($new_all_keywords);
+        $del_keywords = array_diff($old_all_keywords, $new_all_keywords);
+        foreach ($del_keywords as $del_keyword) {
+            $mPref->delete_preference_by_keyword($del_keyword);
+        }
     }
 
     public function push_book_message_by_course(){
