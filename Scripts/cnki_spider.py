@@ -168,12 +168,13 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
         content = response.read()
 
         # 搜索首页, 获取总页数
-        mth = re.search(r'浏览1/(\d+)', content)
-        pages = 1
-        if mth:
-            pages_str = mth.groups()[0]
-            pages_str = pages_str.replace(',', '')
-            pages = int(pages_str)
+        # mth = re.search(r'浏览1/(\d+)', content)
+        # pages = 1
+        # if mth:
+        #     pages_str = mth.groups()[0]
+        #     pages_str = pages_str.replace(',', '')
+        #     pages = int(pages_str)
+        # print "pages: %s" % pages
         mth = re.search(r'找到&nbsp;([\d,]+)&nbsp;条结果', content)
         total = 0
         if mth:
@@ -181,17 +182,21 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
             total_str = total_str.replace(',', '')
             total = int(total_str)
 
+        # print "total: %s" % total
         if not total:
             continue
 
         if not content:
+            # print "content is null in first page."
             continue
         soup = BeautifulSoup(content, 'lxml')
         # 处理第一页
+        # print "page: 1"
         handle_papers(soup)
+        # print "Finish first page."
 
         # print "wait for 10s ..."
-        time.sleep(10)
+        time.sleep(5)
 
         # link = ''
         # page_bar_table = soup.find('table', {'class': 'pageBar_bottom'})
@@ -274,8 +279,10 @@ def handle_papers(soup):
             table_tr_list = table_soup.find_all('tr', {'bgcolor': True})
 
             if not table_tr_list:
+                # print "---- table is null in table."
                 return
 
+            # print "---- Found %s papers." % len(table_tr_list)
             i = 0
             for table_tr in table_tr_list:
                 # 获取论文的部分字段
@@ -286,6 +293,7 @@ def handle_papers(soup):
                     href = link.get("href")
                     new_href = href.replace('kns', 'KCMS', 1)
                     detail_url = "%s%s" % (BASE_URI, new_href)
+                    # print "---- href: %s" % detail_url
                     author = table_td_list[2].get_text().strip()
                     author = author.replace(' ', '')
                     publisher = table_td_list[3].get_text().strip()
@@ -297,10 +305,11 @@ def handle_papers(soup):
                     detail_content = detail_resp.read()
 
                     data = detail_paper(detail_content)
+                    # print "---- data: %s" % str(data)
                     if not data:
                         continue
 
-                    i += 1
+                    # print "---- %s: title: %s" % (i, data['title'])
                     # 合并字段
                     data['link'] = detail_url
                     if ':' in pubdate:
@@ -318,9 +327,12 @@ def handle_papers(soup):
 
                     # 保存第一页的内容到数据库
                     save_paper(data)
+                    i += 1
+                    time.sleep(1)
 
-                except Exception as es:
+                except Exception as ex:
                     continue
+            # print "---- Finish the page."
     except Exception as ex:
         print ex
 
@@ -357,6 +369,7 @@ def detail_paper(detail_content=''):
         # Title
         title_span = soup.find('span', {'id': 'chTitle'})
         if not title_span:
+            # print "-------- detail: title is null. return False"
             return False
         title = title_span.get_text().strip()
         title = title.replace('\n', '')
@@ -373,7 +386,11 @@ def detail_paper(detail_content=''):
         # Author
         author_soup = soup.find('div', {'class': 'author'})
         if not author_soup:
-            return False
+            author_soup = soup.find('div', {'class': 'summary'})
+            if not author_soup:
+                # print "-------- detail: author is null. return False"
+                return False
+
         authors = []
         institutions = []
         if author_soup:
@@ -388,7 +405,10 @@ def detail_paper(detail_content=''):
         # Summary
         summary_span = soup.find('span', {'id': 'ChDivSummary'})
         if not summary_span:
-            return False
+            summary_span = soup.find('span')
+            if not summary_span:
+                # print "-------- detail: summary is null. return False"
+                return False
         summary = summary_span.get_text().strip()
         summary = summary.replace(' ', '')
 
@@ -466,6 +486,7 @@ def main(keyword, topK=50):
         }
 
     for new_keyword in keywords.values():
+        # print "keyword: %s " % (new_keyword['keyword'])
         if not new_keyword['end_time']:
             start_time = new_keyword['start_time']
         else:
@@ -476,6 +497,7 @@ def main(keyword, topK=50):
         fetch_papers(new_keyword['keyword'].encode("utf-8"), start_time, end_time, topK)
         if new_keyword['pref_id']:
             keyword_collection.update({'pref_id': new_keyword['pref_id']}, {"$set": {'end_time': end_time}})
+        time.sleep(5)
 
 
 def command():
