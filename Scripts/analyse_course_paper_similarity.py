@@ -10,7 +10,7 @@ from md5 import md5
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-USAGE = "Usage: python analyse_course_similarity.py"
+USAGE = "Usage: python analyse_course_paper_similarity.py"
 
 MONGODB = {
     'server': 'localhost',
@@ -19,8 +19,8 @@ MONGODB = {
 
 DB_NAME = "onelibrary"
 CURRICULA_COLLECTION = "t_curricula"
-BOOK_COLLECTION = "t_book"
-COURSE_BOOK_COLLECTION = "t_course_book"
+PAPER_COLLECTION = "t_paper"
+COURSE_PAPER_COLLECTION = "t_course_paper"
 
 
 def db_client(db_config):
@@ -82,36 +82,36 @@ def similarity(tags, book_tags):
     return sim
 
 
-def course_book_similarity(client, courses):
+def course_paper_similarity(client, courses):
     """
-    计算课程与图书的相似性
+    计算课程与论文的相似性
     :return:
     """
-    book_collection = client[DB_NAME][BOOK_COLLECTION]
-    course_book_collection = client[DB_NAME][COURSE_BOOK_COLLECTION]
+    paper_collection = client[DB_NAME][PAPER_COLLECTION]
+    course_paper_collection = client[DB_NAME][COURSE_PAPER_COLLECTION]
 
     start = 0
     limit = 1000
-    count = book_collection.count()
+    count = paper_collection.count()
     now = int(time.time())
     while start < count:
-        books = book_collection.find().sort("book_id").skip(start).limit(limit)
+        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
         for course in courses.values():
-            if now - course['mtime'] <= 24 * 3600:
-                books.rewind()
-                for book in books:
-                    sim = similarity(course['tags'], book['tags'])
-                    if sim > 20:
+            papers.rewind()
+            for paper in papers:
+                if (now - paper['ctime']) <= 24 * 3600 or (now - course['mtime']) <= 24 * 3600:
+                    sim = similarity(course['tags'], paper['tags'])
+                    if sim > 10:
                         record = {
                             'course_id': course['course_id'],
-                            'book_id': book['book_id'],
+                            'paper_id': paper['paper_id'],
                             'similarity': sim,
                             'status': 0,
                             'mtime': now
                         }
-                        course_book_collection.find_and_modify({'course_id': course['course_id'], 'book_id': book['book_id'], "status": 0}, record, True)
+                        course_paper_collection.find_and_modify({'course_id': course['course_id'], 'paper_id': paper['paper_id'], "status": 0}, record, True)
                     else:
-                        course_book_collection.delete_many({'course_id': course['course_id'], 'book_id': book['book_id'], "status": 0})
+                        course_paper_collection.delete_many({'course_id': course['course_id'], 'paper_id': paper['paper_id'], "status": 0})
         start += limit
 
 
@@ -144,7 +144,7 @@ def main():
                         'mtime': curricula['mtime']
                     }
 
-    course_book_similarity(client, courses)
+    course_paper_similarity(client, courses)
 
 if __name__ == "__main__":
     main()
