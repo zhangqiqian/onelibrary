@@ -38,6 +38,8 @@ CNKI_COMMON_HEADERS = {
     'Host':'epub.cnki.net',
 }
 
+BASE_URI = 'http://www.cnki.net'
+
 
 def db_client(db_config):
     """
@@ -116,7 +118,7 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
         end_time = time.time()
 
     if start_time == 0:
-        start_time = end_time - 30 * 24 * 3600
+        start_time = end_time - 5 * 24 * 3600
 
     start_time_string = time.strftime('%Y-%m-%d', time.gmtime(start_time))
     end_time_string = time.strftime('%Y-%m-%d', time.gmtime(end_time))
@@ -172,7 +174,6 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
             pages_str = mth.groups()[0]
             pages_str = pages_str.replace(',', '')
             pages = int(pages_str)
-        print "pages: %s" % pages
         mth = re.search(r'找到&nbsp;([\d,]+)&nbsp;条结果', content)
         total = 0
         if mth:
@@ -180,95 +181,148 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
             total_str = total_str.replace(',', '')
             total = int(total_str)
 
-        print "total: %s" % total
         if not total:
             continue
 
+        if not content:
+            continue
+        soup = BeautifulSoup(content, 'lxml')
         # 处理第一页
-        print "page: 1"
-        handle_papers(content)
+        handle_papers(soup)
+
+        # print "wait for 10s ..."
+        time.sleep(10)
+
+        # link = ''
+        # page_bar_table = soup.find('table', {'class': 'pageBar_bottom'})
+        # if page_bar_table:
+        #     page_bar_a_list = soup.find('table', {'class': 'pageBar_bottom'}).find_all('a')
+        #     if not page_bar_a_list:
+        #         return
+        #     for next_page_link in page_bar_a_list:
+        #         text = next_page_link.get_text().strip()
+        #         if text == u'下一页':
+        #             link = next_page_link.get("href")
+
+        # print "Next page url: %s" % link
+        # while link:
+        #     # wait for 10s
+        #     print "-- search next page."
+        #     next_url = "http://epub.cnki.net/kns/brief/brief.aspx%s" % link
+        #     print "-- next url: %s" % next_url
+        #     next_response = urllib2.urlopen(urllib2.Request(next_url, headers=CNKI_COMMON_HEADERS))
+        #     next_content = next_response.read()
+        #     print "-- next content is retrun."
+        #     next_soup = BeautifulSoup(next_content, 'lxml')
+        #     handle_papers(next_soup)
+        #
+        #     link = ''
+        #     next_page_bar_table = soup.find('table', {'class': 'pageBar_bottom'})
+        #     if next_page_bar_table:
+        #         next_page_bar_a_list = soup.find('table', {'class': 'pageBar_bottom'}).find_all('a')
+        #         if not next_page_bar_a_list:
+        #             return
+        #         for next_page_link in next_page_bar_a_list:
+        #             text = next_page_link.get_text().strip()
+        #             print "Finding next page: %s " % text
+        #             if text == u'下一页':
+        #                 link = next_page_link.get("href")
+        #                 print "-- found next page: %s" % link
+        #
+        #     if not link:
+        #         print "-- next page is null."
+        #         break
+        # break
+
 
         # 搜索下一页
-        for i in range(pages):
-            if i == 0:  # 排除第一页
-                continue
-            print "page: %d" % (i+1)
-            next_params = {
-                'curpage': i+1,
-                'RecordsPerPage': topn,
-                'QueryID': 0,
-                'ID': '',
-                'turnpage': 1,
-                'tpagemode': 'L',
-                'dbPrefix': 'SCDB',
-                'Fields': '',
-                'DisplayMode': 'listmode',
-                'PageName': 'ASP.brief_result_aspx'
-            }
-            next_query_string = urllib.urlencode(next_params)
-            next_url = 'http://epub.cnki.net/kns/brief/brief.aspx?' + next_query_string
-            print "next url: %s" % next_url
-            next_response = urllib2.urlopen(urllib2.Request(next_url, headers=CNKI_COMMON_HEADERS))
-            next_content = next_response.read()
+        # for i in range(pages):
+        #     if i == 0:  # 排除第一页
+        #         continue
+        #     print "page: %d" % (i+1)
+        #     next_params = {
+        #         'curpage': i+1,
+        #         'RecordsPerPage': topn,
+        #         'QueryID': 0,
+        #         'ID': '',
+        #         'turnpage': 1,
+        #         'tpagemode': 'L',
+        #         'dbPrefix': 'SCDB',
+        #         'Fields': '',
+        #         'DisplayMode': 'listmode',
+        #         'PageName': 'ASP.brief_result_aspx'
+        #     }
+        #     next_query_string = urllib.urlencode(next_params)
+        #     next_url = 'http://epub.cnki.net/kns/brief/brief.aspx?' + next_query_string
+        #     print "next url: %s" % next_url
+        #     next_response = urllib2.urlopen(urllib2.Request(next_url, headers=CNKI_COMMON_HEADERS))
+        #     next_content = next_response.read()
+        #
+        #     # 处理下一页
+        #     handle_papers(next_content)
 
-            # 处理下一页
-            handle_papers(next_content)
 
-
-def handle_papers(papers_content=''):
+def handle_papers(soup):
     """
     处理查询得到的论文列表及论文详细
     :param papers_content:
     :return:
     """
-    base_uri = 'http://www.cnki.net'
+    try:
+        table_soup = soup.find('table', {'class': 'GridTableContent'})
+        if table_soup:
+            table_tr_list = table_soup.find_all('tr', {'bgcolor': True})
 
-    if not papers_content:
-        return
+            if not table_tr_list:
+                return
 
-    soup = BeautifulSoup(papers_content, 'lxml')
+            i = 0
+            for table_tr in table_tr_list:
+                # 获取论文的部分字段
+                try:
+                    table_td_list = table_tr.find_all('td')
 
-    table_tr_list = soup.find('table', {'class': 'GridTableContent'}).find_all('tr', {'bgcolor': True})
-    for table_tr in table_tr_list:
-        # 获取论文的部分字段
-        table_td_list = table_tr.find_all('td')
-        link = table_td_list[1].find('a', {'href': True})
-        href = link.get("href")
-        new_href = href.replace('kns', 'KCMS', 1)
-        detail_url = "%s%s" % (base_uri, new_href)
-        author = table_td_list[2].get_text().strip()
-        author = author.replace(' ', '')
-        publisher = table_td_list[3].get_text().strip()
-        pubdate = table_td_list[4].get_text().strip()
-        paper_type = table_td_list[5].get_text().strip()
+                    link = table_td_list[1].find('a', {'href': True})
+                    href = link.get("href")
+                    new_href = href.replace('kns', 'KCMS', 1)
+                    detail_url = "%s%s" % (BASE_URI, new_href)
+                    author = table_td_list[2].get_text().strip()
+                    author = author.replace(' ', '')
+                    publisher = table_td_list[3].get_text().strip()
+                    pubdate = table_td_list[4].get_text().strip()
+                    paper_type = table_td_list[5].get_text().strip()
 
-        # 从内容中获取部分字段
-        detail_resp = urllib2.urlopen(urllib2.Request(detail_url, headers=CNKI_COMMON_HEADERS))
-        detail_content = detail_resp.read()
-        data = detail_paper(detail_content)
+                    # 从内容中获取部分字段
+                    detail_resp = urllib2.urlopen(urllib2.Request(detail_url, headers=CNKI_COMMON_HEADERS))
+                    detail_content = detail_resp.read()
 
-        if not data:
-            continue
+                    data = detail_paper(detail_content)
+                    if not data:
+                        continue
 
-        print "title: %s" % data['title']
+                    i += 1
+                    # 合并字段
+                    data['link'] = detail_url
+                    if ':' in pubdate:
+                        time_format = '%Y-%m-%d %H:%M'
+                    else:
+                        time_format = '%Y-%m-%d'
+                    data['pubdate'] = int(time.mktime(time.strptime(pubdate, time_format)))
+                    data['paper_type'] = paper_type
+                    if not data['author']:
+                        data['author'] = author
+                    if not data['journal']:
+                        data['journal'] = publisher
+                    if not data['period']:
+                        data['period'] = pubdate
 
-        # 合并字段
-        data['link'] = detail_url
-        if ':' in pubdate:
-            time_format = '%Y-%m-%d %H:%M'
-        else:
-            time_format = '%Y-%m-%d'
-        data['pubdate'] = int(time.mktime(time.strptime(pubdate, time_format)))
-        data['paper_type'] = paper_type
-        if not data['author']:
-            data['author'] = author
-        if not data['journal']:
-            data['journal'] = publisher
-        if not data['period']:
-            data['period'] = pubdate
+                    # 保存第一页的内容到数据库
+                    save_paper(data)
 
-        # 保存第一页的内容到数据库
-        save_paper(data)
+                except Exception as es:
+                    continue
+    except Exception as ex:
+        print ex
 
 
 def analyse_keywords(content, topn=5, withweight=True):
@@ -296,80 +350,83 @@ def detail_paper(detail_content=''):
     if not detail_content:
         return False
 
-    detail_content = detail_content.replace('utf-16', 'utf-8')
-    soup = BeautifulSoup(detail_content, 'lxml')
+    try:
+        detail_content = detail_content.replace('utf-16', 'utf-8')
+        soup = BeautifulSoup(detail_content, 'lxml')
 
-    # Title
-    title_span = soup.find('span', {'id': 'chTitle'})
-    if not title_span:
-        return False
-    title = title_span.get_text().strip()
-    title = title.replace('\n', '')
-    title = title.replace(' ', '')
+        # Title
+        title_span = soup.find('span', {'id': 'chTitle'})
+        if not title_span:
+            return False
+        title = title_span.get_text().strip()
+        title = title.replace('\n', '')
+        title = title.replace(' ', '')
 
-    # Journal
-    journal_soup = soup.find('div', {'class': 'detailLink'})
-    journal = []
-    if journal_soup:
-        journal_a_list = journal_soup.find_all('a', {'onclick': True})
-        for journal_a in journal_a_list:
-            journal.append(journal_a.get_text().strip())
+        # Journal
+        journal_soup = soup.find('div', {'class': 'detailLink'})
+        journal = []
+        if journal_soup:
+            journal_a_list = journal_soup.find_all('a', {'onclick': True})
+            for journal_a in journal_a_list:
+                journal.append(journal_a.get_text().strip())
 
-    # Author
-    author_soup = soup.find('div', {'class': 'author'})
-    if not author_soup:
-        return False
-    authors = []
-    institutions = []
-    if author_soup:
-        author_a_list = author_soup.find_all('a', {'href': True})
-        for author_a in author_a_list:
-            href = author_a.get('href')
-            if href and 'sfield=au' in href:
-                authors.append(author_a.get_text().strip())
-            if href and 'sfield=inst' in href:
-                institutions.append(author_a.get_text().strip())
+        # Author
+        author_soup = soup.find('div', {'class': 'author'})
+        if not author_soup:
+            return False
+        authors = []
+        institutions = []
+        if author_soup:
+            author_a_list = author_soup.find_all('a', {'href': True})
+            for author_a in author_a_list:
+                href = author_a.get('href')
+                if href and 'sfield=au' in href:
+                    authors.append(author_a.get_text().strip())
+                if href and 'sfield=inst' in href:
+                    institutions.append(author_a.get_text().strip())
 
-    # Summary
-    summary_span = soup.find('span', {'id': 'ChDivSummary'})
-    if not summary_span:
-        return False
-    summary = summary_span.get_text().strip()
-    summary = summary.replace(' ', '')
+        # Summary
+        summary_span = soup.find('span', {'id': 'ChDivSummary'})
+        if not summary_span:
+            return False
+        summary = summary_span.get_text().strip()
+        summary = summary.replace(' ', '')
 
-    # Keywords
-    keywords_a_list = soup.find('span', {'id': 'ChDivKeyWord'}).find_all('a')
-    keywords = []
-    for keywords_a in keywords_a_list:
-        keywords.append(keywords_a.get_text().strip())
+        # Keywords
+        keywords_a_list = soup.find('span', {'id': 'ChDivKeyWord'}).find_all('a')
+        keywords = []
+        for keywords_a in keywords_a_list:
+            keywords.append(keywords_a.get_text().strip())
 
-    # Project
-    project_li_list = soup.find_all('div', {'class': 'keywords int5'})
-    project = ''
-    for project_li in project_li_list:
-        text = project_li.get_text().strip()
-        if u'【基金】' in text:
-            text = text.replace(u'【基金】', '')
-            project = text.strip()
-            break
+        # Project
+        project_li_list = soup.find_all('div', {'class': 'keywords int5'})
+        project = ''
+        for project_li in project_li_list:
+            text = project_li.get_text().strip()
+            if u'【基金】' in text:
+                text = text.replace(u'【基金】', '')
+                project = text.strip()
+                break
 
-    analyse_content = u"关键词: %s, 标题: %s, 摘要: %s, 项目: %s" % (', '.join(keywords), title, summary, project)
-    tags = analyse_keywords(analyse_content)
+        analyse_content = u"关键词: %s, 标题: %s, 摘要: %s, 项目: %s" % (', '.join(keywords), title, summary, project)
+        tags = analyse_keywords(analyse_content)
 
-    data = {
-        'title': title,
-        'author': ';'.join(authors),
-        'institution': ';'.join(institutions),
-        'summary': summary,
-        'journal': journal[0] if len(journal) > 0 else '',
-        'period': journal[2] if len(journal) > 2 else '',
-        'keywords': keywords,
-        'project': project,
-        'ctime': int(time.time()),
-        'source': 'cnki',
-        'tags': tags
-    }
-    return data
+        data = {
+            'title': title,
+            'author': ';'.join(authors),
+            'institution': ';'.join(institutions),
+            'summary': summary,
+            'journal': journal[0] if len(journal) > 0 else '',
+            'period': journal[2] if len(journal) > 2 else '',
+            'keywords': keywords,
+            'project': project,
+            'ctime': int(time.time()),
+            'source': 'cnki',
+            'tags': tags
+        }
+        return data
+    except Exception as ex:
+        return {}
 
 
 def save_paper(paper):
@@ -378,13 +435,14 @@ def save_paper(paper):
     :param papers:
     :return:
     """
-    client = db_client(MONGODB)
-    collection = client[DB_NAME][COLLECTION]
-    old_paper = collection.find_one({'title': paper["title"], 'author': paper["author"]})
-    if not old_paper:
-        paper_id = get_next_sequence("paper_id", client)
-        paper["paper_id"] = paper_id
-        collection.save(paper)
+    if paper:
+        client = db_client(MONGODB)
+        collection = client[DB_NAME][COLLECTION]
+        old_paper = collection.find_one({'title': paper["title"], 'author': paper["author"]})
+        if not old_paper:
+            paper_id = get_next_sequence("paper_id", client)
+            paper["paper_id"] = paper_id
+            collection.save(paper)
 
 
 def main(keyword, topK=50):
@@ -397,42 +455,24 @@ def main(keyword, topK=50):
 
     now = int(time.time())
     keywords = {}
-    if keyword:
-        old_keyword = keyword_collection.find_one({'keyword': keyword})
-        if old_keyword:
-            keywords[old_keyword['pref_id']] = {
-                'pref_id': old_keyword['pref_id'],
-                'keyword': old_keyword['keyword'],
-                'weight': old_keyword['weight'],
-                'start_time': old_keyword['start_time'],
-                'end_time': old_keyword['end_time'],
-            }
-        else:
-            keywords[0] = {
-                'pref_id': 0,
-                'keyword': keyword,
-                'weight': 0,
-                'start_time': int(time.time()) - 5 * 365 * 24 * 3600,
-                'end_time': 0,
-            }
-    else:
-        keyword_records = keyword_collection.find({'end_time': {'$lt': now}})
-        for keyword_record in keyword_records:
-            keywords[keyword_record['pref_id']] = {
-                'pref_id': keyword_record['pref_id'],
-                'keyword': keyword_record['keyword'],
-                'weight': keyword_record['weight'],
-                'start_time': keyword_record['start_time'],
-                'end_time': keyword_record['end_time']
-            }
+    keyword_records = keyword_collection.find({'end_time': {'$lt': now}}).sort("end_time", pymongo.ASCENDING)
+    for keyword_record in keyword_records:
+        keywords[keyword_record['pref_id']] = {
+            'pref_id': keyword_record['pref_id'],
+            'keyword': keyword_record['keyword'],
+            'weight': keyword_record['weight'],
+            'start_time': keyword_record['start_time'],
+            'end_time': keyword_record['end_time']
+        }
 
     for new_keyword in keywords.values():
-        # print "keyword: %s " % (new_keyword['keyword'])
         if not new_keyword['end_time']:
             start_time = new_keyword['start_time']
         else:
             start_time = new_keyword['end_time']
-        end_time = start_time + 30 * 24 * 3600
+        end_time = start_time + 5 * 24 * 3600
+        if end_time > now:
+            end_time = now
         fetch_papers(new_keyword['keyword'].encode("utf-8"), start_time, end_time, topK)
         if new_keyword['pref_id']:
             keyword_collection.update({'pref_id': new_keyword['pref_id']}, {"$set": {'end_time': end_time}})
