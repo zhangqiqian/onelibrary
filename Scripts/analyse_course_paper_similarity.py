@@ -95,7 +95,7 @@ def course_paper_similarity(client, courses):
     count = paper_collection.count()
     now = int(time.time())
     while start < count:
-        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
+        papers = paper_collection.find({"ctime": {"$gte": now - 86400}}).sort("paper_id").skip(start).limit(limit)
         for course in courses.values():
             papers.rewind()
             for paper in papers:

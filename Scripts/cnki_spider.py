@@ -293,7 +293,7 @@ def handle_papers(soup):
                     href = link.get("href")
                     new_href = href.replace('kns', 'KCMS', 1)
                     detail_url = "%s%s" % (BASE_URI, new_href)
-                    # print "---- href: %s" % detail_url
+                    # print "---- detail_url: %s" % detail_url
                     author = table_td_list[2].get_text().strip()
                     author = author.replace(' ', '')
                     publisher = table_td_list[3].get_text().strip()
@@ -305,7 +305,6 @@ def handle_papers(soup):
                     detail_content = detail_resp.read()
 
                     data = detail_paper(detail_content)
-                    # print "---- data: %s" % str(data)
                     if not data:
                         continue
 
@@ -369,12 +368,12 @@ def detail_paper(detail_content=''):
         # Title
         title_span = soup.find('span', {'id': 'chTitle'})
         if not title_span:
-            # print "-------- detail: title is null. return False"
+            print "-------- detail: title is null. return False"
             return False
         title = title_span.get_text().strip()
         title = title.replace('\n', '')
         title = title.replace(' ', '')
-
+        # print "-------- title: %s" % title
         # Journal
         journal_soup = soup.find('div', {'class': 'detailLink'})
         journal = []
@@ -383,12 +382,13 @@ def detail_paper(detail_content=''):
             for journal_a in journal_a_list:
                 journal.append(journal_a.get_text().strip())
 
+        # print "-------- journal: %s" % str(journal)
         # Author
         author_soup = soup.find('div', {'class': 'author'})
         if not author_soup:
             author_soup = soup.find('div', {'class': 'summary'})
             if not author_soup:
-                # print "-------- detail: author is null. return False"
+                print "-------- detail: author is null. return False"
                 return False
 
         authors = []
@@ -398,7 +398,12 @@ def detail_paper(detail_content=''):
             for author_a in author_a_list:
                 href = author_a.get('href')
                 if href and 'sfield=au' in href:
-                    authors.append(author_a.get_text().strip())
+                    author = author_a.get_text().strip()
+                    author.replace(';', ',')
+                    author.replace(u'；', ' ')
+                    if not author.strip():
+                        return False
+                    authors.append(author.strip())
                 if href and 'sfield=inst' in href:
                     institutions.append(author_a.get_text().strip())
 
@@ -407,11 +412,12 @@ def detail_paper(detail_content=''):
         if not summary_span:
             summary_span = soup.find('span')
             if not summary_span:
-                # print "-------- detail: summary is null. return False"
+                print "-------- detail: summary is null. return False"
                 return False
         summary = summary_span.get_text().strip()
         summary = summary.replace(' ', '')
 
+        # print "-------- summary: %s" % summary
         # Keywords
         keywords_a_list = soup.find('span', {'id': 'ChDivKeyWord'}).find_all('a')
         keywords = []

@@ -120,7 +120,7 @@ def user_paper_similarity(client, new_members):
     count = paper_collection.count()
     now = int(time.time())
     while start < count:
-        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
+        papers = paper_collection.find({"ctime": {"$gte": now - 86400}}).sort("paper_id").skip(start).limit(limit)
         for new_member in new_members:
             papers.rewind()
             for paper in papers:
@@ -150,6 +150,7 @@ def main():
 
     members = member_collection.find({'uid': {'$gt': 1}, 'status': 1})
     new_members = []
+    paper_new_members = []
     for member in members:
         if 'tags' in member.keys():
             new_members.append({
@@ -158,8 +159,15 @@ def main():
                 'tags': member['tags'],
                 'nickname': member['nickname'],
             })
+            if member['grade'] == 2:
+                paper_new_members.append({
+                    'uid': int(member['uid']),
+                    'mtime': member['mtime'],
+                    'tags': member['tags'],
+                    'nickname': member['nickname'],
+                })
     user_book_similarity(client, new_members)
-    user_paper_similarity(client, new_members)
+    user_paper_similarity(client, paper_new_members)
 
 
 if __name__ == "__main__":
