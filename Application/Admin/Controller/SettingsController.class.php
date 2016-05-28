@@ -174,9 +174,17 @@ class SettingsController extends AdminController {
         $message_id = I('message_id', 0, 'intval');
         $this->assign('message_id', $message_id);
 
-        $mMember = new MemberModel();
-        $members = $mMember->get_member_list();
-        $this->assign('members', $members);
+        $grades = C('USER_GRADES');
+        unset($grades[0]);
+        unset($grades[3]);
+        unset($grades[4]);
+        unset($grades[5]);
+        unset($grades[6]);
+        $this->assign('grades', $grades);
+
+        $majors = C('MAJOR_MAPPING');
+        unset($majors[0]);
+        $this->assign('majors', $majors);
 
         $priorities = C('MESSAGE_PRIORITY');
         $this->assign('priorities', $priorities);
@@ -189,7 +197,8 @@ class SettingsController extends AdminController {
     }
 
     public function message_publish_submit(){
-        $uid = I('user_uid', 0, 'intval');
+        $grade_id = I('grade_id', 0, 'intval');
+        $major_id = I('major_id', 0, 'intval');
         $location_id = I('location_id', 0, 'intval');
         $publish_time = I('publish_time', '', 'trim');
         $expire_time = I('expire_time', '', 'trim');
@@ -209,24 +218,33 @@ class SettingsController extends AdminController {
             $date_time = strtotime($expire_time);
         }
 
-        $publish = array(
-            'user_uid' => $uid,
-            'location_id' => $location_id,
-            'publish_time' => $pub_time,
-            'expire_time' => $date_time,
-            'message_id' => $message_id,
-            'status' => 0,
-            'priority' => $priority,
-            'similarity' => $similarity
-        );
+        $uids = array();
+        if($grade_id > 0 && $major_id > 0){
+            $mMember = new MemberModel();
+            $members = $mMember->get_members_by_grade_major($grade_id, $major_id);
+            foreach ($members as $member) {
+                $uids[] = $member['uid'];
+            }
+        }else{
+            $uids[] = 0;
+        }
 
         $mPublish = new PublishModel();
-        $ret = $mPublish->insert_publish($publish);
-        if($ret){
-            $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to publish.', 'url' => U('Settings/publish'), 'location' => ''));
-        }else{
-            $this->ajaxReturn(array('errno' => 1, 'errmsg' => 'Failure to publish.', 'url' => '', 'location' => ''));
+        foreach ($uids as $uid) {
+            $publish = array(
+                'user_uid' => $uid,
+                'location_id' => $location_id,
+                'publish_time' => $pub_time,
+                'expire_time' => $date_time,
+                'message_id' => $message_id,
+                'status' => 0,
+                'priority' => $priority,
+                'similarity' => $similarity
+            );
+            $mPublish->insert_publish($publish);
         }
+
+        $this->ajaxReturn(array('errno' => 0, 'errmsg' => 'Success to publish.', 'url' => U('Settings/publish'), 'location' => ''));
     }
 
     public function message_del(){

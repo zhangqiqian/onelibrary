@@ -213,7 +213,7 @@ class CrontabController extends Controller {
                         'weight' => $weight,
                     );
                 }
-                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 50);
+                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 10);
             }
             $user_location['locations'] = $locations;
             $mUserLocation->update_user_location($user['uid'], $user_location);

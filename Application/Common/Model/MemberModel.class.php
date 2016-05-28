@@ -149,6 +149,34 @@ class MemberModel extends MongoModel{
 
     /**
      * 获取普通用户
+     * @return array
+     */
+    public function get_members_by_grade_major($grade_id = 0, $major_id = 0){
+        $map = array(
+            'uid' => array('$ne' => 1),
+            'status' => 1,
+        );
+        if($grade_id > 0){
+            $map['grade'] = $grade_id;
+        }
+        if($major_id > 0){
+            $map['major'] = $major_id;
+        }
+        $members = $this->where($map)->order("uid")->select();
+        if(!$members){
+            $members = array();
+        }
+        $ret = array();
+        foreach ($members as $member) {
+            unset($member['_id']);
+            unset($member['ctime']);
+            $ret[] = $member;
+        }
+        return $ret;
+    }
+
+    /**
+     * 获取普通用户
      * @param $curricula_id
      * @return array
      */
