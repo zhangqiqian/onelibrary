@@ -105,7 +105,7 @@ class CrontabController extends Controller {
         if($user_location){
             $locations = array();
             foreach ($user_location['locations'] as $key => $location) {
-                if($location['type'] == 5){
+                if($location['type'] > 5){
                     continue;
                 }
                 $square_sum = 0;
@@ -169,10 +169,11 @@ class CrontabController extends Controller {
             $locations = $user_location['locations'];
             foreach ($logs as $log) {
                 foreach ($log['location_ids'] as $location_id) {
+                    $location = $mLocation->get_location($location_id);
+                    if(isset($location['location_type']) && $location['location_type'] > 4 ) continue;
                     if(isset($locations[$location_id])){
                         $locations[$location_id]['count'] += 1;
                     }else{
-                        $location = $mLocation->get_location($location_id);
                         $locations[$location_id] = array(
                             'type' => isset($location['location_type']) ? $location['location_type'] : 0,
                             'count' => 1,
@@ -213,7 +214,7 @@ class CrontabController extends Controller {
                         'weight' => $weight,
                     );
                 }
-                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 10);
+                $locations[$location_key]['tags'] = array_slice($map_tags, 0, 5);
             }
             $user_location['locations'] = $locations;
             $mUserLocation->update_user_location($user['uid'], $user_location);
