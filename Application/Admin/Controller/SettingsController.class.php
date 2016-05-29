@@ -219,7 +219,7 @@ class SettingsController extends AdminController {
         }
 
         $uids = array();
-        if($grade_id > 0 && $major_id > 0){
+        if($grade_id > 0 || $major_id > 0){
             $mMember = new MemberModel();
             $members = $mMember->get_members_by_grade_major($grade_id, $major_id);
             foreach ($members as $member) {
