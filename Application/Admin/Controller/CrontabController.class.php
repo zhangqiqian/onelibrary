@@ -529,7 +529,7 @@ class CrontabController extends Controller {
                 continue;
             }
             //查找新的user paper
-            $user_papers = $mUserPaper->get_user_papers($user['uid'], 0, 1);
+            $user_papers = $mUserPaper->get_user_papers($user['uid'], 10, 1);
             //插入新的paper信息
             foreach ($user_papers as $user_paper) {
                 $paper = $mPaper->get_paper($user_paper['paper_id']);
