@@ -117,26 +117,23 @@ def user_paper_similarity(client, new_members):
 
     start = 0
     limit = 1000
-    count = paper_collection.count()
     now = int(time.time())
+    count = paper_collection.count({"ctime": {"$gte": now - 86400}})
     while start < count:
         papers = paper_collection.find({"ctime": {"$gte": now - 86400}}).sort("paper_id").skip(start).limit(limit)
         for new_member in new_members:
             papers.rewind()
             for paper in papers:
-                if (now - paper['ctime']) <= 24 * 3600 or (now - new_member['mtime']) <= 4200:
-                    sim = similarity(new_member['tags'], paper['tags'])
-                    if sim > 10:
-                        record = {
-                            'uid': new_member['uid'],
-                            'paper_id': paper['paper_id'],
-                            'similarity': sim,
-                            'status': 0,
-                            'mtime': now
-                        }
-                        user_paper_collection.find_and_modify({'uid': new_member['uid'], 'paper_id': paper['paper_id'], 'status': 0}, record, True)
-                    else:
-                        user_paper_collection.delete_many({'uid': new_member['uid'], 'paper_id': paper['paper_id'], 'status': 0})
+                sim = similarity(new_member['tags'], paper['tags'])
+                if sim > 10:
+                    record = {
+                        'uid': new_member['uid'],
+                        'paper_id': paper['paper_id'],
+                        'similarity': sim,
+                        'status': 0,
+                        'mtime': now
+                    }
+                    user_paper_collection.find_and_modify({'uid': new_member['uid'], 'paper_id': paper['paper_id']}, record, True)
         start += limit
 
 
