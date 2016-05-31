@@ -150,7 +150,7 @@ class MessageModel extends MongoModel{
      * @return array
      */
     public function get_messages_by_category($category_id){
-        $messages = $this->field('message_id,title')->where(array('category' => $category_id))->order('pubdate desc, message_id desc')->limit(10)->select();
+        $messages = $this->field('message_id,title')->where(array('category' => $category_id, 'message_id' => array('$gt' => 1)))->order('pubdate desc, message_id desc')->limit(10)->select();
         if(!$messages){
             $messages = array();
         }
