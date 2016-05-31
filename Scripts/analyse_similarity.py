@@ -118,22 +118,26 @@ def user_paper_similarity(client, new_members):
     start = 0
     limit = 1000
     now = int(time.time())
-    count = paper_collection.count({"ctime": {"$gte": now - 86400}})
+    count = paper_collection.count() # {"ctime": {"$gte": now - 86400}}
     while start < count:
-        papers = paper_collection.find({"ctime": {"$gte": now - 86400}}).sort("paper_id").skip(start).limit(limit)
+        papers = paper_collection.find().sort("paper_id").skip(start).limit(limit)
         for new_member in new_members:
-            papers.rewind()
-            for paper in papers:
-                sim = similarity(new_member['tags'], paper['tags'])
-                if sim > 10:
-                    record = {
-                        'uid': new_member['uid'],
-                        'paper_id': paper['paper_id'],
-                        'similarity': sim,
-                        'status': 0,
-                        'mtime': now
-                    }
-                    user_paper_collection.find_and_modify({'uid': new_member['uid'], 'paper_id': paper['paper_id']}, record, True)
+            if now - new_member['mtime'] <= 4200:
+                papers.rewind()
+                for paper in papers:
+                    sim = similarity(new_member['tags'], paper['tags'])
+                    if sim > 10:
+                        record = {
+                            'uid': new_member['uid'],
+                            'paper_id': paper['paper_id'],
+                            'similarity': sim,
+                            'status': 0,
+                            'mtime': now
+                        }
+                        user_paper = user_paper_collection.find_one({'uid': new_member['uid'], 'paper_id': paper['paper_id']})
+                        if not user_paper or user_paper['status'] == 0:
+                            user_paper_collection.find_and_modify({'uid': new_member['uid'], 'paper_id': paper['paper_id']}, record, True)
+
         start += limit
 
 
@@ -156,7 +160,7 @@ def main():
                 'tags': member['tags'],
                 'nickname': member['nickname'],
             })
-            if member['grade'] == 2:
+            if member['grade'] > 1:
                 paper_new_members.append({
                     'uid': int(member['uid']),
                     'mtime': member['mtime'],
