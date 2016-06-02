@@ -671,6 +671,19 @@ class SettingsController extends AdminController {
             $courses[$course['section']][$course['week']] = $course;
         }
         $curricula['courses'] = $courses;
+
+        $term_start = $curricula['term_start'];
+        $month = intval(date("m", $term_start));
+        if($month > 8){
+            $term_year_start = intval(date("Y", $term_start));
+            $term_year_end = $term_year_start + 1;
+        }else{
+            $term_year_end = intval(date("Y", $term_start));
+            $term_year_start = $term_year_end - 1;
+        }
+        $curricula['term_year_start'] = $term_year_start;
+        $curricula['term_year_end'] = $term_year_end;
+
         $this->assign('curricula', $curricula);
         $this->display();
     }

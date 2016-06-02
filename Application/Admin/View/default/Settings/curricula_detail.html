@@ -33,7 +33,7 @@
           </div>
           <hr class="featurette-divider">
             <div style="margin-bottom: 5px;">
-                <span class="text-primary pull-right">{$curricula.term_start|date="Y年",###} 第{$curricula.term}学期 (第{$curricula.term_start|date="W",###}周 ~ 第{$curricula.term_end|date="W",###}周)</span>
+                <span class="text-primary pull-right">{$curricula.term_year_start} - {$curricula.term_year_end}学年 第{$curricula.term}学期 (第{$curricula.term_start|date="W",###} ~ {$curricula.term_end|date="W",###}周)</span>
                 <span class="text-primary">班级: {$curricula.major} {$curricula.grade}级{$curricula.class}班</span>
             </div>
             <div class="table-responsive">
