@@ -68,6 +68,12 @@ return array(
         0 => '其他',
     ),
 
+    'STATUS_NAMES' => array(
+        0 => "推送未接收",
+        1 => "接收但未读",
+        2 => "接收并已读"
+    ),
+
     /* 1 -> section 1/2: 08:00~09:40; 2 -> section 3/4: 10:00~11:40; 3 -> section 5/6: 14:10~15:50; 4 -> section 7/8: 16:10~17:50 */
     'COURSE_SECTION_TIME_MAPPING' => array(
         1 => array(

@@ -151,6 +151,40 @@ class PublishModel extends MongoModel{
     }
 
     /**
+     * 获取所有publish by status
+     * @param int $uid
+     * @param int $status
+     * @param int $start_time
+     * @param int $end_time
+     * @return array
+     */
+    public function get_publish_count_by_status($uid, $status = 0, $start_time = 0, $end_time = 0){
+        if($end_time == 0){
+            $end_time = time();
+        }
+        $params = array(
+            'user_uid' => $uid,
+            'status' => $status, //no read
+            'ctime' => array('$gte' => $start_time, '$lte' => $end_time)
+        );
+
+        $publish_count = $this->where($params)->count();
+        return $publish_count;
+    }
+
+    public function get_all_publishes($start_time = 0, $end_time = 0){
+        if($end_time == 0){
+            $end_time = time();
+        }
+        $params = array(
+            'ctime' => array('$gte' => $start_time, '$lte' => $end_time)
+        );
+
+        $publishes = $this->field('user_uid,status,publish_time')->where($params)->order('publish_time')->select();
+        return array_values($publishes);
+    }
+
+    /**
      * 获取所有publish by user features
      * $map = array(
      *       'or' => array(

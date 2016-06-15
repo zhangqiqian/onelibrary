@@ -1,0 +1,331 @@
+<extend name="Base/common-nofooter"/>
+
+<block name="body">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li>
+                    <a href="{:U('Dashboard/index')}">Overview</a>
+                </li>
+                <li class="active">
+                    <a href="{:U('Dashboard/user')}">User</a>
+                </li>
+                <li>
+                    <a href="{:U('Dashboard/message')}">Message</a>
+                </li>
+                <li>
+                    <a href="{:U('Dashboard/location')}">Location</a>
+                </li>
+            </ul>
+    </div>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="row">
+            <ol class="breadcrumb">
+                <li><a href="{:U('Dashboard/index')}">Dashboard</a></li>
+                <li class="active">User</li>
+            </ol>
+        </div>
+        <div class="row">
+            <h3>用户概览</h3>
+            <hr class="featurette-divider">
+            <div class="col-sm-6" style="padding-left: 0;">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                        <h3 class="panel-title">用户总数</h3>
+                    </div>
+                    <div class="panel-body" style="min-height: 500px;">
+                        <div id="user_total" style="height:300px"></div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th width="50%">名称</th>
+                                <th>值</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <foreach name="table_total_users" item="user">
+                                <tr>
+                                    <td>{$user.name}</td>
+                                    <td>{$user.y}</td>
+                                </tr>
+                            </foreach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6" style="padding-right: 0;">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                        <h3 class="panel-title">按角色分</h3>
+                    </div>
+                    <div id="grade" class="panel-body" style="min-height: 500px;">
+                        <div id="user_by_grade" style="height:300px"></div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th width="50%">名称</th>
+                                <th>值</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <foreach name="table_grade_users" item="grade">
+                                <tr>
+                                    <td>{$grade.name}</td>
+                                    <td>{$grade.y}</td>
+                                </tr>
+                            </foreach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" style="padding-left:0;padding-right: 0;">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                        <h3 class="panel-title">按专业分</h3>
+                    </div>
+                    <div class="panel-body" style="min-height: 500px;">
+                        <div id="user_by_major" style="height:300px"></div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th width="50%">名称</th>
+                                <th>值</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <foreach name="table_major_users" item="major">
+                                <tr>
+                                    <td>{$major.name}</td>
+                                    <td>{$major.y}</td>
+                                </tr>
+                            </foreach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3>用户详细</h3>
+            <hr class="featurette-divider">
+            <div class="col-sm-12" style="padding-left: 0;padding-right: 0;">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                        <h3 class="panel-title">用户接收推送消息数</h3>
+                    </div>
+                    <div class="panel-body" style="min-height: 300px;">
+                        <div id="user_recieved"></div>
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead>
+                            <tr>
+                                <th width="60">用户ID</th>
+                                <th width="200">用户名</th>
+                                <th width="25%">登录数</th>
+                                <th width="25%">推送未接收数</th>
+                                <th width="25%">接收但未读数</th>
+                                <th width="25%">接收比已读数</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <foreach name="table_users" item="user">
+                                <tr <eq name="user.active" value="1">class="success"</eq>>
+                                    <td>{$user.uid}</td>
+                                    <td>{$user.name}</td>
+                                    <td>{$user.login_count}</td>
+                                    <td>{$user.pushed_count}</td>
+                                    <td>{$user.received_count}</td>
+                                    <td>{$user.read_count}</td>
+                                </tr>
+                            </foreach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="__STATIC__/highcharts/highcharts.js"></script>
+    <script src="__STATIC__/highcharts/exporting.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        $('#user_total').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            credits:{
+                enabled: false
+            },
+            title: {
+                text: '活跃用户占总用户比例'
+            },
+            tooltip: {
+                pointFormat: '<b>{point.y}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    /*allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true*/
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                colorByPoint: true,
+                data: {$chart_active_users}
+            }]
+        });
+
+        $('#user_by_grade').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            credits:{
+                enabled: false
+            },
+            title: {
+                text: '按角色分用户占比'
+            },
+            tooltip: {
+                pointFormat: '<b>{point.y}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    /*allowPointSelect: true,
+                     cursor: 'pointer',
+                     dataLabels: {
+                     enabled: false
+                     },
+                     showInLegend: true*/
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                colorByPoint: true,
+                data: {$chart_grade_users}
+            }]
+        });
+
+        $('#user_by_major').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            credits:{
+                enabled: false
+            },
+            title: {
+                text: '按专业分用户占比'
+            },
+            tooltip: {
+                pointFormat: '<b>{point.y}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    /*allowPointSelect: true,
+                     cursor: 'pointer',
+                     dataLabels: {
+                     enabled: false
+                     },
+                     showInLegend: true*/
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                colorByPoint: true,
+                data: {$chart_major_users}
+            }]
+        });
+
+        $('#user_recieved').highcharts({
+            chart: {
+                type: 'bar',
+                height: 6000
+            },
+            credits:{
+                enabled: false
+            },
+            title: {
+                text: '用户接收信息统计'
+            },
+            subtitle: {
+                text: '按用户接收数与已读数之和排序'
+            },
+            xAxis: {
+                categories: {$chart_user_names}
+            },
+            yAxis: {
+                min: 0,
+                title:{
+                    text: '总数'
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black'
+                        }
+                    }
+                }
+            },
+            series: {$chart_users}
+        });
+    });
+  </script>
+</block>

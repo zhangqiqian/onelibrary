@@ -58,6 +58,15 @@ class PaperModel extends MongoModel{
     }
 
     /**
+     * 获取paper个数
+     * @return int
+     */
+    public function get_paper_count(){
+        $paper_count = $this->count();
+        return $paper_count;
+    }
+
+    /**
      * 获取paper信息
      * @param $paper_id
      * @return array

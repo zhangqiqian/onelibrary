@@ -163,6 +163,21 @@ class MessageModel extends MongoModel{
         return $ret;
     }
 
+    public function get_message_count_by_category($category_id, $start_time = 0, $end_time = 0){
+        if($end_time == 0){
+            $end_time = time();
+        }
+
+        $params = array(
+            'category' => $category_id,
+            'ctime' => array('$gte' => $start_time, '$lte' => $end_time)
+        );
+
+        $message_count = $this->where($params)->count();
+        return $message_count;
+    }
+
+
     /**
      * 更新Message
      * @param $message_id

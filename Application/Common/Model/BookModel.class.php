@@ -56,6 +56,15 @@ class BookModel extends MongoModel{
     }
 
     /**
+     * 获取所有book个数
+     * @return array
+     */
+    public function get_book_count(){
+        $book_count = $this->count();
+        return $book_count;
+    }
+
+    /**
      * 获取book信息
      * @param $book_id
      * @return array
