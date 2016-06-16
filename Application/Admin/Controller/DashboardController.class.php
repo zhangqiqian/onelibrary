@@ -14,6 +14,7 @@ use Common\Model\MessageModel;
 use Common\Model\PaperModel;
 use Common\Model\PublishModel;
 use Common\Model\MemberModel;
+use Common\Model\UserLocationLogModel;
 use Think\Controller;
 
 class DashboardController extends AdminController {
@@ -349,6 +350,265 @@ class DashboardController extends AdminController {
     }
 
     public function location(){
+        $mPublish = new PublishModel();
+        $mMember = new MemberModel();
+        $mMessage = new MessageModel();
+        $mLocation = new LocationModel();
+        $mUserLocationLog = new UserLocationLogModel();
+
+        $start_time = 0;//strtotime("2016-05-15 UTC");
+        $end_time = 0;//strtotime("2016-06-12 UTC");
+
+        //locations by category
+        $location_types = C('LOCATION_TYPE_MAPPING');
+        $type_locations = array();
+        $location_names = array();
+        $location_total = 0;
+        $locations = $mLocation->get_locations_by_type(array(1,2,3,4,7));
+        foreach ($locations as $location) {
+            if(isset($type_locations[$location['location_type']])){
+                $type_locations[$location['location_type']]['y'] += 1;
+            }else{
+                $type_locations[$location['location_type']] = array(
+                    'name' => $location_types[$location['location_type']],
+                    'y' => 1
+                );
+            }
+            $location_total += 1;
+            $location_names[$location['location_id']] = array(
+                'name' => $location['name'],
+                'longitude' => $location['longitude'],
+                'latitude' => $location['latitude']
+            );
+        }
+
+        $this->assign('chart_type_locations', json_encode(array_values($type_locations)));
+        $type_locations[] = array(
+            'name' => '总数',
+            'y' => $location_total
+        );
+        $this->assign('table_type_locations', $type_locations);
+
+
+        $user_grades = array();
+        $member_list = $mMember->get_members();
+        foreach ($member_list as $member) {
+            $user_grades[$member['uid']] = $member['grade'];
+        }
+
+        //location stat
+        $locations_stat = array();
+        $temp_locations_total = array();
+        $locations_total = array();
+        $location_logs = $mUserLocationLog->get_user_location_logs();
+        foreach ($location_logs as $location_log) {
+            foreach ($location_log['location_ids'] as $location_id) {
+                if(isset($location_names[$location_id])){
+                    if(isset($locations_stat[$location_id])){
+                        $locations_stat[$location_id]['z'] += 1;
+                    }else{
+                        $locations_stat[$location_id] = array(
+                            'name' => $location_names[$location_id]['name'],
+                            'x' => $location_names[$location_id]['longitude'],
+                            'y' => $location_names[$location_id]['latitude'],
+                            'z' => 1
+                        );
+                    }
+
+                    if(isset($temp_locations_total[$location_id])){
+                        $temp_locations_total[$location_id] += 1;
+                        $locations_total[$location_id]['count'] += 1;
+                    }else{
+                        $temp_locations_total[$location_id] = 1;
+                        $locations_total[$location_id] = array(
+                            'name' => $location_names[$location_id]['name'],
+                            'type' => $user_grades[$location_log['uid']],
+                            'count' => 1,
+                        );
+                    }
+                }
+            }
+        }
+        $this->assign('chart_locations_stat', json_encode(array_values($locations_stat)));
+
+        //top5 locations total
+        arsort($temp_locations_total);
+        $temp_locations_total = array_slice($temp_locations_total, 0, 5, true);
+        $top_location_names = array();
+        $top_location_values = array();
+        $table_top_location = array();
+
+        foreach ($temp_locations_total as $key => $count) {
+            $top_location_names[] = $locations_total[$key]['name'];
+            $top_location_values[] = $count;
+            $table_top_location[] = array(
+                'name' => $locations_total[$key]['name'],
+                'y' => $count
+            );
+        }
+        $this->assign('chart_top_location_names', json_encode($top_location_names));
+        $this->assign('chart_top_location_values', json_encode($top_location_values));
+        $this->assign('table_top_location_total', $table_top_location);
+
+
+        //messages by category
+        $book_message_count = $mMessage->get_message_count_by_category(1, $start_time);
+        $paper_message_count = $mMessage->get_message_count_by_category(2, $start_time);
+        $info_message_count = $mMessage->get_message_count_by_category(4, $start_time);
+        $course_message_count = $mMessage->get_message_count_by_category(7, $start_time);
+        $messages = array(
+            array(
+                'name' => '图书',
+                'y' => $book_message_count,
+            ),
+            array(
+                'name' => '期刊论文',
+                'y' => $paper_message_count,
+            ),
+            array(
+                'name' => '资讯',
+                'y' => $info_message_count,
+            ),
+            array(
+                'name' => '课程',
+                'y' => $course_message_count,
+            ),
+        );
+        $this->assign('chart_messages', json_encode($messages));
+        $this->assign('table_messages', $messages);
+
+        //messages by grade
+        $user_grades = array();
+        $member_list = $mMember->get_members();
+        foreach ($member_list as $member) {
+            $user_grades[$member['uid']] = $member['grade'];
+        }
+
+        $publishes = $mPublish->get_all_publishes($start_time);
+        $undergraduates_status = array();
+        $graduates_status = array();
+        $teachers_status = array();
+        $pushed_status_trend = array();
+        $received_status_trend = array();
+        $read_status_trend = array();
+
+        $status_names = C('STATUS_NAMES');
+        foreach ($publishes as $publish) {
+            if(isset($user_grades[$publish['user_uid']])){
+                $grade = $user_grades[$publish['user_uid']];
+                if($grade == 1){
+                    if(isset($undergraduates_status[$publish['status']])){
+                        $undergraduates_status[$publish['status']]['y'] += 1;
+                    }else{
+                        $undergraduates_status[$publish['status']] = array(
+                            'name' => $status_names[$publish['status']],
+                            'y' => 1
+                        );
+                    }
+                }elseif ($grade == 2){
+                    if(isset($graduates_status[$publish['status']])){
+                        $graduates_status[$publish['status']]['y'] += 1;
+                    }else{
+                        $graduates_status[$publish['status']] = array(
+                            'name' => $status_names[$publish['status']],
+                            'y' => 1
+                        );
+                    }
+                }else{
+                    if(isset($teachers_status[$publish['status']])){
+                        $teachers_status[$publish['status']]['y'] += 1;
+                    }else{
+                        $teachers_status[$publish['status']] = array(
+                            'name' => $status_names[$publish['status']],
+                            'y' => 1
+                        );
+                    }
+                }
+
+                $point_time = intval($publish['publish_time']/86400) * 86400;
+                if($publish['status'] == 0){ //pushed
+                    if(isset($pushed_status_trend[$point_time])){
+                        $pushed_status_trend[$point_time] += 1;
+                    }else{
+                        $pushed_status_trend[$point_time] = 1;
+                    }
+                }elseif ($publish['status'] == 1){ //received
+                    if(isset($received_status_trend[$point_time])){
+                        $received_status_trend[$point_time] += 1;
+                    }else{
+                        $received_status_trend[$point_time] = 1;
+                    }
+                }else{ //read
+                    if(isset($read_status_trend[$point_time])){
+                        $read_status_trend[$point_time] += 1;
+                    }else{
+                        $read_status_trend[$point_time] = 1;
+                    }
+                }
+            }
+        }
+
+        ksort($undergraduates_status);
+        ksort($graduates_status);
+        ksort($teachers_status);
+
+        $total_status = array();
+        foreach ($status_names as $id => $status_name) {
+            $undergraduates_count = isset($undergraduates_status[$id]['y']) ? $undergraduates_status[$id]['y'] : 0;
+            $graduates_count = isset($graduates_status[$id]['y']) ? $graduates_status[$id]['y'] : 0;
+            $teachers_count = isset($teachers_status[$id]['y']) ? $teachers_status[$id]['y'] : 0;
+            $total_status[] = array(
+                'name' => $status_name,
+                'y' => $undergraduates_count + $graduates_count + $teachers_count
+            );
+        }
+
+        $this->assign('chart_total_status', json_encode($total_status));
+        $this->assign('table_total_status', $total_status);
+
+        $this->assign('chart_undergraduate_status', json_encode($undergraduates_status));
+        $this->assign('table_undergraduate_status', $undergraduates_status);
+
+        $this->assign('chart_graduate_status', json_encode($graduates_status));
+        $this->assign('table_graduate_status', $graduates_status);
+
+        $this->assign('chart_teacher_status', json_encode($teachers_status));
+        $this->assign('table_teacher_status', $teachers_status);
+
+        ksort($pushed_status_trend);
+        ksort($received_status_trend);
+        ksort($read_status_trend);
+
+        $new_pushed_status_trend = array();
+        foreach ($pushed_status_trend as $point_time => $val) {
+            $new_pushed_status_trend[] = array($point_time * 1000, $val);
+        }
+
+        $new_received_status_trend = array();
+        foreach ($received_status_trend as $point_time => $val) {
+            $new_received_status_trend[] = array($point_time * 1000, $val);
+        }
+
+        $new_read_status_trend = array();
+        foreach ($read_status_trend as $point_time => $val) {
+            $new_read_status_trend[] = array($point_time * 1000, $val);
+        }
+
+        $series = array(
+            array(
+                'name' => '接收并已读',
+                'data' => $new_read_status_trend,
+            ),
+            array(
+                'name' => '接收但未读',
+                'data' => $new_received_status_trend,
+            ),
+            array(
+                'name' => '推送未接收',
+                'data' => $new_pushed_status_trend,
+            ),
+        );
+        $this->assign('chart_status_trend', json_encode($series));
         $this->display();
     }
 
