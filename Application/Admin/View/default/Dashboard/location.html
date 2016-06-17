@@ -112,7 +112,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <foreach name="table_top_location_total" item="location">
+                                <foreach name="table_top_under_locations" item="location">
                                     <tr>
                                         <td>{$location.name}</td>
                                         <td>{$location.y}</td>
@@ -141,7 +141,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <foreach name="table_top_location_total" item="location">
+                                <foreach name="table_top_graduate_locations" item="location">
                                     <tr>
                                         <td>{$location.name}</td>
                                         <td>{$location.y}</td>
@@ -168,7 +168,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <foreach name="table_top_location_total" item="location">
+                                <foreach name="table_top_teacher_locations" item="location">
                                     <tr>
                                         <td>{$location.name}</td>
                                         <td>{$location.y}</td>
@@ -187,7 +187,7 @@
                     <div class="panel panel-danger">
                         <div class="panel-heading">
                             <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
-                            <h3 class="panel-title">用户位置分布图(Scatter)</h3>
+                            <h3 class="panel-title">用户位置分布图</h3>
                         </div>
                         <div class="panel-body" style="min-height: 300px;">
                             <div id="user_locations"></div>
@@ -198,21 +198,10 @@
                     <div class="panel panel-danger">
                         <div class="panel-heading">
                             <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
-                            <h3 class="panel-title">时间位置分布图(headmap)</h3>
+                            <h3 class="panel-title">时间位置分布图</h3>
                         </div>
                         <div class="panel-body" style="min-height: 300px;">
                             <div id="time_locations"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-12" style="padding-left: 0;padding-right: 0;">
-                    <div class="panel panel-danger">
-                        <div class="panel-heading">
-                            <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
-                            <h3 class="panel-title">位置排序图(treemap)</h3>
-                        </div>
-                        <div class="panel-body" style="min-height: 300px;">
-                            <div id="locations_sort"></div>
                         </div>
                     </div>
                 </div>
@@ -224,6 +213,7 @@
     <script src="__STATIC__/highcharts/highcharts-more.js"></script>
     <script src="__STATIC__/highcharts/no-data-to-display.js"></script>
     <script src="__STATIC__/highcharts/exporting.js"></script>
+    <script src="__STATIC__/highcharts/heatmap.js"></script>
     <script type="text/javascript">
         $(function () {
             $('#locations_by_category').highcharts({
@@ -351,7 +341,7 @@
                     text: '本科生信息推送的Top5位置'
                 },
                 xAxis: {
-                    categories: {$chart_top_location_names}
+                    categories: {$chart_top_under_location_names}
                 },
                 yAxis: {
                     title: {
@@ -369,7 +359,7 @@
                 },
                 series: [{
                     name: '信息推送的位置数',
-                    data: {$chart_top_location_values}
+                    data: {$chart_top_under_location_values}
                 }]
             });
 
@@ -384,7 +374,7 @@
                     text: '研究生信息推送的Top5位置'
                 },
                 xAxis: {
-                    categories: {$chart_top_location_names}
+                    categories: {$chart_top_graduate_location_names}
                 },
                 yAxis: {
                     title: {
@@ -402,7 +392,7 @@
                 },
                 series: [{
                     name: '信息推送的位置数',
-                    data: {$chart_top_location_values}
+                    data: {$chart_top_graduate_location_values}
                 }]
             });
 
@@ -417,7 +407,7 @@
                     text: '教师信息推送的Top5位置'
                 },
                 xAxis: {
-                    categories: {$chart_top_location_names}
+                    categories: {$chart_top_teacher_location_names}
                 },
                 yAxis: {
                     title: {
@@ -435,176 +425,132 @@
                 },
                 series: [{
                     name: '信息推送的位置数',
-                    data: {$chart_top_location_values}
+                    data: {$chart_top_teacher_location_values}
                 }]
             });
 
             $('#user_locations').highcharts({
                 chart: {
-                    height: 300,
-                    type: 'areaspline'
+                    type: 'scatter',
+                    zoomType: 'xy'
                 },
                 credits: {
                     enabled: false
                 },
                 title: {
-                    text: '按状态统计推送信息趋势'
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    areaspline: {
-                        lineWidth: 0.5,
-                        marker: {
-                            enabled: false,
-                            symbol: 'circle',
-                            radius: 2,
-                            states: {
-                                hover: {
-                                    enabled: true
-                                }
-                            }
-                        },
-                        stacking: 'normal'
-                    }
+                    text: '接收推送信息的用户位置分布'
                 },
                 xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                        day: '%m月%e日',
-                        week: '%m月%e日',
-                        month: '%Y年%m月',
-                        year: '%Y年'
-                    }
+                    title: {
+                        enabled: true,
+                        text: '经度'
+                    },
+                    startOnTick: true,
+                    endOnTick: true,
+                    showLastLabel: true
                 },
                 yAxis: {
                     title: {
-                        text: ''
+                        text: '纬度'
                     }
                 },
-                tooltip: {
-                    shared: true
-                    /*formatter: function () {
-                     return Highcharts.dateFormat("%Y-%m-%d", this.x) + "<br/>" + this.series[0].name + ":" + this.y;
-                     }*/
+                plotOptions: {
+                    scatter: {
+                        marker: {
+                            radius: 5,
+                            states: {
+                                hover: {
+                                    enabled: true,
+                                    lineColor: 'rgb(100,100,100)'
+                                }
+                            }
+                        },
+                        states: {
+                            hover: {
+                                marker: {
+                                    enabled: false
+                                }
+                            }
+                        },
+                        tooltip: {
+                            headerFormat: '<b>{series.name}</b><br>',
+                            pointFormat: '{point.x}, {point.y}'
+                        }
+                    }
                 },
-                legend: {
-                    reversed: true
-                },
-                series: {$chart_status_trend}
+                series: [{
+                    name: '本科生',
+                    color: 'rgba(223, 83, 83, .5)',
+                    data: {$chart_under_user_locations},
+                    marker: {
+                        symbol: 'circle'
+                    }
+                }, {
+                    name: '研究生',
+                    color: 'rgba(119, 152, 191, .5)',
+                    data: {$chart_under_user_locations},
+                    marker: {
+                        symbol: 'circle'
+                    }
+                }, {
+                    name: '教师',
+                    color: 'rgba(200, 240, 120, .5)',
+                    data: {$chart_under_user_locations},
+                    marker: {
+                        symbol: 'circle'
+                    }
+                }]
             });
 
             $('#time_locations').highcharts({
                 chart: {
-                    height: 300,
-                    type: 'areaspline'
+                    type: 'heatmap',
+                    marginTop: 40,
+                    marginBottom: 80,
+                    plotBorderWidth: 1,
+                    height: 1500
                 },
                 credits: {
                     enabled: false
                 },
                 title: {
-                    text: '按状态统计推送信息趋势'
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    areaspline: {
-                        lineWidth: 0.5,
-                        marker: {
-                            enabled: false,
-                            symbol: 'circle',
-                            radius: 2,
-                            states: {
-                                hover: {
-                                    enabled: true
-                                }
-                            }
-                        },
-                        stacking: 'normal'
-                    }
+                    text: '接收信息的时间位置分布'
                 },
                 xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                        day: '%m月%e日',
-                        week: '%m月%e日',
-                        month: '%Y年%m月',
-                        year: '%Y年'
-                    }
+                    categories: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
                 },
                 yAxis: {
-                    title: {
-                        text: ''
-                    }
+                    categories: {$chart_time_location_names},
+                    title: null
                 },
-                tooltip: {
-                    shared: true
-                    /*formatter: function () {
-                     return Highcharts.dateFormat("%Y-%m-%d", this.x) + "<br/>" + this.series[0].name + ":" + this.y;
-                     }*/
+                colorAxis: {
+                    min: 0,
+                    minColor: '#FFFFFF',
+                    maxColor: Highcharts.getOptions().colors[0]
                 },
                 legend: {
-                    reversed: true
-                },
-                series: {$chart_status_trend}
-            });
-
-            $('#locations_sort').highcharts({
-                chart: {
-                    height: 300,
-                    type: 'areaspline'
-                },
-                credits: {
-                    enabled: false
-                },
-                title: {
-                    text: '按状态统计推送信息趋势'
-                },
-                subtitle: {
-                    text: ''
-                },
-                plotOptions: {
-                    areaspline: {
-                        lineWidth: 0.5,
-                        marker: {
-                            enabled: false,
-                            symbol: 'circle',
-                            radius: 2,
-                            states: {
-                                hover: {
-                                    enabled: true
-                                }
-                            }
-                        },
-                        stacking: 'normal'
-                    }
-                },
-                xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                        day: '%m月%e日',
-                        week: '%m月%e日',
-                        month: '%Y年%m月',
-                        year: '%Y年'
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: ''
-                    }
+                    align: 'right',
+                    layout: 'vertical',
+                    margin: 0,
+                    verticalAlign: 'top',
+                    y: 25,
+                    symbolHeight: 280
                 },
                 tooltip: {
-                    shared: true
-                    /*formatter: function () {
-                     return Highcharts.dateFormat("%Y-%m-%d", this.x) + "<br/>" + this.series[0].name + ":" + this.y;
-                     }*/
+                    formatter: function () {
+                        return '<b>' + this.series.yAxis.categories[this.point.y] + '</b><br>在 <b>' + this.series.xAxis.categories[this.point.x] + '</b><br>推送消息 <b>' +
+                                this.point.value + '</b> 条';
+                    }
                 },
-                legend: {
-                    reversed: true
-                },
-                series: {$chart_status_trend}
+                series: [{
+                    name: '推送信息时间位置',
+                    borderWidth: 1,
+                    data: {$chart_time_location_data},
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000'
+                    }
+                }]
             });
         });
     </script>

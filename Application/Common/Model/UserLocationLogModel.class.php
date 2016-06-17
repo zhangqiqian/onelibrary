@@ -36,8 +36,15 @@ class UserLocationLogModel extends MongoModel{
      * 获取所有User Location logs
      * @return array
      */
-    public function get_user_location_logs(){
-        $logs = $this->order('mtime desc')->select();
+    public function get_user_location_logs($start_time = 0, $end_time = 0){
+        if($end_time == 0){
+            $end_time = time();
+        }
+
+        $params = array(
+            'mtime' => array('$gte' => $start_time, '$lte' => $end_time)
+        );
+        $logs = $this->where($params)->order('mtime desc')->select();
         if(!$logs){
             $logs = array();
         }

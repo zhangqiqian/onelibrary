@@ -350,14 +350,12 @@ class DashboardController extends AdminController {
     }
 
     public function location(){
-        $mPublish = new PublishModel();
         $mMember = new MemberModel();
-        $mMessage = new MessageModel();
         $mLocation = new LocationModel();
         $mUserLocationLog = new UserLocationLogModel();
 
-        $start_time = 0;//strtotime("2016-05-15 UTC");
-        $end_time = 0;//strtotime("2016-06-12 UTC");
+        $start_time = strtotime("2016-05-15 UTC");
+        $end_time = strtotime("2016-06-12 UTC");
 
         //locations by category
         $location_types = C('LOCATION_TYPE_MAPPING');
@@ -389,7 +387,6 @@ class DashboardController extends AdminController {
         );
         $this->assign('table_type_locations', $type_locations);
 
-
         $user_grades = array();
         $member_list = $mMember->get_members();
         foreach ($member_list as $member) {
@@ -399,8 +396,17 @@ class DashboardController extends AdminController {
         //location stat
         $locations_stat = array();
         $temp_locations_total = array();
-        $locations_total = array();
-        $location_logs = $mUserLocationLog->get_user_location_logs();
+        $temp_locations_under = array();
+        $temp_locations_graduate = array();
+        $temp_locations_teacher = array();
+
+        $under_user_locations = array();
+        $graduate_user_locations = array();
+        $teacher_user_locations = array();
+
+        $time_locations = array();
+
+        $location_logs = $mUserLocationLog->get_user_location_logs($start_time, $end_time);
         foreach ($location_logs as $location_log) {
             foreach ($location_log['location_ids'] as $location_id) {
                 if(isset($location_names[$location_id])){
@@ -417,18 +423,50 @@ class DashboardController extends AdminController {
 
                     if(isset($temp_locations_total[$location_id])){
                         $temp_locations_total[$location_id] += 1;
-                        $locations_total[$location_id]['count'] += 1;
                     }else{
                         $temp_locations_total[$location_id] = 1;
-                        $locations_total[$location_id] = array(
-                            'name' => $location_names[$location_id]['name'],
-                            'type' => $user_grades[$location_log['uid']],
-                            'count' => 1,
+                    }
+
+                    if($user_grades[$location_log['uid']] == 1){
+                        $under_user_locations[] = array($location_log['longitude'], $location_log['latitude']);
+                        if(isset($temp_locations_under[$location_id])){
+                            $temp_locations_under[$location_id] += 1;
+                        }else{
+                            $temp_locations_under[$location_id] = 1;
+                        }
+                    }
+                    if($user_grades[$location_log['uid']] == 2){
+                        $graduate_user_locations[] = array($location_log['longitude'], $location_log['latitude']);
+                        if(isset($temp_locations_graduate[$location_id])){
+                            $temp_locations_graduate[$location_id] += 1;
+                        }else{
+                            $temp_locations_graduate[$location_id] = 1;
+                        }
+                    }
+                    if($user_grades[$location_log['uid']] == 7){
+                        $teacher_user_locations[] = array($location_log['longitude'], $location_log['latitude']);
+                        if(isset($temp_locations_teacher[$location_id])){
+                            $temp_locations_teacher[$location_id] += 1;
+                        }else{
+                            $temp_locations_teacher[$location_id] = 1;
+                        }
+                    }
+
+                    $week = intval(date('w', $location_log['mtime']));
+                    if($week == 0){
+                        $week = 7;
+                    }
+                    if(isset($time_locations[$week])){
+                        $time_locations[$week][$location_id] += 1;
+                    }else{
+                        $time_locations[$week] = array(
+                            $location_id => 1
                         );
                     }
                 }
             }
         }
+
         $this->assign('chart_locations_stat', json_encode(array_values($locations_stat)));
 
         //top5 locations total
@@ -437,12 +475,11 @@ class DashboardController extends AdminController {
         $top_location_names = array();
         $top_location_values = array();
         $table_top_location = array();
-
-        foreach ($temp_locations_total as $key => $count) {
-            $top_location_names[] = $locations_total[$key]['name'];
+        foreach ($temp_locations_total as $location_id => $count) {
+            $top_location_names[] = $location_names[$location_id]['name'];
             $top_location_values[] = $count;
             $table_top_location[] = array(
-                'name' => $locations_total[$key]['name'],
+                'name' => $location_names[$location_id]['name'],
                 'y' => $count
             );
         }
@@ -450,167 +487,87 @@ class DashboardController extends AdminController {
         $this->assign('chart_top_location_values', json_encode($top_location_values));
         $this->assign('table_top_location_total', $table_top_location);
 
-
-        //messages by category
-        $book_message_count = $mMessage->get_message_count_by_category(1, $start_time);
-        $paper_message_count = $mMessage->get_message_count_by_category(2, $start_time);
-        $info_message_count = $mMessage->get_message_count_by_category(4, $start_time);
-        $course_message_count = $mMessage->get_message_count_by_category(7, $start_time);
-        $messages = array(
-            array(
-                'name' => '图书',
-                'y' => $book_message_count,
-            ),
-            array(
-                'name' => '期刊论文',
-                'y' => $paper_message_count,
-            ),
-            array(
-                'name' => '资讯',
-                'y' => $info_message_count,
-            ),
-            array(
-                'name' => '课程',
-                'y' => $course_message_count,
-            ),
-        );
-        $this->assign('chart_messages', json_encode($messages));
-        $this->assign('table_messages', $messages);
-
-        //messages by grade
-        $user_grades = array();
-        $member_list = $mMember->get_members();
-        foreach ($member_list as $member) {
-            $user_grades[$member['uid']] = $member['grade'];
-        }
-
-        $publishes = $mPublish->get_all_publishes($start_time);
-        $undergraduates_status = array();
-        $graduates_status = array();
-        $teachers_status = array();
-        $pushed_status_trend = array();
-        $received_status_trend = array();
-        $read_status_trend = array();
-
-        $status_names = C('STATUS_NAMES');
-        foreach ($publishes as $publish) {
-            if(isset($user_grades[$publish['user_uid']])){
-                $grade = $user_grades[$publish['user_uid']];
-                if($grade == 1){
-                    if(isset($undergraduates_status[$publish['status']])){
-                        $undergraduates_status[$publish['status']]['y'] += 1;
-                    }else{
-                        $undergraduates_status[$publish['status']] = array(
-                            'name' => $status_names[$publish['status']],
-                            'y' => 1
-                        );
-                    }
-                }elseif ($grade == 2){
-                    if(isset($graduates_status[$publish['status']])){
-                        $graduates_status[$publish['status']]['y'] += 1;
-                    }else{
-                        $graduates_status[$publish['status']] = array(
-                            'name' => $status_names[$publish['status']],
-                            'y' => 1
-                        );
-                    }
-                }else{
-                    if(isset($teachers_status[$publish['status']])){
-                        $teachers_status[$publish['status']]['y'] += 1;
-                    }else{
-                        $teachers_status[$publish['status']] = array(
-                            'name' => $status_names[$publish['status']],
-                            'y' => 1
-                        );
-                    }
-                }
-
-                $point_time = intval($publish['publish_time']/86400) * 86400;
-                if($publish['status'] == 0){ //pushed
-                    if(isset($pushed_status_trend[$point_time])){
-                        $pushed_status_trend[$point_time] += 1;
-                    }else{
-                        $pushed_status_trend[$point_time] = 1;
-                    }
-                }elseif ($publish['status'] == 1){ //received
-                    if(isset($received_status_trend[$point_time])){
-                        $received_status_trend[$point_time] += 1;
-                    }else{
-                        $received_status_trend[$point_time] = 1;
-                    }
-                }else{ //read
-                    if(isset($read_status_trend[$point_time])){
-                        $read_status_trend[$point_time] += 1;
-                    }else{
-                        $read_status_trend[$point_time] = 1;
-                    }
-                }
-            }
-        }
-
-        ksort($undergraduates_status);
-        ksort($graduates_status);
-        ksort($teachers_status);
-
-        $total_status = array();
-        foreach ($status_names as $id => $status_name) {
-            $undergraduates_count = isset($undergraduates_status[$id]['y']) ? $undergraduates_status[$id]['y'] : 0;
-            $graduates_count = isset($graduates_status[$id]['y']) ? $graduates_status[$id]['y'] : 0;
-            $teachers_count = isset($teachers_status[$id]['y']) ? $teachers_status[$id]['y'] : 0;
-            $total_status[] = array(
-                'name' => $status_name,
-                'y' => $undergraduates_count + $graduates_count + $teachers_count
+        //top 5 under locations
+        arsort($temp_locations_under);
+        $temp_locations_under = array_slice($temp_locations_under, 0, 5, true);
+        $top_under_location_names = array();
+        $top_under_location_values = array();
+        $table_top_under_locations = array();
+        foreach ($temp_locations_under as $location_id => $count) {
+            $top_under_location_names[] = $location_names[$location_id]['name'];
+            $top_under_location_values[] = $count;
+            $table_top_under_locations[] = array(
+                'name' => $location_names[$location_id]['name'],
+                'y' => $count
             );
         }
+        $this->assign('chart_top_under_location_names', json_encode($top_under_location_names));
+        $this->assign('chart_top_under_location_values', json_encode($top_under_location_values));
+        $this->assign('table_top_under_locations', $table_top_under_locations);
 
-        $this->assign('chart_total_status', json_encode($total_status));
-        $this->assign('table_total_status', $total_status);
-
-        $this->assign('chart_undergraduate_status', json_encode($undergraduates_status));
-        $this->assign('table_undergraduate_status', $undergraduates_status);
-
-        $this->assign('chart_graduate_status', json_encode($graduates_status));
-        $this->assign('table_graduate_status', $graduates_status);
-
-        $this->assign('chart_teacher_status', json_encode($teachers_status));
-        $this->assign('table_teacher_status', $teachers_status);
-
-        ksort($pushed_status_trend);
-        ksort($received_status_trend);
-        ksort($read_status_trend);
-
-        $new_pushed_status_trend = array();
-        foreach ($pushed_status_trend as $point_time => $val) {
-            $new_pushed_status_trend[] = array($point_time * 1000, $val);
+        //top 5 graduate locations
+        arsort($temp_locations_graduate);
+        $temp_locations_graduate = array_slice($temp_locations_graduate, 0, 5, true);
+        $top_graduate_location_names = array();
+        $top_graduate_location_values = array();
+        $table_top_graduate_locations = array();
+        foreach ($temp_locations_graduate as $location_id => $count) {
+            $top_graduate_location_names[] = $location_names[$location_id]['name'];
+            $top_graduate_location_values[] = $count;
+            $table_top_graduate_locations[] = array(
+                'name' => $location_names[$location_id]['name'],
+                'y' => $count
+            );
         }
+        $this->assign('chart_top_graduate_location_names', json_encode($top_graduate_location_names));
+        $this->assign('chart_top_graduate_location_values', json_encode($top_graduate_location_values));
+        $this->assign('table_top_graduate_locations', $table_top_graduate_locations);
 
-        $new_received_status_trend = array();
-        foreach ($received_status_trend as $point_time => $val) {
-            $new_received_status_trend[] = array($point_time * 1000, $val);
+        //top 5 teacher locations
+        arsort($temp_locations_teacher);
+        $temp_locations_teacher = array_slice($temp_locations_teacher, 0, 5, true);
+        $top_teacher_location_names = array();
+        $top_teacher_location_values = array();
+        $table_top_teacher_locations = array();
+        foreach ($temp_locations_teacher as $location_id => $count) {
+            $top_teacher_location_names[] = $location_names[$location_id]['name'];
+            $top_teacher_location_values[] = $count;
+            $table_top_teacher_locations[] = array(
+                'name' => $location_names[$location_id]['name'],
+                'y' => $count
+            );
         }
+        $this->assign('chart_top_teacher_location_names', json_encode($top_teacher_location_names));
+        $this->assign('chart_top_teacher_location_values', json_encode($top_teacher_location_values));
+        $this->assign('table_top_teacher_locations', $table_top_teacher_locations);
 
-        $new_read_status_trend = array();
-        foreach ($read_status_trend as $point_time => $val) {
-            $new_read_status_trend[] = array($point_time * 1000, $val);
+        //user locations
+        $this->assign('chart_under_user_locations', json_encode($under_user_locations));
+        $this->assign('chart_graduate_user_locations', json_encode($graduate_user_locations));
+        $this->assign('chart_teacher_user_locations', json_encode($teacher_user_locations));
+
+        //time locations
+        $weeks = array(1,2,3,4,5,6,7);
+        $time_location_data = array();
+        $time_location_names = array();
+        foreach ($location_names as $location_id => $location) {
+            $time_location_names[$location_id] = $location['name'];
         }
+        foreach ($weeks as $week) {
+            $i = $week - 1;
+            $j = 0;
+            foreach ($time_location_names as $location_id => $name) {
+                $count = 0;
+                if(isset($time_locations[$week][$location_id])){
+                    $count = $time_locations[$week][$location_id];
+                }
+                $time_location_data[] = array($i, $j, $count);
+                $j += 1;
+            }
+        }
+        $this->assign('chart_time_location_names', json_encode(array_values($time_location_names)));
+        $this->assign('chart_time_location_data', json_encode($time_location_data));
 
-        $series = array(
-            array(
-                'name' => '接收并已读',
-                'data' => $new_read_status_trend,
-            ),
-            array(
-                'name' => '接收但未读',
-                'data' => $new_received_status_trend,
-            ),
-            array(
-                'name' => '推送未接收',
-                'data' => $new_pushed_status_trend,
-            ),
-        );
-        $this->assign('chart_status_trend', json_encode($series));
         $this->display();
     }
-
-
 }
