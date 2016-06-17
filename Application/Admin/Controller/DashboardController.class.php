@@ -34,8 +34,8 @@ class DashboardController extends AdminController {
         $user_total = 0;
         $active_user_count = 0;
 
-        $start_time = 0;//strtotime("2016-05-15 UTC");
-        $end_time = 0;//strtotime("2016-06-12 UTC");
+        $start_time = strtotime("2016-05-15 UTC");
+        $end_time = strtotime("2016-06-12 UTC");
 
         $users = array();
         $grade_users = array();
@@ -45,8 +45,8 @@ class DashboardController extends AdminController {
         $majors = C('MAJOR_MAPPING');
         foreach ($member_list as $member) {
             //user
-            $push_no_received_count = $mPublish->get_publish_count_by_status($member['uid'], 0, $start_time);
-            $received_no_read_count = $mPublish->get_publish_count_by_status($member['uid'], 1, $start_time);
+            $push_no_received_count = $mPublish->get_publish_count_by_status($member['uid'], 0, $start_time, $end_time);
+            $received_no_read_count = $mPublish->get_publish_count_by_status($member['uid'], 1, $start_time, $end_time);
             $read_count = $mPublish->get_publish_count_by_status($member['uid'], 2, $start_time);
 
             $active = 0;
@@ -165,8 +165,8 @@ class DashboardController extends AdminController {
         $mBook = new BookModel();
         $mPaper = new PaperModel();
 
-        $start_time = 0;//strtotime("2016-05-15 UTC");
-        $end_time = 0;//strtotime("2016-06-12 UTC");
+        $start_time = strtotime("2016-05-15 UTC");
+        $end_time = strtotime("2016-06-12 UTC");
 
         //info total stat
         $book_total = $mBook->get_book_count();
@@ -189,10 +189,10 @@ class DashboardController extends AdminController {
         $this->assign('table_infos', $infos);
 
         //messages by category
-        $book_message_count = $mMessage->get_message_count_by_category(1, $start_time);
-        $paper_message_count = $mMessage->get_message_count_by_category(2, $start_time);
-        $info_message_count = $mMessage->get_message_count_by_category(4, $start_time);
-        $course_message_count = $mMessage->get_message_count_by_category(7, $start_time);
+        $book_message_count = $mMessage->get_message_count_by_category(1, $start_time, $end_time);
+        $paper_message_count = $mMessage->get_message_count_by_category(2, $start_time, $end_time);
+        $info_message_count = $mMessage->get_message_count_by_category(4, $start_time, $end_time);
+        $course_message_count = $mMessage->get_message_count_by_category(7, $start_time, $end_time);
         $messages = array(
             array(
                 'name' => '图书',
@@ -225,6 +225,11 @@ class DashboardController extends AdminController {
         $undergraduates_status = array();
         $graduates_status = array();
         $teachers_status = array();
+
+        $under_grade_trend = array();
+        $graduate_grade_trend = array();
+        $teacher_grade_trend = array();
+
         $pushed_status_trend = array();
         $received_status_trend = array();
         $read_status_trend = array();
@@ -233,6 +238,7 @@ class DashboardController extends AdminController {
         foreach ($publishes as $publish) {
             if(isset($user_grades[$publish['user_uid']])){
                 $grade = $user_grades[$publish['user_uid']];
+                $point_time = intval($publish['publish_time']/86400) * 86400;
                 if($grade == 1){
                     if(isset($undergraduates_status[$publish['status']])){
                         $undergraduates_status[$publish['status']]['y'] += 1;
@@ -241,6 +247,13 @@ class DashboardController extends AdminController {
                             'name' => $status_names[$publish['status']],
                             'y' => 1
                         );
+                    }
+                    if($publish['status'] > 0){
+                        if(isset($under_grade_trend[$point_time])){
+                            $under_grade_trend[$point_time] += 1;
+                        }else{
+                            $under_grade_trend[$point_time] = 1;
+                        }
                     }
                 }elseif ($grade == 2){
                     if(isset($graduates_status[$publish['status']])){
@@ -251,6 +264,13 @@ class DashboardController extends AdminController {
                             'y' => 1
                         );
                     }
+                    if($publish['status'] > 0) {
+                        if (isset($graduate_grade_trend[$point_time])) {
+                            $graduate_grade_trend[$point_time] += 1;
+                        } else {
+                            $graduate_grade_trend[$point_time] = 1;
+                        }
+                    }
                 }else{
                     if(isset($teachers_status[$publish['status']])){
                         $teachers_status[$publish['status']]['y'] += 1;
@@ -260,9 +280,15 @@ class DashboardController extends AdminController {
                             'y' => 1
                         );
                     }
+                    if($publish['status'] > 0){
+                        if(isset($teacher_grade_trend[$point_time])){
+                            $teacher_grade_trend[$point_time] += 1;
+                        }else{
+                            $teacher_grade_trend[$point_time] = 1;
+                        }
+                    }
                 }
 
-                $point_time = intval($publish['publish_time']/86400) * 86400;
                 if($publish['status'] == 0){ //pushed
                     if(isset($pushed_status_trend[$point_time])){
                         $pushed_status_trend[$point_time] += 1;
@@ -331,7 +357,7 @@ class DashboardController extends AdminController {
             $new_read_status_trend[] = array($point_time * 1000, $val);
         }
 
-        $series = array(
+        $status_series = array(
             array(
                 'name' => '接收并已读',
                 'data' => $new_read_status_trend,
@@ -345,7 +371,43 @@ class DashboardController extends AdminController {
                 'data' => $new_pushed_status_trend,
             ),
         );
-        $this->assign('chart_status_trend', json_encode($series));
+        $this->assign('chart_status_trend', json_encode($status_series));
+
+        //grade trend
+        ksort($under_grade_trend);
+        ksort($graduate_grade_trend);
+        ksort($teacher_grade_trend);
+
+        $new_under_grade_trend = array();
+        foreach ($under_grade_trend as $point_time => $val) {
+            $new_under_grade_trend[] = array($point_time * 1000, $val);
+        }
+
+        $new_graduate_grade_trend = array();
+        foreach ($graduate_grade_trend as $point_time => $val) {
+            $new_graduate_grade_trend[] = array($point_time * 1000, $val);
+        }
+
+        $new_teacher_grade_trend = array();
+        foreach ($teacher_grade_trend as $point_time => $val) {
+            $new_teacher_grade_trend[] = array($point_time * 1000, $val);
+        }
+
+        $grade_series = array(
+            array(
+                'name' => '教师',
+                'data' => $new_teacher_grade_trend,
+            ),
+            array(
+                'name' => '研究生',
+                'data' => $new_graduate_grade_trend,
+            ),
+            array(
+                'name' => '本科生',
+                'data' => $new_under_grade_trend,
+            )
+        );
+        $this->assign('chart_grade_trend', json_encode($grade_series));
         $this->display();
     }
 

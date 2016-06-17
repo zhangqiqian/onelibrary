@@ -229,6 +229,17 @@
                     </div>
                 </div>
             </div>
+            <div class="col-sm-12" style="padding-left: 0;padding-right: 0;">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <span class="glyphicon glyphicon-option-vertical pull-right" aria-hidden="true"></span>
+                        <h3 class="panel-title">按角色统计接收推送信息趋势</h3>
+                    </div>
+                    <div class="panel-body" style="min-height: 300px;">
+                        <div id="grade_messages_by_day"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -493,14 +504,64 @@
                 },
                 tooltip: {
                     shared: true
-                    /*formatter: function () {
-                        return Highcharts.dateFormat("%Y-%m-%d", this.x) + "<br/>" + this.series[0].name + ":" + this.y;
-                    }*/
                 },
                 legend: {
                     reversed: true
                 },
                 series: {$chart_status_trend}
+            });
+
+            $('#grade_messages_by_day').highcharts({
+                chart: {
+                    height: 300,
+                    type: 'areaspline'
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: '按用户角色统计接收推送信息趋势'
+                },
+                subtitle: {
+                    text: ''
+                },
+                plotOptions: {
+                    areaspline: {
+                        lineWidth: 0.5,
+                        marker: {
+                            enabled: false,
+                            symbol: 'circle',
+                            radius: 2,
+                            states: {
+                                hover: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        stacking: 'normal'
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                        day: '%m月%e日',
+                        week: '%m月%e日',
+                        month: '%Y年%m月',
+                        year: '%Y年'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    }
+                },
+                tooltip: {
+                    shared: true
+                },
+                legend: {
+                    reversed: true
+                },
+                series: {$chart_grade_trend}
             });
         });
     </script>
