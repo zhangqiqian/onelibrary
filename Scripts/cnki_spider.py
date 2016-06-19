@@ -167,14 +167,6 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
         response = urllib2.urlopen(urllib2.Request(search_url, headers=CNKI_COMMON_HEADERS))
         content = response.read()
 
-        # 搜索首页, 获取总页数
-        # mth = re.search(r'浏览1/(\d+)', content)
-        # pages = 1
-        # if mth:
-        #     pages_str = mth.groups()[0]
-        #     pages_str = pages_str.replace(',', '')
-        #     pages = int(pages_str)
-        # print "pages: %s" % pages
         mth = re.search(r'找到&nbsp;([\d,]+)&nbsp;条结果', content)
         total = 0
         if mth:
@@ -182,89 +174,15 @@ def fetch_papers(keyword='', start_time=0, end_time=0, topn=50):
             total_str = total_str.replace(',', '')
             total = int(total_str)
 
-        # print "total: %s" % total
         if not total:
             continue
 
         if not content:
-            # print "content is null in first page."
             continue
         soup = BeautifulSoup(content, 'lxml')
-        # 处理第一页
-        # print "page: 1"
         handle_papers(soup)
-        # print "Finish first page."
 
-        # print "wait for 10s ..."
         time.sleep(5)
-
-        # link = ''
-        # page_bar_table = soup.find('table', {'class': 'pageBar_bottom'})
-        # if page_bar_table:
-        #     page_bar_a_list = soup.find('table', {'class': 'pageBar_bottom'}).find_all('a')
-        #     if not page_bar_a_list:
-        #         return
-        #     for next_page_link in page_bar_a_list:
-        #         text = next_page_link.get_text().strip()
-        #         if text == u'下一页':
-        #             link = next_page_link.get("href")
-
-        # print "Next page url: %s" % link
-        # while link:
-        #     # wait for 10s
-        #     print "-- search next page."
-        #     next_url = "http://epub.cnki.net/kns/brief/brief.aspx%s" % link
-        #     print "-- next url: %s" % next_url
-        #     next_response = urllib2.urlopen(urllib2.Request(next_url, headers=CNKI_COMMON_HEADERS))
-        #     next_content = next_response.read()
-        #     print "-- next content is retrun."
-        #     next_soup = BeautifulSoup(next_content, 'lxml')
-        #     handle_papers(next_soup)
-        #
-        #     link = ''
-        #     next_page_bar_table = soup.find('table', {'class': 'pageBar_bottom'})
-        #     if next_page_bar_table:
-        #         next_page_bar_a_list = soup.find('table', {'class': 'pageBar_bottom'}).find_all('a')
-        #         if not next_page_bar_a_list:
-        #             return
-        #         for next_page_link in next_page_bar_a_list:
-        #             text = next_page_link.get_text().strip()
-        #             print "Finding next page: %s " % text
-        #             if text == u'下一页':
-        #                 link = next_page_link.get("href")
-        #                 print "-- found next page: %s" % link
-        #
-        #     if not link:
-        #         print "-- next page is null."
-        #         break
-        # break
-
-
-        # 搜索下一页
-        # for i in range(pages):
-        #     if i == 0:  # 排除第一页
-        #         continue
-        #     print "page: %d" % (i+1)
-        #     next_params = {
-        #         'curpage': i+1,
-        #         'RecordsPerPage': topn,
-        #         'QueryID': 0,
-        #         'ID': '',
-        #         'turnpage': 1,
-        #         'tpagemode': 'L',
-        #         'dbPrefix': 'SCDB',
-        #         'Fields': '',
-        #         'DisplayMode': 'listmode',
-        #         'PageName': 'ASP.brief_result_aspx'
-        #     }
-        #     next_query_string = urllib.urlencode(next_params)
-        #     next_url = 'http://epub.cnki.net/kns/brief/brief.aspx?' + next_query_string
-        #     print "next url: %s" % next_url
-        #     next_response = urllib2.urlopen(urllib2.Request(next_url, headers=CNKI_COMMON_HEADERS))
-        #     next_content = next_response.read()
-        #
-        #     # 处理下一页
-        #     handle_papers(next_content)
 
 
 def handle_papers(soup):
@@ -279,10 +197,8 @@ def handle_papers(soup):
             table_tr_list = table_soup.find_all('tr', {'bgcolor': True})
 
             if not table_tr_list:
-                # print "---- table is null in table."
                 return
 
-            # print "---- Found %s papers." % len(table_tr_list)
             i = 0
             for table_tr in table_tr_list:
                 # 获取论文的部分字段
@@ -293,7 +209,6 @@ def handle_papers(soup):
                     href = link.get("href")
                     new_href = href.replace('kns', 'KCMS', 1)
                     detail_url = "%s%s" % (BASE_URI, new_href)
-                    # print "---- detail_url: %s" % detail_url
                     author = table_td_list[2].get_text().strip()
                     author = author.replace(' ', '')
                     publisher = table_td_list[3].get_text().strip()
@@ -308,7 +223,6 @@ def handle_papers(soup):
                     if not data:
                         continue
 
-                    # print "---- %s: title: %s" % (i, data['title'])
                     # 合并字段
                     data['link'] = detail_url
                     if ':' in pubdate:
@@ -331,7 +245,6 @@ def handle_papers(soup):
 
                 except Exception as ex:
                     continue
-            # print "---- Finish the page."
     except Exception as ex:
         print ex
 
@@ -368,12 +281,10 @@ def detail_paper(detail_content=''):
         # Title
         title_span = soup.find('span', {'id': 'chTitle'})
         if not title_span:
-            print "-------- detail: title is null. return False"
             return False
         title = title_span.get_text().strip()
         title = title.replace('\n', '')
         title = title.replace(' ', '')
-        # print "-------- title: %s" % title
         # Journal
         journal_soup = soup.find('div', {'class': 'detailLink'})
         journal = []
@@ -382,13 +293,11 @@ def detail_paper(detail_content=''):
             for journal_a in journal_a_list:
                 journal.append(journal_a.get_text().strip())
 
-        # print "-------- journal: %s" % str(journal)
         # Author
         author_soup = soup.find('div', {'class': 'author'})
         if not author_soup:
             author_soup = soup.find('div', {'class': 'summary'})
             if not author_soup:
-                print "-------- detail: author is null. return False"
                 return False
 
         authors = []
@@ -412,12 +321,10 @@ def detail_paper(detail_content=''):
         if not summary_span:
             summary_span = soup.find('span')
             if not summary_span:
-                print "-------- detail: summary is null. return False"
                 return False
         summary = summary_span.get_text().strip()
         summary = summary.replace(' ', '')
 
-        # print "-------- summary: %s" % summary
         # Keywords
         keywords_a_list = soup.find('span', {'id': 'ChDivKeyWord'}).find_all('a')
         keywords = []
@@ -492,7 +399,6 @@ def main(keyword, topK=50):
         }
 
     for new_keyword in keywords.values():
-        # print "keyword: %s " % (new_keyword['keyword'])
         if not new_keyword['end_time']:
             start_time = new_keyword['start_time']
         else:
