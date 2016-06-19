@@ -35,7 +35,7 @@ class DashboardController extends AdminController {
         $active_user_count = 0;
 
         $start_time = strtotime("2016-05-15 UTC");
-        $end_time = strtotime("2016-06-12 UTC");
+        $end_time = strtotime("2016-06-08 UTC");
 
         $users = array();
         $grade_users = array();
@@ -166,7 +166,7 @@ class DashboardController extends AdminController {
         $mPaper = new PaperModel();
 
         $start_time = strtotime("2016-05-15 UTC");
-        $end_time = strtotime("2016-06-12 UTC");
+        $end_time = strtotime("2016-06-08 UTC");
 
         //info total stat
         $book_total = $mBook->get_book_count();
@@ -221,7 +221,7 @@ class DashboardController extends AdminController {
             $user_grades[$member['uid']] = $member['grade'];
         }
 
-        $publishes = $mPublish->get_all_publishes($start_time);
+        $publishes = $mPublish->get_all_publishes($start_time, $end_time);
         $undergraduates_status = array();
         $graduates_status = array();
         $teachers_status = array();
@@ -417,7 +417,7 @@ class DashboardController extends AdminController {
         $mUserLocationLog = new UserLocationLogModel();
 
         $start_time = strtotime("2016-05-15 UTC");
-        $end_time = strtotime("2016-06-12 UTC");
+        $end_time = strtotime("2016-06-08 UTC");
 
         //locations by category
         $location_types = C('LOCATION_TYPE_MAPPING');
