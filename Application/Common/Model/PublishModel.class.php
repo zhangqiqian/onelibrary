@@ -180,7 +180,7 @@ class PublishModel extends MongoModel{
             'ctime' => array('$gte' => $start_time, '$lte' => $end_time)
         );
 
-        $publishes = $this->field('user_uid,status,publish_time')->where($params)->order('publish_time')->select();
+        $publishes = $this->field('user_uid,status,publish_time,mtime')->where($params)->order('publish_time')->select();
         return array_values($publishes);
     }
 
